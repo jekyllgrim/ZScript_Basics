@@ -3,7 +3,7 @@
 ## Contents
 
 1. [Introduction](#Introduction)
-2. [Why ZScript?](#Why_ZScript.md)
+2. [Why ZScript?](Why_ZScript.md)
 3. Classes instead of actors
 4. Anonymous functions
 5. Variables and data types
