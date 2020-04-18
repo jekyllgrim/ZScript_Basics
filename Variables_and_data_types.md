@@ -1,0 +1,136 @@
+# Variables and data types
+
+If you’ve used ACS, you’re probably familiar with variables. Variables can be defined and used in ZScript in a similar manner, but there are more **data types** that they can hold.
+
+A variable is a piece of data that holds some information — a number, a string of text, coordinates, etc. When declaring variables, you give them names which you can use to reference them later. 
+
+Usually custom variables look like this:
+
+```csharp
+string foo;		//creates a variable 'foo' that holds a text string
+int bar;		//creates a variable 'bar' that holds an integer number
+bool tobeornot;	//creates a variable 'tobeornot' that holds a 'true' or 'false' value
+```
+
+Here’s a simple example of declaring a variable in a class and using it:
+
+```csharp
+Class SpeedyImp : DoomImp {
+	int speedups;	//creates a variable that can hold an integer number
+	Default {
+		health 300;
+	}
+	states {
+	Pain:
+		TNT1 A 0 {
+			if (speedups < 5) {	 //check if the value is less than 5
+				speedups += 1;	//if so, increase the value by one
+				speed *= 1.2;	//and multiply imp's speed by 1.2
+			}
+		}
+		goto super::Pain;		// go to the normal Pain state
+	}
+}
+```
+
+[^*Note*]: speed` 
+
+Whenever this Imp is hurt, it'll increase it's speed by x1.2. But this will only happen as long as `speedups` is less than 5, so, no more than 5 times.
+
+A variable like that can be declared anywhere in the class but *not* inside the `Default` or `States` blocks. You can access it anywhere in the class, as well as classes that inherit from `SpeedyImp`. This type of variables is known as **fields**.
+
+A different method is declaring a variable inside an anonymous function. If you do that, that variable will exist only within that anonymous function:
+
+```csharp
+Class WeirdImp : DoomImp {
+	int speedups;			//this variable is available anywhere in the class
+	Default {
+		health 500;
+	}
+	states {
+	Pain:
+		TNT1 A 0 {
+			if (speedups < 10) {
+				speedups++;
+// create a temporary variable s that holds a random value between 0.8 and 1.2:
+				double foo = frandom(0.8,1.2);	
+				speed *= foo;				// multiply speed by that value
+				scale /= foo;				// divide scale by the same value
+			}
+		}
+		goto super::Pain;
+	}
+}
+```
+
+This weird Imp will randomly change its `speed` and `scale` (inversely related) when being hit, up to 10 times. Notice that `speed` is multiplied and `scale` is divided always by the same value: so, *first* a random value between 0.8 and 1.2 is selected, and *then*, after it's chosen, the multiplication and division happen.
+
+Variable `foo` in this example exists only inside that anonymous function and isn't available anywhere else. This is a **local** variable.
+
+Let's summarize the differences between these two types:
+
+### **Class-scope variables aka fields**
+
+- Fields by default can be changed from anywhere (this class, inheriting classes, even other classes if they get access to it—see [Pointers and Casting](#Pointers_and_casting.md)).
+- Fields can’t be declared and receive a value at the same time; when you declare them, they receive a default value (for `int` this is 0), and then you have to modify it somewhere. In the example above `speedups` is initially equal to 0 and it’s increased by 1 when the Imp enters its Pain state for the first time.
+- Fields keep their value while the class exists. That’s why every time we do `speedups += 1`, it increases by 1 and will keep that value throughout whatever the Imp does.
+- Since fields can be accessed from multiple places, it’s a good idea to give them a sensible and understandable name.
+
+### **Local variables**
+
+- Variables declared inside anonymous functions are available only within that function. 
+- They can be declared *and* given a value within the same line.
+- Obviously, whenever the function is executed again, this variable will be re-declared and receive the value. That’s why double `foo = frandom(0.8,1.2)` will create a temporary variable `foo` equal to a random value between 0.8 and 1.2 every time Pain state is entered. (Note that actors can enter the Pain state multiple times simultaneously when hit by multiple attacks, such as a shotgun blast.)
+- Their names aren’t that important, since they won’t exist after the function stops executing. Usually something very short is used.
+
+
+
+## Access modifiers
+
+Usually variables are declared according to the following syntax:
+
+```csharp
+//pseudocode:
+accessmodifier type variablename;
+
+//actual example:
+private int myspecialnumber;
+```
+
+Access modifier lets you restrict access to the variable, defining what can read and change its value. The available options are:
+
+- `protected` — this variable can be changed only from this class and classes inheriting from it but it can’t be changed from anywhere else
+- `private` — this variable is only available to this class and nothing else
+- If left unspecified, the variable can be readable and changeable from anywhere in the game provide you have a pointer to the class that contains it (see [Pointers and Casting](Pointers_and_casting.md))
+
+It's usually not something you need to worry about, but in general, if you *know* that you're declaring a variable that will never be (and shouldn't be) changeable from any other class, it's a good idea to make it `private` (or `protected` if you want it to be accessible to child classes, but not to other classes). This approach is known as [encapsulation](https://en.wikipedia.org/wiki/Encapsulation_(computer_programming)), and the gist of it is: sometimes it's important to be *sure* that this data doesn't get changed accidentally from somewhere else, so better protect it.
+
+
+
+## Data types
+
+Of course, `int` isn't the only existing variable type. In fact, variables can hold multiple types of data. It's important to have a general understanding of these data types, since actor properties and function arguments in Doom are also essentially variables and they also hold data of various types. 
+
+Hence here's a list of various data types. You don't need to immediately learn them by heart, but rather use it as a reference:
+
+- **int** — holds an integer number (such as 1, 2, 3, 10, 500, etc.)
+  - Many existing properties are also integer values, for example `damage` and `health`. That’s why projectiles can’t deal 2.5 points of damage, only 2 or 3.
+- **double** — holds a float-point number (such as 2.5). Note that `float` is also an existing type, but `double` is used in ZScript instead because it’s essentially the same thing but it has higher precision. That’s usually not something you need to worry about as a user, just remember that what’s called **float** in ACS is **double** in ZScript.
+  - There’s a whole lot of values in GZDoom that are doubles. For example, an actor’s `angle`, `height`, `radius`, `speed`, `alpha`, `bouncefactor` are all doubles.
+- **bool** — a boolean variable holds a `true`/`false` value. You can set and check it against true and false, such as `if (foo == true)` (to check if it's true) and `foo = false`; (to set foo to true).
+  - The most common example of a bool is actor flags. While flags in the Default block are a special case, since you can set them with + and -, those flags are internally connected to boolean variables named `bFLAGNAME`. You can change the majority of flags on the fly by using those names; for example, you can do `bSHOOTABLE = false;` to suddenly make an actor unshootable.
+    - A shorthand for `if (foo == true)` is simply `if (foo)`. And `if (foo == false)` can be replaced with `if (!foo)` (`!` means "not" and inverts any check).
+  - No quotation marks! "True" is a string holding the text "True", while `true` is a boolean value.
+- **string** — holds *case-sensitive* text (such as "Adam")
+  - Setting and changing it requires using double quotes: `string foo = "Bar";` creates a variable foo that holds the text "Bar". 
+- **name** — holds *case-insensitive* text (i.e. ‘adam’, ‘Adam’ and ‘ADAM’ are all the same)
+  - In contrast to strings setting and changing them can be done by using *single* quotes. You can still use double quotes, but it’s a good idea not to do that, so that when you look at the variable, you’ll immediately know it’s a `name` and not a `string`. In fact, for custom variables in the majority of cases it’s better to use a name than a string, since there are relatively few applications for case-sensitive text.
+  - A bunch of stuff in GZDoom are names, for example class names and values of various properties such as `Renderstyle` or `Bouncetype`.
+- **vector2** — holds global (map-wise) 2D coordinates of something, i.e. an object’s `pos.x` and `pos.y`; or an object’s velocity in 2D space, i.e. the object’s `vel.x` and `vel.y`. The contents of this type of variable is two float-point values enclosed in parentheses, such as `(15.0,14.2)`. 
+- **vector3** — similar to vector2, but for 3D space, so it can hold `pos.x`, `pos.y` and `pos.z`, or, in case of velocities, `vel.x`, `vel.y` and `vel.z`. An example of a vector3 expression that you can use it your code is `pos` which holds the coordinates of the actor it’s called from.
+  - If you have only a vague understanding of how coordinates work and why they’re called "vectors", it’s very simple: every map has an origin point with coordinates of (0, 0, 0). Any object within a map has coordinates *relative* to that origin point; for example, if an actor is positioned at `(15, 12.3, 0)` that means it’s located 15 units to the east, 12.3 units to the north and 0 units vertically off the map origin point. Since all coordinates are *relative* to that (0,0,0) origin, this makes all coordinates *vectors*; a vector in this context is basically a line that starts at (0,0,0) and ends wherever the object is.
+  - Similarly, velocity is just how quickly an object is changing position per tic (1/35 of a second). If an actor’s velocity is `(15, 0, 1.2)`, every tic it moves 15 units north, 0 units east/west and 1.2 units upward. Basically, actor movement is their vector3 of velocity being constantly added to their vector3 position.
+- **Class<Actor>** — a variable that holds a name of an actor. 
+  - The `<Actor>` part can be substituted for something else, if you want to limit this variable to being able to hold a pointer to only something specific, for example `Class<Ammo>`. 
+- **actor** — a variable that holds an instance of an actor (i.e. a pointer to it). It’s not a name of an actor class, but a *pointer* to a *specific* actor that exists in the level. Learn more in [Pointers and Casting](Pointers_and_casting.md).
+- **state** — holds a reference to a state (such as Spawn, Ready, etc.)

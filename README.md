@@ -4,10 +4,11 @@
 
 1. [Introduction](#Introduction)
 2. [Why ZScript?](Why_ZScript.md)
-3. Classes instead of actors
-4. Anonymous functions
-5. Variables and data types
-   1. Data types
+3. [Classes instead of actors](Classes_instead_of_actors.md)
+4. [Anonymous functions](Anonymous_functions.md)
+5. [Variables and data types](Variables_and_data_types.md)
+   1. [Access modifiers](Variables_and_data_types.md#Access modifiers)
+   2. [Data types](Variables_and_data_types.md#Data types)
 6. Pointers and casting
    1. Basic pointers
    2. Using pointers in ZScript

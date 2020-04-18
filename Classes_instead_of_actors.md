@@ -34,7 +34,8 @@ Actor MyActor {
 ```csharp
 //ZScript:
 
-version "4.2.4" //you need to declare your ZScript version only once, at the top of your main zscript file
+//at the top of your main zscript file you need to declare version (once)
+version "4.2.4" 
 
 Class MyClass : Actor {
 	Default {
