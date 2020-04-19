@@ -7,7 +7,7 @@
 3. [Classes instead of actors](Classes_instead_of_actors.md)
 4. [Anonymous functions](Anonymous_functions.md)
 5. [Variables and data types](Variables_and_data_types.md)
-   1. [[Access modifiers|Variables_and_data_types.md#Access modifiers]]
+   1. [[ Access modifiers | Variables_and_data_types.md#Access modifiers ]]
    2. Data types
 6. Pointers and casting
    1. Basic pointers
