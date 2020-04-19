@@ -23,10 +23,9 @@
 9. Event Handlers
 10. Arrays
     1. Dynamic arrays
+    2. Static arrays
 11. Flow Control
-    1. Operators
-       1. Checks
-       2. Setters
+12. Best Practices and Rules of Thumb
 
 ## Introduction
 

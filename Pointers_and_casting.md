@@ -26,7 +26,7 @@ Class GraciousImp : DoomImp {
 	states {
 	Death:
 		TNT1 A 0 {
-			if (target != null)					 //checks that target exists before doing anything
+			if (target != null)					//checks that target exists before doing anything
 				target.GiveInventory("Shell",20); //if so, give it 20 shells
 		}
 		goto super::Death;
