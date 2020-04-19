@@ -33,7 +33,7 @@ Class SpeedyImp : DoomImp {
 }
 ```
 
-[^*Note*]: speed` 
+[^*Note*]: speed is the default Actor speed property, not a custom variable, you can just read and change it directly.
 
 Whenever this Imp is hurt, it'll increase it's speed by x1.2. But this will only happen as long as `speedups` is less than 5, so, no more than 5 times.
 
@@ -82,6 +82,38 @@ Let's summarize the differences between these two types:
 - They can be declared *and* given a value within the same line.
 - Obviously, whenever the function is executed again, this variable will be re-declared and receive the value. That’s why double `foo = frandom(0.8,1.2)` will create a temporary variable `foo` equal to a random value between 0.8 and 1.2 every time Pain state is entered. (Note that actors can enter the Pain state multiple times simultaneously when hit by multiple attacks, such as a shotgun blast.)
 - Their names aren’t that important, since they won’t exist after the function stops executing. Usually something very short is used.
+
+
+
+## Turning variables into actor properties
+
+You can turn a variable into a custom actor property using this syntax:
+
+```csharp
+//pseudocode:
+type varname;
+property propname : varname;
+```
+
+An actual example:
+
+```csharp
+Class WeirdImp : DoomImp {
+	int speedups;					//defines variable 'speedups'
+	property speedups : speedups;	//assigns the variable to a property with the same name
+	Default {
+		WeirdImp.speedups 10;		//defines the default value for the variable
+	}
+}
+```
+
+Notes on the example:
+
+- This allows you to easily provide a default value for your custom field, which is otherwise impossible.
+- Once you define a property, you need to give it a value in the `Default {}` block (since you're giving it a *default* value).
+- All custom properties need to be prefixed with the name of the class where they are defined: hence we're using `WeirdImp.speedups` and not just `speedups` in the `Default {}` block.
+
+This property will be available to the WeirdImp class, as well as to all classes inheriting from it. If you're planning to have a lot of custom properties for all the actors in your mod, it's a good idea to define a custom version of the Actor class, define all properties in it, and then use it as a base class for all your custom classes.
 
 
 

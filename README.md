@@ -7,18 +7,19 @@
 3. [Classes instead of actors](Classes_instead_of_actors.md)
 4. [Anonymous functions](Anonymous_functions.md)
 5. [Variables and data types](Variables_and_data_types.md)
-   1. Access modifiers
-   2. Data types
-6. Pointers and casting
+   1. Turning variables into actor properties
+   2. Access modifiers
+   3. Data types
+6. [Pointers and casting]([Pointers_and_casting.md)
    1. Basic pointers
    2. Using pointers in ZScript
    3. Casting and custom pointers
    4. Type casting
-7. Custom functions
+7. [Custom functions](Custom_functions.md)
    1. Non-void functions and return values
-   2. Virtual functions
-8. ZScript Virtual Functions
-   1. Common virtual functions
+8. [Virtual Functions](Virtual_functions.md)
+   1. ZScript Virtual Functions
+   2. Common virtual functions
 9. Event Handlers
 10. Arrays
     1. Dynamic arrays
