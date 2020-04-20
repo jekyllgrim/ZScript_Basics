@@ -17,9 +17,9 @@
    4. Type casting
 7. [Custom functions](Custom_functions.md)
    1. Non-void functions and return values
-8. [Virtual Functions](Virtual_functions.md) -- work in progress
+8. [Virtual Functions](Virtual_functions.md)
    1. ZScript Virtual Functions
-   2. Common virtual functions
+   2. Common ZScript virtual functions
 9. Event Handlers
 10. Arrays
     1. Dynamic arrays
