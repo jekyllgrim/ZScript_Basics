@@ -77,4 +77,4 @@ Knowing just these points, you can already start coding in ZScript. Next, we del
 
 
 
-[>> Next: Anonymous functions](Anonymous_functions.md)
+### [>> Next: Anonymous functions](Anonymous_functions.md)
