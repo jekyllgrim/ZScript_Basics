@@ -1,3 +1,7 @@
+### [<<< Back to  start](Readme.md)
+
+[<< Previous: Anonymous functions](Anonymous_functions.md)
+
 # Variables and data types
 
 If you’ve used ACS, you’re probably familiar with variables. Variables can be defined and used in ZScript in a similar manner, but there are more **data types** that they can hold.
@@ -134,7 +138,7 @@ Access modifier lets you restrict access to the variable, defining what can read
 
 - `protected` — this variable can be changed only from this class and classes inheriting from it but it can’t be changed from anywhere else
 - `private` — this variable is only available to this class and nothing else
-- If left unspecified, the variable can be readable and changeable from anywhere in the game provide you have a pointer to the class that contains it (see [Pointers and Casting](Pointers_and_casting.md))
+- If left unspecified, the variable will be readable and changeable from anywhere in the game, provided you have a pointer to the class that contains it (see [Pointers and Casting](Pointers_and_casting.md))
 
 It's usually not something you need to worry about, but in general if you *know* that you're declaring a variable that will never be (and shouldn't be) changeable from any other class, it's a good idea to make it `private` (or `protected` if you want it to be accessible to child classes, but not to other classes). This approach is known as [encapsulation](https://en.wikipedia.org/wiki/Encapsulation_(computer_programming)), and the gist of it is: sometimes it's important to be *sure* that this data doesn't get changed accidentally from somewhere else, so better protect it.
 
@@ -168,3 +172,7 @@ Hence here's a list of various data types. You don't need to immediately learn t
   - Note that while it holds a name, it's not the same as a `name`. `Class<Actor>` isn't just a line of text; it also contains information that tells the game that this is, in fact, an existing actor class. In contrast, a `name` simply contains text and nothing else.
 - **actor** — a variable that holds an instance of an actor (i.e. a pointer to it). It’s not a name of an actor class, but a *pointer* to a *specific* actor that exists in the level. Learn more in [Pointers and Casting](Pointers_and_casting.md).
 - **state** — holds a reference to a state (such as Spawn, Ready, etc.)
+
+
+
+[>> Next: Pointers and casting]([Pointers_and_casting.md)

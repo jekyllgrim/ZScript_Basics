@@ -1,3 +1,7 @@
+### [<<< Back to  start](Readme.md)
+
+[<< Previous: Classes instead of actors](Classes_instead_of_actors.md)
+
 # Anonymous functions
 
 This isn’t really a ZScript-only feature because it was available in DECORATE before ZScript became widely available. However, that was a brief period and many DECORATE users missed that; plus, Zandronum’s version of DECORATE doesn’t support this feature at all.
@@ -35,3 +39,7 @@ There are a few things you need to remember when using anonymous functions:
 - You can't use jump commands directly, and instead will have to use the `return` command
 
 These aspects are described in more detail in the [**Flow Control**](#_Flow_Control) section.
+
+
+
+[>> Next: Variables and data types](Variables_and_data_types.md)

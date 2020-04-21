@@ -1,3 +1,7 @@
+### [<<< Back to  start](Readme.md)
+
+[<< Previous: Pointers and casting]([Pointers_and_casting.md)
+
 # Custom functions
 
 Sometimes you need to perform a bunch of similar actions in multiple places and/or multiple actors. Usually you can simplify things by creating a custom function. Most functions will look like this:
@@ -195,3 +199,7 @@ This function works as a state jump, such as `A_Jump`: when the function is call
   - It jumps to a state provided in the second argument of the function. By default, it's "See" but in the example above it's "AttackEnd". (I.e. this monster has a custom animation for stopping the attack, but other monsters using this function may not and they just jump to "See".)
 - Finally, if none of the checks go through, the function returns nothing. `ResolveState()` is the correct way to return states in ZScript (you can't directly put in a state name). `ResolveState` will be covered in more detail in [Flow Control](#_Flow_Control_1).
   - In this case, if the function returns null, the state machine will continue going through the state. In the example above it'll show frame `CPAS E` for 1 tic and then it'll hit `loop` and go back to the beginning of the state.
+
+
+
+[>> Next: Virtual Functions](Virtual_functions.md)

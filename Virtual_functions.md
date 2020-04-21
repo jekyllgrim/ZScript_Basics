@@ -1,3 +1,7 @@
+### [<<< Back to  start](Readme.md)
+
+[<< Previous: Custom functions](Custom_functions.md)
+
 # Virtual functions
 
 `Virtual` is a keyword that makes a function overridable. You can add it before the type of the function when defining it:

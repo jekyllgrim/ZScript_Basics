@@ -1,4 +1,8 @@
-## Classes instead of actors
+### [<<< Back to  start](Readme.md)
+
+[<< Previous: Why ZScript?](why_zscript.md)
+
+# Classes instead of actors
 
 Let’s talk basic syntax. The first thing you need to know is that DECORATE is used only to define actors—objects that "physically" spawn in the game world. These are monsters, decorations, weapons, inventory items, and player pawns (the actors you control in the game). There are some special cases, for example built-in GZDoom particles (the ones that spawn by default when you use `A_RailAttack` or `A_CustomRailGun`), which are not technically actors, but more on that later.
 
@@ -70,3 +74,7 @@ So, what are the differences here?
 - Not shown in the example: flag prefixes are *not* optional in ZScript. I.e. for example, in `+INVENTORY.AUTOACTIVATE` you can’t omit `INVENTORY`.
 
 Knowing just these points, you can already start coding in ZScript. Next, we delve into ZScript-only features.
+
+
+
+[>> Next: Anonymous functions](Anonymous_functions.md)

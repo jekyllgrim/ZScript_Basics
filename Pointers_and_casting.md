@@ -1,3 +1,7 @@
+### [<<< Back to  start](Readme.md)
+
+[<< Previous: Variables and data types](Variables_and_data_types.md)
+
 # Pointers and casting
 
 ## Basic pointers
@@ -488,3 +492,7 @@ Class CustomBlueTorch : BlueTorch replaces BlueTorch {
 *Note:* The names of the sprites, as well as **alpha** and **scale** values are, obviously, just examples here.
 
 Using the code above each of the torches will spawn a halo and immediately set its halocolor variable to whatever you need. 
+
+
+
+[>> Next: Custom functions](Custom_functions.md)

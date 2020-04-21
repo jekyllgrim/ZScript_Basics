@@ -1,4 +1,6 @@
-## Why ZScript?
+### [<<< Back to  start](Readme.md)
+
+# Why ZScript?
 
 Before talking about variables, pointers and classes it’s a good idea to answer this simple question: why use ZScript at all? What if you’ve been doing relatively simple things and DECORATE + occasionally ACS have been working out fine for you? Should you still switch?
 
@@ -63,3 +65,7 @@ ZScript can obtain and even change certain map-related data. While there are som
 **Reduced performance impact**
 
 With ZScript you’ll have tons of tools at your disposal to make your stuff more efficient. Even if you don’t do anything special, when you just follow some good basic rules of syntax and [flow control](Flow_Control.md) (more on those later), your code will *already* work much faster than something similar would in DECORATE.
+
+
+
+### [>> Next: Classes instead of actors](Classes_instead_of_actors.md)
