@@ -1,4 +1,4 @@
-### [<<< Back to  start](Readme.md)
+### [<<< Back to  start](README.md)
 
 # Why ZScript?
 
