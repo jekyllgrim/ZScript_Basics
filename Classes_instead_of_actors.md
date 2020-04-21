@@ -1,6 +1,6 @@
-### [<<< Back to  start](Readme.md)
+### [<<< Back to  start](README.md)
 
-[<< Previous: Why ZScript?](why_zscript.md)
+[<< Previous: Why ZScript?](Why_ZScript.md)
 
 # Classes instead of actors
 

@@ -1,6 +1,6 @@
-### [<<< Back to  start](Readme.md)
+### [<<< Back to  start](README.md)
 
-[<< Previous: Pointers and casting]([Pointers_and_casting.md)
+[<< Previous: Pointers and casting](Pointers_and_casting.md)
 
 # Custom functions
 
