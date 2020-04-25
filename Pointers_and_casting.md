@@ -363,7 +363,81 @@ let orb = Inventory(Spawn("Soulsphere",pos));
 
 You'll need to use type casting for your own custom actors and their functions as well. Let's take a more advanced example: say, you created a sprite light halo and you want to attach it to torches. You have 3 versions of a halo (red, green, blue) and you don't want to define separate actors for each; instead you want to have only one actor and you want it to change its color depending on which torch spawned it. You can do this:
 
---- TO DO ---
+```csharp
+Class UniversalLightHalo : Actor {
+	name halocolor;			//this will hold the color
+	Default {
+		+NOINTERACTION		//disables gravity and collision
+		Renderstyle 'add';
+		alpha 0.35;
+		scale 0.5;
+	}
+	states {
+		Spawn:
+			TNT1 A 0 NoDelay {
+			//using 'sprite' allows you to manually set which sprite t o use:
+				if (halocolor == 'red')
+					sprite = GetSpriteIndex("HRED");
+				else if (halocolor == 'blue')
+					sprite = GetSpriteIndex("HBLU");
+				else if (halocolor == 'green')
+					sprite = GetSpriteIndex("HGRN");
+			}
+			#### A -1;		//#### means "use previous sprite"
+			stop;
+		Load: //this fake state is used to simply load sprites into memory
+			HRED A 0;
+			HBLU A 0;
+			HGRN A 0;
+			stop;	//this state will never be entered, but better add stop for consistency
+	}
+}
+	
+Class CustomRedTorch : RedTorch replaces RedTorch {
+	states {
+		Spawn:
+			TNT1 A 0 NoDelay {
+				let halo = UniversalLightHalo(Spawn("UniversalLightHalo",(pos.x,pos.y,pos.z+48)));
+				if (halo)
+					halo.halocolor = 'Red';
+			}
+			goto super::spawn;
+	}
+}
+	
+Class CustomGreenTorch : GreenTorch replaces GreenTorch {
+	states {
+		Spawn:
+			TNT1 A 0 NoDelay {
+				let halo = UniversalLightHalo(Spawn("UniversalLightHalo",(pos.x,pos.y,pos.z+48)));
+				if (halo)
+					halo.halocolor = 'Green';
+			}
+			goto super::spawn;
+	}
+}
+
+Class CustomBlueTorch : BlueTorch replaces BlueTorch {
+	states {
+		Spawn:
+			TNT1 A 0 NoDelay {
+				let halo = UniversalLightHalo(Spawn("UniversalLightHalo",(pos.x,pos.y,pos.z+48)));
+				if (halo)
+					halo.halocolor = 'Blue';
+			}
+			goto super::spawn;
+	}
+}
+```
+
+Using the code above each of the torches will spawn a halo and immediately set its `halocolor` variable to whatever you need. 
+
+Notes:
+
+* `sprite` is a pointer to the currently used sprite; by modifying its value you can manually set which sprite to set. Note that it doesn't take an image name directly, but rather an imagine ID—hence you need to use `GetSpriteIndex("spritename")` to set an image to it.
+* `NOINTERACTION`, among other things, makes actors much less resource-intensive, so use it whenever possible on actors that don't need collision and gravity.
+* If you're setting `sprite` directly, the sprites you're providing via `GetSpriteIndex` need to be defined *somewhere* in order to be loaded into memory when GZDoom starts. This can be done anywhere—you can even simply define a dummy class somewhere that only has one state used to load sprites.
+* `scale` and `alpha` values in the example above are arbitrary and are provided just as an example.
 
 
 
