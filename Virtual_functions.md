@@ -98,7 +98,7 @@ Class TemporaryZombieman : Zombieman {
 
 This Zombieman will continuously (and relatively quickly) fade out as it exists. Notice that we don't need to redefine any states for this effect. Neat!
 
-Remember that `Tick()` is called even while the game is paused, so if you use the code above, your Zombieman will fade out even when you have a main menu open. Normally you need to add a check for that:
+Remember that `Tick()` is called even when the actor is frozen, so normally you need to add a check for that:
 
 ```csharp
 Class TemporaryZombieman : Zombieman {
@@ -116,9 +116,9 @@ Class TemporaryZombieman : Zombieman {
 Notes:
 
 - `IsFrozen()` is a ZScript bool that returns `true` if the actor that calls it is currently frozen, which can happen when:
-  - the game is paused (by opening main menu or the console, or pressing Pause in single player);
   - "freeze" cheat has been entered in the console;
-  - the player has a PowerTimeFreezer powerup and the actor in question does *not* have a NOTIMEFREEZE flag.
+  - the player has a PowerTimeFreezer powerup and the actor in question does *not* have a NOTIMEFREEZE flag;
+  - naturally, there can be other scripts that for whatever reason freeze actors.
 -  Boolean checks such as `if (bool == true)` can be shortened to `if (bool)`. And `!` means "not" and cab be used to invert any check. `if (!isFrozen())` is the same as `if (IsFrozen() == false)`.
 
 
@@ -132,7 +132,7 @@ Class BlurryCacoBall : CacoDemonBall {
 		if (isFrozen())		//check if the actor is frozen
 			return;			//if so, we stop here and don't do anything else
 		actor img = Spawn("CacoBall_AfterImage",pos);	//spawn after-image and cast it
-		//transfer current actor's alpha, renderstyle and sprite frame to the spawned after-image
+	//transfer current actor's alpha, renderstyle and sprite frame to the spawned after-image
         if (img) {
 			img.A_SetRenderstyle(alpha,GetRenderstyle());
 			img.sprite = sprite;	//sprite is the current sprite, such as "BAL2"
