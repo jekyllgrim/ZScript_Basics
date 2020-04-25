@@ -132,11 +132,11 @@ int GetTargetHealth() {
 	if (target)
 		return target.health;
 	else
-		return null;
+		return 0; //we have to return something, so let's use 0 as default
 }
 ```
 
-This function checks if the actor that called it has a `target`, and if so, returns the amount of health it has. If there's no target, it doesn't return anything. (`null` means no data; note that it's *not* the same as 0, it's literally nothing—if you try to print it out, you'll either get nothing or useless garbage data) 
+This function checks if the actor that called it has a `target`, and if so, returns the amount of health it has. If there's no target, it doesn't return anything.
 
 Note that you *have to* include a null-check here, as well as cover all possible cases: there has to be a return value for the case where target doesn't exist, that's why we must provide `return null`. If we don't, the function won't know what to do. (Nothing terrible will happen, GZDoom simply won't start. Bad stuff will happen if you skip the null-check, however, since it can cause a VM abort due to a null pointer).
 
@@ -146,7 +146,7 @@ It can also be slightly simplified:
 int GetTargetHealth() {
 	if (target)
 		return target.health;
-	return null;
+	return 0;
 }
 ```
 
