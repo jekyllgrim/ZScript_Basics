@@ -20,12 +20,12 @@
 8. [Virtual Functions](Virtual_functions.md)
    1. ZScript Virtual Functions
    2. Common ZScript virtual functions
-9. Event Handlers
+9. [Event Handlers](Event_Handlers.md)
 10. Arrays
     1. Dynamic arrays
     2. Static arrays
 11. Flow Control
-12. Best Practices and Rules of Thumb
+12. [Best Practices and Rules of Thumb](Best_Practices.md)
 
 ## Introduction
 
