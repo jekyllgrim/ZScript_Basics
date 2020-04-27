@@ -130,7 +130,7 @@ Class RewardStuff : EventHandler {
 
 In this version we inverted the check: instead of doing "if A and B and C and D — do the thing" it's doing "if not A, do nothing; otherwise if not B, do nothing; otherwise if not C, do nothing; otherwise if not D, do nothing".
 
-This makes the strings of checks shorter, and whenever any of the checks is false, `return;` is called and the function is cut off. In other words, GZDoom will mostly have to do fewer checks: one or two most of the time, instead of doing *all* 4 checks *every* time a thing is spawned. This can affect the game's performance.
+This makes the string of checks shorter, and whenever any of the checks is false, `return;` is called and the function is cut off. In other words, GZDoom will mostly have to do fewer checks: one or two most of the time, instead of doing *all* 4 checks *every* time a thing is spawned. This can affect the game's performance.
 
 
 
@@ -185,7 +185,7 @@ Class PlayerBleedControl : Inventory {
 	int bleedbuildup;	//this holds the buildup value
 	actor bleedsource;	//holds the actor who dealt damage, for proper kill credit
 
-    //runs every tic the item is in possession:
+	//runs every tic the item is in possession:
 	override void DoEffect () {
 		super.DoEffect();
 		//null-check the owner:
@@ -194,7 +194,7 @@ Class PlayerBleedControl : Inventory {
 		//debug printf, uncomment to see the information in game:
 		//Console.Printf("Bleed buildup: %d; Bleeding: %d",bleedbuildup,isbleeding); 
 
-        //this thing only runs once a second:
+		//this thing only runs once a second:
 		if (level.time % 35 == 0) {
 			//decrease buildup value by 1, keeping it within 0-100 range
 			bleedbuildup = Clamp(bleedbuildup - 1, 0, 100);
@@ -206,7 +206,7 @@ Class PlayerBleedControl : Inventory {
 				*/
 				owner.DamageMobj(owner,bleedsource,Clamp(bleedbuildup * 0.2,1,5),"normal",DMG_NO_ARMOR|DMG_THRUSTLESS|DMG_NO_ENHANCE); 
 			}
-			/*	Also every second we can stop bleeding, if a random value between 1–80
+			/*	Also every second we may stop bleeding if a random value between 1–80
 				turns out to be higher than bleedbuildup value.
 				So, the lower the buildup, the higher is the chance that we stop
 				bleeding. This simulates wound drying over time.
@@ -221,7 +221,7 @@ Class PlayerBleedControl : Inventory {
 // This event handler gives the control item and activates the bleeding itself:
 
 Class BleedingHandler : EventHandler {
-    //check if spawned thing is a player and doesn't have the control item:
+	//check if spawned thing is a player and doesn't have the control item:
 	override void WorldThingSpawned (WorldEvent e) {         
 		if (e.thing.player && !e.thing.FindInventory("PlayerBleedControl"))            
 			e.thing.GiveInventory("PlayerBleedControl",1);	//if so, give them the item				
@@ -231,7 +231,7 @@ Class BleedingHandler : EventHandler {
 		//do nothing if the thing doesn't exist:
 		if (!e.thing != "bleed")
 			return;									
-        //if for some reason they don't have our control item, also do nothing:
+		//if for some reason they don't have our control item, also do nothing:
 		if (!e.thing.FindInventory("PlayerBleedControl"))						
 			return;
 		//otherwise cast the item:
