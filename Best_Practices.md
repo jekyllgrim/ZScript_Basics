@@ -32,7 +32,7 @@ Class MyClass : Actor {		//level 1 header
 		property2;
 		property3;
 		+FLAGNAME
-	}						//end of level 2 block
+	}					//end of level 2 block
 	states {				//level 2 header
 	Spawn:					
 		SPRT A 1;			//level 3 code
@@ -45,8 +45,8 @@ Class MyClass : Actor {		//level 1 header
         }					//end of level 4 block
 		SPRT E -1;
 		stop;
-	}						//end of level 2 block
-}							//end of level 1 block
+	}					//end of level 2 block
+}						//end of level 1 block
 ```
 
 There *is* some discussion regarding how to indent the contents of the `states` block though, but both of these options should be fine:
@@ -54,13 +54,13 @@ There *is* some discussion regarding how to indent the contents of the `states` 
 ```csharp
 //considers state labels as new-level code:
 	states {
-        Spawn:            
-            SPRT A 1;
-            loop;
-        Death:
-            SPRT E -1;
-            stop;
-    } //all makes sense except this awkward closing brace that is too far
+		Spawn:            
+			SPRT A 1;
+			loop;
+		Death:
+			SPRT E -1;
+			stop;
+	} 					//this awkward closing brace is too far
 
 //only considers state contents as new-level code, but not the labels:
     states {
