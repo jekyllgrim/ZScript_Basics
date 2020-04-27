@@ -63,8 +63,8 @@ There *is* some discussion regarding how to indent the contents of the `states` 
 	} 					//this awkward closing brace is too far
 
 //only considers state contents as new-level code, but not the labels:
-    states {
-    Spawn:
+	states {
+	Spawn:
 		SPRT A 1;
 		loop;
 	Death:
