@@ -116,7 +116,7 @@ Class RewardStuff : EventHandler {
 	int killedmonsters;
 	override void WorldThingDied (worldevent e) {
 		if (!e.thing || !e.thing.bISMONSTER || !e.thing.target || !e.thing.target.player)
-            return;
+			return;
 		killedmonsters++;
 		Console.Printf("Monsters killed: %d",killedmonsters);
 		if (killedmonsters >= 50) {
