@@ -42,7 +42,7 @@ Class MyClass : Actor {		//level 1 header
 		SPRT CD 5 {			//level 4 header
             	A_Function1();	//level 4 code
             	A_Function2();
-        }					//end of level 4 block
+		}					//end of level 4 block
 		SPRT E -1;
 		stop;
 	}					//end of level 2 block
