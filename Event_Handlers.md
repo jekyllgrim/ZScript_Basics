@@ -44,7 +44,7 @@ Let's break it down how this works:
 - In the example above we first check if `e.thing` exists (a standard null-check), and then we check if it has an `ISMONSTER` flag (which is normally the best defining feature of a monster).
 - If both checks pass, we call `destroy()` on the thing to make it disappear from the map.
 
-Notice that event virtual functions don't need a `super.` call as opposed to [Actor virtual functions](Virtual_functions.md), because other things that need to happen when something dies will happen anyway, it's not tied to our event handler.
+Notice that event virtual functions don't need a `super.` call as opposed to [Actor virtual functions](Virtual_functions.md), because the virtual functions of the `EventHandler` class are empty: other things that need to happen when something dies will happen anyway, it's not tied to event handlers.
 
 So, this handler will remove anything that we kill. However, it's not very elegant, since every monster will just pop out of existence as soon as it dies—and it won't even finish its Death animation, it'll disappear as soon as its health reaches 0.
 

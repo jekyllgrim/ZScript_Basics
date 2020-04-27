@@ -72,7 +72,7 @@ Class SomeOtherCaco : CacoSingleDad {
 }
 ```
 
-`Super` is a pointer to the original function. In the example above SomeOtherCaco *first* does everything the original `SpawnBaby()` function does, and after that it adds some changes: it modifies the spawned baby's `scale` and sets itself as the baby's `master`.
+`Super` is a pointer to the parent class, and using it like that makes it call the parent's version of the function. As a result, in the example above SomeOtherCaco *first* does everything the original `SpawnBaby()` function does, and after that it adds some changes: it modifies the spawned baby's `scale` and sets itself as the baby's `master`.
 
 
 
