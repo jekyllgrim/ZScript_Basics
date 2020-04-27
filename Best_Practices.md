@@ -1,4 +1,8 @@
+## [<<< Back to  start](README.md)
+
 # Best Practices and Rules of Thumb
+
+--- This chapter is WIP ---
 
 Even in our day and age there are lot of important best practices that are either unknown to many or often being overlooked. This section describes some of them—most of them are related to ZScript, but some are concerned with modding in general.
 
@@ -77,9 +81,37 @@ Final notes:
 
 
 
-## Using PK3 instead of WAD
+## Using #include
 
-For some reason people keep using WAD files instead of PK3. Avoid this! WAD files should only be used for maps—because this is the only format that maps accept. Everything else—textures, sounds, models, any sort of assets, *and* your code—should be inside a PK3 for ease of use and access. [ZDoom wiki describes how to structure a PK3 in detail](https://zdoom.org/wiki/Using_ZIPs_as_WAD_replacement).
+It's not a good idea to place all of your code inside `zscript` file at the root of your archive. Instead you should create a folder with a name you prefer, such as `MyModName_Scripts` and place zscript files with appropriate names in it. (This assumes you're [using a PK3](#PK3 instead of WAD and folders instead of archives), of course.) After that you need to use `#include` in the root `zscript` lump to add those files. An example of how a structure like that could work:
+
+```
+MyWeaponMod.pk3/zscript.zs
+MyWeaponMod.pk3/MyWeaponMod_Scripts/weapons/pistol.zs
+MyWeaponMod.pk3/MyWeaponMod_Scripts/weapons/shotgun.zs
+MyWeaponMod.pk3/MyWeaponMod_Scripts/monsters/zombieman.zs
+```
+
+The contents of `zscript.zs` would look as follows:
+
+```csharp
+version "4.3.0"
+
+#include "MyWeaponMod_Scripts/weapons/pistol.zs"
+#include "MyWeaponMod_Scripts/weapons/shotgun.zs"
+#include "MyWeaponMod_Scripts/monsters/zombieman.zs"
+```
+
+Notes: 
+
+- Do NOT place your custom scripts in `ZScript/` folder. This is the folder that gzdoom.pk3 uses; if by chance your file matches an existing zscript file, it'll try override it. `Zscript` lump at the root of the archive is the only one that can't be overridden, but your custom scripts should be placed in a unique folder.
+- File extension doesn't matter, but `.zs` and `.zsc` are common examples for ZScript. [Syntax highlighting plugins](https://forum.zdoom.org/viewtopic.php?f=37&t=46674) will recognize them automatically.
+
+
+
+## PK3 instead of WAD and folders instead of archives
+
+For some reason people keep using WAD files instead of PK3. Avoid this! WAD files should only be used for maps (and this is the only format that works for Doom maps). Everything else—textures, sounds, models, any sort of assets, *and* your code—should be inside a PK3 for ease of use and access. [ZDoom wiki describes how to structure a PK3 in detail](https://zdoom.org/wiki/Using_ZIPs_as_WAD_replacement).
 
 However, a next-level strategy would be using a *folder* instead of an archive. Specifically, instead of having a packed PK3 (which, remember, is just a zip file), you can unpack it and keep it as an unpacked folder that uses the same internal structure as PK3 would. For example, this is how a development version of Beautiful Doom looks in a folder on my PC:
 
@@ -103,3 +135,11 @@ Second, you'll be able to upload your mod to a GitHub repository.
 
 ## Using GitHub
 
+[GitHub](https://github.com/) is a cloud-based service designed for easy version control and release of software. If you're keeping your mod in a folder, you can register on GitHub, install GitHub app and turn that folder into a GitHub repository. Working with GitHub is pretty easy, and the process is covered by its own extensive documentation You can begin with an intro guide [here](https://product.hubspot.com/blog/git-and-github-tutorial-for-beginners).
+
+A good number of well-known mods use GitHub because of the obvious benefits:
+
+- Your work stays safe in the cloud, so you'll never lose your progress (as long as you pushed the changes into the repository; it's not being updated automatically).
+- You can easily track changes for *every* file in your project: GitHub will highlight the changes of the contents, inform you about any deletion/addition, and you'll be able to roll back any of those changes at any point.
+- You can easily release your work using GitHub's release feature. Once you're ready to make a release, GitHub will automatically compile your folder in an archive. That archive will be playable in GZDoom as is.
+- You can easily collaborate with other people—this is, in fact, one of the primary purposes of GitHub. People can be added as contributors to your repository, or they can make pull requests (user-made updates to your work) which you can accept to decline.
