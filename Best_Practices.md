@@ -40,8 +40,8 @@ Class MyClass : Actor {		//level 1 header
 	Death:
 		SPRT B 5 A_Function;
 		SPRT CD 5 {			//level 4 header
-            	A_Function1();	//level 4 code
-            	A_Function2();
+			A_Function1();	//level 4 code
+			A_Function2();
 		}					//end of level 4 block
 		SPRT E -1;
 		stop;
