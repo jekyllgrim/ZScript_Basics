@@ -1,8 +1,10 @@
 ## [<<< Back to  start](README.md)
 
-# Best Practices and Rules of Thumb
+
 
 --- This chapter is WIP ---
+
+# Best Practices and Rules of Thumb
 
 Even in our day and age there are lot of important best practices that are either unknown to many or often being overlooked. This section describes some of them—most of them are related to ZScript, but some are concerned with modding in general.
 
@@ -10,9 +12,9 @@ Even in our day and age there are lot of important best practices that are eithe
 
 ## Using a consistent indentation style
 
-Indentation is using tabs and/or spaces to mark the start of a new code block. They're covered in surprising detail [on Wikipedia](https://en.wikipedia.org/wiki/Indentation_style), so go have a look. Many new coders, and sometimes even the not-so-new ones, including people who have been working with DECORATE for years, have little respect for indentation, which causes a *very* serious issue: their code is hard to read.
+Indentation is using tabs and/or spaces to mark the start of a new code block. They're covered in surprising detail [on Wikipedia](https://en.wikipedia.org/wiki/Indentation_style), so go have a look. Many new coders, and sometimes even the not-so-new ones, including people who have been working with DECORATE for years, have little care for indentation, which causes one serious issue: their code is hard to read.
 
-Your instinctive reaction, most likely, is to say, "I can read it just fine!" This, however, isn't the point. Lack of consistent indentation leads to messy code, which leads to major problems:
+Your instinctive reaction, most likely, is to say, "I can read my code just fine, thank you very much!" This, however, isn't the point. Lack of consistent indentation leads to messy code, which leads to major problems:
 
 1. You'll have problems reading your own code. You may think you won't, and perhaps you don't—for now. But when you decide to come back to some code you wrote months or years earlier, you'll be surprised how hard it is to navigate that crap.
 2. You'll have a much harder time getting help from others—and not because everyone is a snob who only wants to read well-written code, but because it's *genuinely* hard to read somebody else's code that isn't well-organized.
@@ -74,7 +76,7 @@ There *is* some discussion regarding how to indent the contents of the `states` 
 
 Final notes:
 
-- GZDoom rather consistently uses Allman, same goes for most examples on ZDoom Wiki.
+- GZDoom rather consistently uses Allman (both in its ZScript definitions and the C++ engine code), same goes for most examples on ZDoom Wiki.
 - This guide uses K&R style simply because I've grown to use that in my mods. The only reason I use it is because it's *a bit* faster since there are fewer Enter presses to start a new block. At the same time I consider Allman a bit easier to read.
 - Other styles exist, but consider ZScript is styled after C# / Unrealscript, it makes sense to choose one of the two most popular styles.
 - If you copy-paste a snippet of code from somewhere, don't be lazy and change its indentation to your style if they don't match.
