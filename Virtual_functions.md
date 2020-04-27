@@ -346,3 +346,7 @@ A non-comprehensive of some of the most common virtual functions you'll be overr
 - `void ModifyDamage (int damage, Name damageType, out int newdamage, bool passive, Actor inflictor = null, Actor source = null, int flags = 0)` — Called by items capable of modifying the owner's incoming damage, such as PowerProtection.
 
 A more detailed list can be found on the [ZDoom Wiki](https://zdoom.org/wiki/ZScript_virtual_functions#Actor).
+
+
+
+### [>> Next: Event Handlers](Event_Handlers.md)
