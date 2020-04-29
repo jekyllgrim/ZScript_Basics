@@ -48,7 +48,7 @@ Notice that event virtual functions don't need a `super.` call as opposed to [Ac
 
 So, this handler will remove anything that we kill. However, it's not very elegant, since every monster will just pop out of existence as soon as it dies—and it won't even finish its Death animation, it'll disappear as soon as its health reaches 0.
 
-Let's say we want to fade it out. But we can't make it via an event handler—this event just called only once when the monster is killed, so we can't loop `A_FadeOut` in it. For something like this `Inventory` objects are usually used as containers for special effects, like so:
+Let's say we want to fade it out. But we can't make it via an event handler—this event is called only once when the monster is killed, so we can't loop `A_FadeOut` in it. For something like this `Inventory` objects are usually used as containers for special effects, like so:
 
 ```csharp
 Class CorpseFadeHandler : EventHandler {
