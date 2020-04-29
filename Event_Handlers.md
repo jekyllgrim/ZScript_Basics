@@ -105,9 +105,9 @@ Class RewardStuff : EventHandler {
 
 Notes:
 
-- Normally when actor A kills actor B, actor A will become actor B's `target`, so the `target` pointer serves as a pointer to the killer. Hence `e.thing.target && e.thing.target.player` checks that `target` exists and that it's a player.
+- Normally when actor A kills actor B, actor A will become actor B's `target`, so the `target` pointer serves as a pointer to the killer. Hence `e.thing.target && e.thing.target.player` checks that the killed thing has a `target` and that it's a player.
 - `Console.PrintF` is a Java-like function that prints stuff into the console and the standard Doom message area. It's often used for debugging as well: it works similarly to `A_Log` and allows passing values to it via `%d`, `%f` and such, which are described [here](https://zdoom.org/wiki/String#Methods).
-- Since `EventHandler` is not actor, to use some ZScript functions you need to explicitly tell it it's an actor function. `Actor.Spawn` tells it to use `Spawn` as defined in `Actor`. You won't need to do it for DECORATE action functions.
+- Since `EventHandler` is not an actor, to use some ZScript functions you need to explicitly tell it it's an actor function. `Actor.Spawn` tells it to use `Spawn` as defined in `Actor`. You won't need to do it for DECORATE action functions.
 
 It's important that this event handler could be optimized like so:
 
@@ -130,22 +130,22 @@ Class RewardStuff : EventHandler {
 
 In this version we inverted the check: instead of doing "if A and B and C and D — do the thing" it's doing "if not A, do nothing; otherwise if not B, do nothing; otherwise if not C, do nothing; otherwise if not D, do nothing".
 
-This makes the string of checks shorter, and whenever any of the checks is false, `return;` is called and the function is cut off. In other words, GZDoom will mostly have to do fewer checks: one or two most of the time, instead of doing *all* 4 checks *every* time a thing is spawned. This can affect the game's performance.
+This makes the string of checks shorter, and whenever any of the checks is false, `return;` is called and the function is cut off. In other words, this way in most cases GZDoom will have to do fewer checks: one or two most of the time, instead of doing *all* 4 checks *every* time a thing is spawned. This can affect the game's performance.
 
 
 
-Handlers can be used to store global data, similarly to global variables in ACS. To retrive that data from a class, you'll need to cast your event handler just like you cast custom actors:
+Handlers can be used to store global data, similarly to global variables in ACS. To retrieve that data from a class you'll need to cast your event handler just like you cast custom actors:
 
 ```csharp
 Class CheckMonsterAmount : EventHandler {
 	int alivemonsters;	//this simple int will hold the number of alive monsters
-    //called when an actor is spawned in map:
+	//called when an actor is spawned in map:
 	override void WorldThingSpawned (worldevent e) { 
         //check if actor exists, is a monster and isn't friendly:
 		if (e.thing && e.thing.bISMONSTER && !e.thing.bFRIENDLY)	
 			alivemonsters++; 	//if so, increase counter
 	}
-    //called when an actor dies in a map:
+	//called when an actor dies in a map:
 	override void WorldThingDied (worldevent e) {
 		if (e.thing && e.thing.bISMONSTER && !!e.thing.bFRIENDLY)
 			alivemonsters--;	//decrease counter
@@ -171,7 +171,7 @@ When spawned, this Cyberdemon will check the `alivemonsters` variable held in ou
 Finally, here's a slightly more advanced example where an event handler and a dummy item container are used to create a bleeding system:
 
 ```csharp
-/*	this is our control item: when in player's inventory, it'll control
+/*	This is our control item: when in player's inventory, it'll control
 	bleed buildup and bleed damage:
 */
 Class PlayerBleedControl : Inventory {
@@ -183,7 +183,7 @@ Class PlayerBleedControl : Inventory {
 	
 	bool isbleeding;	//if this is true, owner is bleeding	
 	int bleedbuildup;	//this holds the buildup value
-	actor bleedsource;	//holds the actor who dealt damage, for proper kill credit
+	actor bleedsource;	//holds the actor that dealt damage, for proper kill credit
 
 	//runs every tic the item is in possession:
 	override void DoEffect () {
@@ -244,7 +244,7 @@ Class BleedingHandler : EventHandler {
 		if (random(1,100) < bleeder.bleedbuildup) {
 			//if check passed, start bleeding:
 			bleeder.isbleeding = true;
-			//save the actor that dealt damage for proper kill credit if player bleeds out:
+			//and save the actor that dealt damage for proper kill credit if player bleeds out:
 			bleeder.bleedsource = e.DamageSource;											
 		}
 	}	
@@ -254,10 +254,10 @@ Class BleedingHandler : EventHandler {
 The basic mechanics of this system is actually relatively simple:
 
 - Whenever a player is spawned in a map, they receive the control item. That item holds `bleedbuildup` which serves as an invisible "gauge" that shows how close the player is to starting bleeding.
-- Whenever damage is dealt to the player, their `bleedbuildup` value increases by the same number as the damage dealt. So, for example, if a Zombieman shot us for 7 damage, `bleedbuildup` will raise by 7. (`bleedbuildup` can not go beyond 100, however.)
+- Whenever damage is dealt to the player, their `bleedbuildup` value increases by the same number as the damage dealt. So, for example, if a Zombieman shot us for 7 damage, `bleedbuildup` will raise by 7. (`bleedbuildup` can not go beyond 100, however.) For a stronger effect, you can multiply it.
 - Also, every time the player is damaged, a random 0–100 value is checked against `bleedbuildup`. The higher `bleedbuildup` is, the higher is the chance the check will pass. If the check passes, the player will start bleeding.
 - The control item handles the bleeding itself. While the player isn't bleeding, the item doesn't do anything. But as soon as they start bleeding, the player will be damaged every second. The damage is always between 1 and 5, but it'll be higher depending on how high `bleedbuildup` is.
-- *Also* every second the player has a chance to stop bleeding. This chance is a value between 0–80 compared to `bleedbuildup`. Since `bleedbuildup` can go up to 100, if it's over 80, the player can't stop bleeding. (So, if you're "heavily wounded", bleeding is guaranteed.)
+- *Also* every second the player has a chance to stop bleeding. This chance is a value between 0–80 compared to `bleedbuildup`. Since `bleedbuildup` can go up to 100, the player can't stop bleeding as long as `bleedbuildup` is over 80. (So, if you're "heavily wounded", some bleeding is guaranteed.)
 
 Some notes of the functions used in this script:
 
