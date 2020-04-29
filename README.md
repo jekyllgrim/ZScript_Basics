@@ -45,9 +45,10 @@ I decided to write this short entry guide to help alleviate exactly that: it cov
 
 ## Important notes
 
-This guide is aimed at people with prior DECORATE (and possibly ACS) knowledge. It implies that you know what GZDoom is, what actors are, how they're structured, how they interact with each other. All of those aspects are covered by [ZDoom Wiki](http://zdoom.org/wiki/Main_Page), so I don't feel there's a need to describe them within this guide.
+1. This guide is aimed at people with prior DECORATE (and possibly ACS) knowledge. It implies that you know what GZDoom is, what actors are, how they're structured, how they interact with each other. All of those aspects are covered by [ZDoom Wiki](http://zdoom.org/wiki/Main_Page), so I don't feel there's a need to describe them within this guide.
 
-While all code examples in the guide are made to be runnable, it's *not* recommended to use them as is: many of them are purposefully inefficient, and the guide tends to iterate over them, improving various aspects while explaining new techniques. Examples are meant to be just that: examples—not ready-made solutions.
+2. While all code examples in the guide are made to be runnable, it's *not* recommended to use them as is: many of them are purposefully inefficient, and the guide tends to iterate over them, improving various aspects while explaining new techniques. Examples are meant to be just that: examples—not ready-made solutions.
+3. This document is a guide, not a wiki. As such, it's designed to be read from beginning to end. Chapters are not self-contained and often rely on information explained earlier in the guide, so it's not recommended to skip anything.
 
 
 
