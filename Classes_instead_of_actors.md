@@ -68,7 +68,7 @@ Class MyClass : Actor {
 So, what are the differences here?
 
 - Definitions begin with the word `Class`
-- If you want to make a completely original actor, your class has to inherit from `Actor` (which is the base class for all actors); you can’t *not* inherit from anything
+- If you want to make a completely original actor, your class has to inherit from `Actor` (which is the base class for all actors). Classes that aren't actors can exist in ZScript.
 - Default properties and flags have to be enclosed in a `Default { }` block instead of just being written somewhere above states
 - All lines except block names (`Class`, `Default`, `states`) and flags have to end with a semicolon. (Flags *can* end with a semicolon, but it’s optional.)
 - Not shown in the example: flag prefixes are *not* optional in ZScript. I.e. for example, in `+INVENTORY.AUTOACTIVATE` you can’t omit `INVENTORY`.
