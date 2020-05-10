@@ -10,7 +10,7 @@
    1. Turning variables into actor properties
    2. Access modifiers
    3. Data types
-6. [Pointers and casting]([Pointers_and_casting.md)
+6. [Pointers and casting](Pointers_and_casting.md)
    1. Basic pointers
    2. Using pointers in ZScript
    3. Casting and custom pointers
