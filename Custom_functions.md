@@ -164,7 +164,7 @@ Class ChaingunGuyWithAMagazine : ChaingunGuy {
         ChaingunGuyWithAMagazine.monstermag 40;
     }
 	state CustomMonsterRefire(int ChanceToEnd = 0, statelabel endstate = "See") { 
-		if (monstermag == 0)				//check how much "ammo" is left
+		if (monstermag <= 0)				//check how much "ammo" is left
 			return ResolveState("Reload");	//if 0, goto Reload state
 		else if (ChanceToEnd > random(0,100))//otherwise check ChanceToEnd against a random value
 			return ResolveState(endstate);	//if true, go to end state
