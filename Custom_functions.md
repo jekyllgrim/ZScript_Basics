@@ -172,11 +172,14 @@ Class ChaingunGuyWithAMagazine : ChaingunGuy {
 	}
 	states {
 	Missile:
-		CPAS F 2 A_CPosAttack;
+		CPAS F 2 {
+            	A_CPosAttack();
+            	monstermag--;
+		}
 		CPAS E 2 A_FaceTarget;
 		CPAS F 2 A_CPosAttack;
 		CPAS E 2 A_FaceTarget();
-		TNT1 A 0 A_MonsterRefire(5,"AttackEnd");
+		TNT1 A 0 CustomMonsterRefire(5,"AttackEnd");
 		loop;
 	AttackEnd:
 		CPAS A 20;
