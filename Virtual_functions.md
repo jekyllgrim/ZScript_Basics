@@ -341,7 +341,7 @@ A non-comprehensive of some of the most common virtual functions you'll be overr
 **Inventory:**
 
 - `void DoEffect()` — Called every tic by inventory items that are inside an actor's inventory. Use it instead of Tick() to continuously do stuff on items.
-- `void AttachToOwner(Actor user)` — Called by items when they are placed in an actor's inventory. After this call the user (the actor the item gets attached to) becomes owner, and the item can use the owner pointer.
+- `void AttachToOwner(Actor other)` — Called by items when they are placed in an actor's inventory. After this call the `other` (the actor the item gets attached to) becomes `owner`, and the item can use the `owner` pointer.
 - `void DetachFromOwner()` — Called anytime the item is fully removed from owner's inventory, whether by being tossed, destroyed or taken away entirely.
 - `void ModifyDamage (int damage, Name damageType, out int newdamage, bool passive, Actor inflictor = null, Actor source = null, int flags = 0)` — Called by items capable of modifying the owner's incoming damage, such as PowerProtection.
 
