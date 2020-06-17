@@ -11,8 +11,8 @@ One of the primary concepts you need to have a good grasp on to use ZScript is p
 DECORATE actually has pointers! But you are limited to using three of them: **master, target** and **tracer**. You’re probably familiar with them, but here’s a quick recap:
 
 - `Target` is the most common pointer and it’s automatically used by monsters and projectiles:
-  - In case of **monsters** a target is literally their current target—the actor they’ll be chasing and attacking (if there is one). Monsters acquire a target by calling `A_Look`, then chase it with `A_Chase`, and they aim at the target with `A_FaceTarget`.
-  - In case of **projectiles** a `target` is (counter-intuitively) the **shooter** of the projectile. So, if it’s a player-spawned projectile, the player pawn will be its target. Why is it even tracked? Because the shooter has to get **kill credit**: it allows the game to track how many monsters the player killed, who killed whom in multiplayer, and print out obituary messages (such as "*Playername* stood in awe of Spider demon"). If for some reason the projectile loses its `target` pointer (which normally shouldn’t happen), the killer won’t get the credit. (There are other more obscure mechanics involved; for example, a projectile can’t hit its shooter as long as the shooter is the projectile’s `target`).
+  - In case of **monsters** `target` is literally their current target—the actor they’ll be chasing and attacking (if there is one). Monsters acquire a target by calling `A_Look`, then chase it with `A_Chase`, and they aim at the target with `A_FaceTarget`.
+  - In case of **projectiles** `target` is (counter-intuitively) the **shooter** of the projectile. So, if it’s a player-spawned projectile, the player pawn will be its target. Why is it even tracked? Because the shooter has to get **kill credit**: it allows the game to track how many monsters the player killed, who killed whom in multiplayer, and print out obituary messages (such as "*Playername* stood in awe of Spider demon"). If for some reason the projectile loses its `target` pointer (which normally shouldn’t happen), the killer won’t get the credit. (There are other more obscure mechanics involved; for example, a projectile can’t hit its shooter as long as the shooter is the projectile’s `target`).
     - *Note*: if you’re wondering if a projectile has any pointer to its actual target, i.e. the monster that it'll hit, the answer is no. Projectiles don’t need pointers to actors they hit because they simply hit whatever they collide with. (They do get a pointer to what they hit briefly when the hit happens, but you can't access it in DECORATE; more on that later.)
 - `Tracer` pointer is normally only used by seeker projectiles, such as **RevenantTracer**. Projectiles using seeking functions such as `A_Tracer` or `A_SeekerMissile` continuously face their tracer to change their direction towards it.
 - `Master` pointer is not set by anything in vanilla Doom, but you might’ve set it yourself via `A_SpawnItemEx` which allows setting pointers manually via flags (`SXF_SETMASTER` in this case).
@@ -21,7 +21,7 @@ Pointers in DECORATE can be set manually mostly with `A_SpawnItemEx` by using th
 
 ## Using pointers in ZScript
 
-In ZScript pointers are much more flexible. The first difference is how you use them: you can use them as prefixes for calling functions and setting properties on a specific actor. For example, doing alpha = 0.5; will change the translucency of the actor that calls this code, but doing master.alpha = 0.5; will change the alpha of the actor’s master. 
+In ZScript pointers are much more flexible. The first difference is how you use them: you can use them as prefixes for calling functions and setting properties on a specific actor. For example, doing `alpha = 0.5;` will change the translucency of the actor that calls this code, but doing `master.alpha = 0.5;` will change the alpha of the actor’s master. 
 
 You can use the same syntax to call functions on a specific actor from another actor, like so:
 
@@ -30,8 +30,8 @@ Class GraciousImp : DoomImp {
 	states {
 	Death:
 		TNT1 A 0 {
-			if (target != null)					//checks that target exists before doing anything
-				target.GiveInventory("Shell",20); //if so, give it 20 shells
+			if (target != null)	//checks that target exists before doing anything
+				target.GiveInventory("Shell",20);	//if so, give it 20 shells
 		}
 		goto super::Death;
 	}
@@ -101,7 +101,7 @@ Class CacoBaby : Cacodemon {
 		speed 12;
 		floatspeed 6;
 		scale 0.5;
-		Translation "BabyCalm";			//translation as defined in TRNSLATE lump
+		Translation "BabyCalm";	//translation as defined in TRNSLATE lump
 	}
 }
 
@@ -114,15 +114,15 @@ Class CacoDaddy : Cacodemon {
 		wait;	//loops the last frame instead of the whole state, in contrast to loop
 	Death:
 		TNT1 A 0 {
-			if (tracer) {							//null-check tracer
+			if (tracer) {	//null-check tracer
 				tracer.A_PlaySound("caco/active");	//play Cacodemon "wake up" sound on tracer
-				tracer.A_SetTranslation("BabyAngry");//change translation, as defined in TRNSLATE
-				tracer.speed *= 2;					//multiply tracer's speed by 2 
-				tracer.floatspeed*= 1.5;			//multiply tracer's floatspeed by 1.5
-				tracer.bNOPAIN = true;				//set tracer's NOPAIN flag to true
+				tracer.A_SetTranslation("BabyAngry");	//change translation, as defined in TRNSLATE
+				tracer.speed *= 2;	//multiply tracer's speed by 2 
+				tracer.floatspeed*= 1.5;	//multiply tracer's floatspeed by 1.5
+				tracer.bNOPAIN = true;	//set tracer's NOPAIN flag to true
 			}
 		}
-		goto super::Death;							//continue to default Cacodemon death
+		goto super::Death;	//continue to default Cacodemon death
 	}
 }
 ```
@@ -138,7 +138,7 @@ We use `tracer.` as a prefix to execute functions on it and change its propertie
 But casting and custom pointers is where the actual fun begins. **Casting** is creating a variable and attaching something to it (usually an instance of an actor). In other words, casing basically means creating a custom pointer. There are two main cases when you need to use casting:
 
 - To create a custom pointer that doesn't take place of `master`, `target` or `tracer`. As I mentioned earlier, you should avoid using these pointers when you can, since there's a lot of implicit behavior attached to them (for example, monsters will target their attacks at their `target` pointer).
-- To get access to **class-specific variables**, which includes your custom variables. This concerns any custom variables you may have created as well
+- To get access to **class-specific variables**, which includes your custom variables. This concerns any custom variables you may have created as well.
 
 First, creating the pointers. Just like any variables, they can be class-wide or local. Let's modify our daddy Cacodemon slightly:
 
@@ -184,8 +184,8 @@ One minor downside is that `Spawn` uses global offsets, not relative, so we can'
 Spawn:
 	TNT1 A 0 NoDelay {
 		baby = Spawn("CacoBaby",pos);
-		if (baby)			//don't forget to immediately null-check the pointer!
-			baby.Warp(self,64,0,0); //moves the spawned baby 64 units in front of self (CacoDaddy)
+		if (baby)	//don't forget to immediately null-check the pointer!
+			baby.Warp(self,64,0,0);	//moves the spawned baby 64 units in front of self (CacoDaddy)
 	}
 	HEAD A 10 A_Look;
 	wait;
@@ -286,16 +286,16 @@ Actually, let's take a look at that! (Don't worry that you don't understand all 
 ```csharp
 private static void BrainishExplosion(vector3 pos)	//defines a function for BossBrain to use
 {
-	Actor boom = Actor.Spawn("Rocket", pos, NO_REPLACE); //spawns a Rocket and cast it to boom
+	Actor boom = Actor.Spawn("Rocket", pos, NO_REPLACE);	//spawns a Rocket and cast it to boom
 	if (boom)
 	{
-		boom.DeathSound = "misc/brainexplode";			//changes rocket explosion sound
+		boom.DeathSound = "misc/brainexplode";	//changes rocket explosion sound
 		boom.Vel.z = random[BrainScream](0, 255)/128.;	//randomizes vertical velocity
-		boom.SetStateLabel ("Brainexplode");		//sets Rocket to speical Brainexplode state
-		boom.bRocketTrail = false;					//disables rocket trail used in GZDoom
-		boom.SetDamage(0);							//disables collision since it's not needed
-		boom.tics -= random[BrainScream](0, 7);		//changes duration of the frames randomly
-		if (boom.tics < 1) boom.tics = 1;			//makes sure duration isn't less than 1
+		boom.SetStateLabel ("Brainexplode");	//sets Rocket to speical Brainexplode state
+		boom.bRocketTrail = false;	//disables rocket trail used in GZDoom
+		boom.SetDamage(0);	//disables collision since it's not needed
+		boom.tics -= random[BrainScream](0, 7);	//changes duration of the frames randomly
+		if (boom.tics < 1) boom.tics = 1;	//makes sure duration isn't less than 1
 }
 ```
 
