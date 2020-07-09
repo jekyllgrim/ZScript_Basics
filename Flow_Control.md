@@ -1,6 +1,6 @@
 ### [<<< Back to  start](README.md)
 
-[<< Previous: Arrays](arrays.md)
+<< Previous: Arrays
 
 # Flow Control
 
@@ -33,8 +33,8 @@ Basic arithmetic operations like addition, subtraction, multiplication, division
   
 ```csharp
   A_SetHealth(health + target.health); //sets the actor's health to its current value plus the actor's target's current health value
-  ```
-  
+```
+
 - `-`  — **subtraction**:
 
   ```csharp
