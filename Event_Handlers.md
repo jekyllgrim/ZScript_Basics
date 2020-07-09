@@ -107,7 +107,7 @@ Notes:
 
 - Normally when actor A kills actor B, actor A will become actor B's `target`, so the `target` pointer serves as a pointer to the killer. Hence `e.thing.target && e.thing.target.player` checks that the killed thing has a `target` and that it's a player.
 - `Console.PrintF` is a Java-like function that prints stuff into the console and the standard Doom message area. It's often used for debugging as well: it works similarly to `A_Log` and allows passing values to it via `%d`, `%f` and such, which are described [here](https://zdoom.org/wiki/String#Methods).
-- Since `EventHandler` is not an actor, to use some ZScript functions you need to explicitly tell it it's an actor function. `Actor.Spawn` tells it to use `Spawn` as defined in `Actor`. You won't need to do it for DECORATE action functions.
+- Since `EventHandler` is not an actor, to use ZScript Actor functions from it you need to explicitly tell it it's an actor function. `Actor.Spawn` tells it to use `Spawn` as defined in `Actor`. You won't need to do it for DECORATE action functions.
 
 It's important that this event handler could be optimized like so:
 
@@ -263,7 +263,7 @@ Some notes of the functions used in this script:
 
 - `Clamp(value, min, max)` allows modifying a value while making sure it doesn't exceed the `min` or `max` values. In the example above `bleedbuildup = Clamp(bleedbuildup - 1, 0, 100)` is similar to doing `bleedbuildup -= 1`, but it makes sure it never goes below 0 or above 100.
 - `level.time` is a global variable that returns how much time (in tics) has passed since the current map was started. It's a neat and simple way to make sure effects occur only after a specific period of time or with specific intervals (as above). It's necessary in constantly executing functions, such as `Tick()` or `DoEffect()`, since they don't have any analog of `wait` or `delay`.
-- `%` is a [modulo operator](https://en.wikipedia.org/wiki/Modulo_operation): `value1 % value2` will return the remaining number after a division of `value1` by `value2`, known as **modulus**. For example, the expression `5 % 2` would give us modulus 1 because 5 divided by 2 has a quotient of 2 and a remainder of 1, while `9 % 3` would evaluate to 0 because the division of 9 by 3 has a quotient of 3 and leaves a remainder of 0; there is nothing to subtract from 9 after multiplying 3 times 3. Hence, the check `if (level.time % 35 == 0)` will return true every 35 tics, because a value such as 105 divided by 35 has a quotient of 3 (since 3 x 35 = 105) and a remainder of 0.
+- `%` is a [modulo operator](https://en.wikipedia.org/wiki/Modulo_operation): `value1 % value2` will return the remaining number after a division of `value1` by `value2`, known as **modulus**. For example, the expression `5 % 2` would give us modulus 1 because 5 divided by 2 has a quotient of 2 and a remainder of 1, while `9 % 3` would evaluate to 0 because the division of 9 by 3 has a quotient of 3 and leaves a remainder of 0; there is nothing to subtract from 9 after multiplying 3 times 3. Hence, the check `if (level.time % 35 == 0)` will return `true` every 35 tics, because a value such as 105 divided by 35 has a quotient of 3 (since 3 x 35 = 105) and a remainder of 0.
 
 
 
