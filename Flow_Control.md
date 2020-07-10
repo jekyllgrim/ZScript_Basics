@@ -2,6 +2,8 @@
 
 << Previous: Arrays
 
+**Disclaimer:** This chapter is work in progress. Things will be moved, amended and expanded. At least two more sections are planned.
+
 # Flow Control
 
 When you call functions, change values and do other things within a code block (an anonymous function, a virtual function override, etc.), these changes are executed in a certain order, following the specified conditions. To control this flow, you need to know how to use **statements** and **operators**.
