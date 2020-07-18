@@ -4,9 +4,21 @@
 
 # Pointers and casting
 
+## But what IS a pointer?
+
+Pointer is a very simple, but incredible powerfull concept in all kind of programming, not only Zscript.
+
+Technically speaking **a pointer is just a variable that hold a memory address**. On the surface all it means is "specific variable which **store address** of some data".
+
+A real life example, roghly speaking, a page number in a book are a pointer to the corresponding page. So we can reference to, say, "page 9" without retelling whole content of page 9.
+What does it gives? It **saves time**. In case of book, content of the page already exist in the book and we dont have to waste time creating a page from scratch.
+
+
+You can see more deep explanation about what pointer is, on the example of C++ language, [in this video](https://www.youtube.com/watch?v=iChalAKXffs). Zscript uses much simpler syntax than in the video, but main idea is the same.
+
+
 ## Basic pointers
 
-One of the primary concepts you need to have a good grasp on to use ZScript is pointers. A **pointer** is, in essence, a type of variable that gives you *access* to something—usually an actor. 
 
 DECORATE actually has pointers! But you are limited to using three of them: **master, target** and **tracer**. You’re probably familiar with them, but here’s a quick recap:
 
@@ -18,6 +30,18 @@ DECORATE actually has pointers! But you are limited to using three of them: **ma
 - `Master` pointer is not set by anything in vanilla Doom, but you might’ve set it yourself via `A_SpawnItemEx` which allows setting pointers manually via flags (`SXF_SETMASTER` in this case).
 
 Pointers in DECORATE can be set manually mostly with `A_SpawnItemEx` by using the function’s flags. Doing this, you get access to functions such as `A_KillMaster` or `A_RemoveChildren` and such, which allow killing/removing actors from another actor that has a pointer to them. `A_FaceTarget` is also a common example of a function that interacts with a pointer, making the actor face its target (if it has one).
+
+## Most important thing about using pointers
+Since pointers store some data, its important to check is data even **exist** in the first place before trying to access it. If you tries to read some information from empty pointer in Zscript it cause error known as **VM abort**. More specifically specific case of VM abort named **NULL pointer VM abort**.
+
+Why NULL pointer? Because pointer without any data in it names **NULL pointer**.
+
+Why is it happens? Zscript expect to see some data in pointer, and if there are no any data it, Gzdoom conclude that **something goes wrong** in some code before reading from pointer, and to not escalate error further, breaks code execution.
+
+In Zscript check pointer for data can be done by simple condition statement `if(pointer name here != NULL) {}` which mean `if(there are something in this pointer) {do things here}`. Such check names **NULL check** since it check is pointer equal to NULL or no.
+
+Note, simple `if(pointer name here) {}` works as well, since Zscript implicitly **cast** it to bool (See further about **casting**)
+
 
 ## Using pointers in ZScript
 
@@ -42,14 +66,11 @@ This gracious Imp gives the target some shells when it dies (hence, if you kille
 
 *Notes on the example:*
 
-- `if (target != null)` checks if `target` exists. This is called **null-checking** (because it checks if a pointer isn't null), and you *have* to do it before trying to call anything on the `target`. 
-
-  - If you don't do the null-check, and for some reason the actor doesn't exist (in this case it can happen when the target is already dead), the game will close with an error (this is known as a **VM abort**).
-  - You can simplify this check to `if (target)` — it'll work the same way.
+- `if (target != null)` **null-checking**, see explanation above
 
 - `GiveInventory` is an internal ZScript version of `A_GiveInventory` and it works basically the same way.
 
-- You might've noticed there are no curly braces after around the **target.GiveInventory** block. You can do that when there’s only **one line** after the condition. However, if there are 2 or more lines, you can’t do that:
+- You might've noticed there are no curly braces after around the **target.GiveInventory** block. You can do that if you want exacute only **one line** after the condition. However, if there are 2 or more lines, you can’t do that:
 
   ```csharp
   //this is OK:
@@ -70,7 +91,7 @@ This gracious Imp gives the target some shells when it dies (hence, if you kille
   //THIS IS NOT OK!
   if (target)
   	target.GiveInventory("Shotgun",1)
-  	target.GiveInventory("Shell",20); //this will ignore the null-check
+  	target.GiveInventory("Shell",20); //this will ignore the null-check and executes regardless of null check
   ```
 
   
@@ -133,12 +154,7 @@ The daddy Caco spawns a baby Caco when it appears, and makes the baby its `trace
 
 We use `tracer.` as a prefix to execute functions on it and change its properties. As mentioned earlier, **it's very important to null-check all pointers you use** to avoid the risk of causing a VM abort. A simple example why it could happen here is that the daddy spawns its baby 64 units in front of itself; if the daddy Caco is initially placed facing some other actor or a wall, it won't spawn the baby at all (because `A_SpawnItemEx` checks for free space before spawning something).
 
-## Casting and custom pointers
-
-But casting and custom pointers is where the actual fun begins. **Casting** is creating a variable and attaching something to it (usually an instance of an actor). In other words, casing basically means creating a custom pointer. There are two main cases when you need to use casting:
-
-- To create a custom pointer that doesn't take place of `master`, `target` or `tracer`. As I mentioned earlier, you should avoid using these pointers when you can, since there's a lot of implicit behavior attached to them (for example, monsters will target their attacks at their `target` pointer).
-- To get access to **class-specific variables**, which includes your custom variables. This concerns any custom variables you may have created as well.
+## Usage of custom pointers
 
 First, creating the pointers. Just like any variables, they can be class-wide or local. Let's modify our daddy Cacodemon slightly:
 
@@ -174,9 +190,12 @@ Class CacoDaddy : Cacodemon {
 
 The behavior barely changes, but we're now using a custom pointer baby instead of pre-existing tracer. This frees up the tracer pointer to be used somewhere else (perhaps by one of the existing functions, who knows). 
 
-What exactly happens: `baby = Spawn("CacoBaby",pos)` spawns an actor named CacoBaby at the position `pos` (CacoDaddy's position) *and* casts CacoBaby to the variable `baby`. 
+What exactly happens: `baby = Spawn("CacoBaby",pos)` spawns an actor named CacoBaby at the position `pos` (CacoDaddy's position) *and* store pointer to spawned `CacoBaby` to the variable `baby`. 
 
-You may wonder why we're not using `A_SpawnItemEx` here. That's because ZScript `Spawn` function not only spawns an actor but also tells us what actor was spawned—as a result, we can immediately cast it to the variable. `A_SpawnItemEx`, however, spawns an actor but does not return any data. (See [Custom Functions](Custom_Functions.md) to learn more about return values.)
+You may wonder "why we're not using `A_SpawnItemEx` here?".
+That's because ZScript `Spawn` function spawns an actor and return pointer to it, or **NULL** of spawn was unsucsesfull. 
+
+And `A_SpawnItemEx` is a specific functions with **multiple returns**, which we dont know how to handle for now. (See [Custom Functions](Custom_Functions.md) to learn more.)
 
 One minor downside is that `Spawn` uses global offsets, not relative, so we can't spawn CacoBaby 64 units in front of CacoDaddy. But that's not a problem, since we can spawn it and then immediately move it using `Warp` (a ZScript function similar to `A_Warp`):
 
@@ -193,7 +212,21 @@ Spawn:
 
 [^*Note*]: For this simple example, we're not checking the position here at all, so if CacoDaddy was in front of a wall, the baby can end up inside a wall.
 
-`Self`, as you probably already guessed, is a pointer to the current actor; since we're calling this from CacoDaddy, `self` is CacoDaddy. The full syntax for `Warp` is **Warp(pointer, xoffsets, yoffsets, zoffsets)**, and the offsets are relative, just like with `A_Warp`, so we move the spawned baby 64 units in front of `self` (CacoDaddy).  (`Self` is an existing pointer, you don't need to define or cast it.)
+or calculate result position by hand using math
+
+```csharp
+Spawn:
+	TNT1 A 0 NoDelay {
+		vector3 offset = (cos(self.angle) * 64, sin(self.angle) * 64, 0);//initialization of local varible of "vector 3" type and calculate baby offset inside of it
+		baby = Spawn("CacoBaby",pos + offset);//adding two vectors together
+		if (baby)	//don't forget to immediately null-check the pointer!
+			baby.Warp(self,64,0,0);	//moves the spawned baby 64 units in front of self (CacoDaddy)
+	}
+	HEAD A 10 A_Look;
+	wait;
+```
+
+`Self`, as you probably already guessed, is a pointer to the current actor aka actor that execute tis code; since we're calling this from CacoDaddy, `self` is CacoDaddy. The full syntax for `Warp` is **Warp(pointer, xoffsets, yoffsets, zoffsets)**, and the offsets are relative, just like with `A_Warp`, so we move the spawned baby 64 units in front of `self` (CacoDaddy).  (`Self` is an existing pointer, you don't need to define or cast it.)
 
  
 
@@ -301,9 +334,16 @@ private static void BrainishExplosion(vector3 pos)	//defines a function for Boss
 
 There's a lot of stuff in this example we haven't covered yet, like creating custom functions, but now you should be able to mostly understand what's happening: the function creates a rocket, changes its explosion sound, disables rocket trail and damage and slightly randomizes its animation speed. On the whole, Icon of Sin's death effect is more complicated than that (and it only works at specific map coordinates, by the way), but you get the gist.
 
-## Type casting
+## Type casting pointers
 
-There's one other case of casting that you'll need to use when working with classes that use custom variables or functions. 
+**Casting** is a way to convert pointer data type from one type to another.
+
+In Zscript there are two types of casting exist, **Implicit casting** and **Explicit casting**.
+
+**Implicit casting** implies that Gzdoom tries to guess the result data type on its own using internal methods for it.
+**Explicit casting** implies that you, as person who write code, defines type of data which Gzdoom should use when acessing such data.
+
+The main cases to use casting is to get access to **class-specific variables and/or functions**, which includes your custom variables/functions. 
 
 Let's say we want to make a version of Baron of Hell that drops a big Soulsphere when it's killed: this Soulsphere should set our health to 300 instead giving 100 HP limited to 200. Of course, we could create a new Soulsphere actor, but since we now know about casting, we try do this:
 
@@ -328,7 +368,11 @@ Class PrinceOfHell : BaronOfHell {
 
 But if you run the code above, you'll get "Unknown identifier" script errors about `amount`, `maxamount` and `pickupmessage`.
 
-The reason is simple: we're casting Soulsphere as **actor**, but properties like `amount` and `maxamount` are *not* defined in the `Actor` class; they're actually defined in the `Inventory` class. To avoid the error that, we need to cast it explicitly as `Inventory`. And this is what's called **type casting**:
+The reason is simple: we're casting Soulsphere as **actor**, but properties like `amount` and `maxamount` are *not* defined in the `Actor` class; they're actually defined in the `Inventory` class.
+
+While Zscript aware about existing of `Inventory` class, which cave mentioned above variables, it treat pointer to Soulsphere as an `actor` type, since pointer type **explicitly** set to `actor`.
+
+To avoid the error, we need to cast it explicitly as `Inventory`. And this is what's called **type casting**:
 
 ```csharp
 //this will work:
@@ -349,7 +393,9 @@ Class PrinceOfHell : BaronOfHell {
 }
 ```
 
-In this case inventory orb creates a variable orb of type `Inventory`, then casts it to an `Inventory` class and spawns it. You'll need to use this method whenever you're trying to get access to variables, properties and functions defined only for a specific class. 
+In this case `inventory orb` creates a pointer named `orb` of type `Inventory`, and then cast pointer returned by `Spawn` function to an `Inventory` class type. You'll need to use this method whenever you're trying to get access to variables, properties and functions defined only for a specific class.
+
+But why I should cast `actor` to `inventory` if Zscript already know about existing of such class? Because by default everything that got spawned treats as `actor` type, since every single actors in Gzdoom inherit from base class `actor`, which is a base class for all **map objects** in the game.
 
 You can simplify type casting by using the word `let`:
 

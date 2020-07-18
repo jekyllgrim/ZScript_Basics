@@ -11,10 +11,12 @@
    2. Access modifiers
    3. Data types
 6. [Pointers and casting](Pointers_and_casting.md)
-   1. Basic pointers
-   2. Using pointers in ZScript
-   3. Casting and custom pointers
-   4. Type casting
+   1.What IS a pointer?
+   2. Basic pointers
+   3.Most important thing about pointers
+   4. Using pointers in ZScript
+   5. Usage of custom pointers
+   6. Type casting pointers
 7. [Custom functions](Custom_functions.md)
    1. Non-void functions and return values
 8. [Virtual Functions](Virtual_functions.md)
