@@ -36,7 +36,7 @@ Since pointers store some data, its important to check is data even **exist** in
 
 Why NULL pointer? Because pointer without any data in it names **NULL pointer**.
 
-Why is it happens? Zscript expect to see some data in pointer, and if there are no any data it, Gzdoom conclude that **something goes wrong** in some code before reading from pointer, and to not escalate error further, breaks code execution.
+Why is it happens? Zscript expect to see some data in pointer, and if there are no any data in it, Gzdoom conclude that **something goes wrong** in some code located before code that tries to read from pointer, and to not escalate error further, breaks code execution.
 
 In Zscript check pointer for data can be done by simple condition statement `if(pointer name here != NULL) {}` which mean `if(there are something in this pointer) {do things here}`. Such check names **NULL check** since it check is pointer equal to NULL or no.
 
@@ -70,7 +70,7 @@ This gracious Imp gives the target some shells when it dies (hence, if you kille
 
 - `GiveInventory` is an internal ZScript version of `A_GiveInventory` and it works basically the same way.
 
-- You might've noticed there are no curly braces after around the **target.GiveInventory** block. You can do that if you want exacute only **one line** after the condition. However, if there are 2 or more lines, you can’t do that:
+- You might've noticed there are no curly braces after around the **target.GiveInventory** block. You can do that if you want execute only **one line** after the condition. However, if there are 2 or more lines, you can’t do that:
 
   ```csharp
   //this is OK:
@@ -395,7 +395,7 @@ Class PrinceOfHell : BaronOfHell {
 
 In this case `inventory orb` creates a pointer named `orb` of type `Inventory`, and then cast pointer returned by `Spawn` function to an `Inventory` class type. You'll need to use this method whenever you're trying to get access to variables, properties and functions defined only for a specific class.
 
-But why I should cast `actor` to `inventory` if Zscript already know about existing of such class? Because by default everything that got spawned treats as `actor` type, since every single actors in Gzdoom inherit from base class `actor`, which is a base class for all **map objects** in the game.
+But why I should cast `Actor` to `inventory` if Zscript already know about existing of such class? Because returned pointer type of a `spawn` function is `actor` type, since every single actors in Gzdoom inherit from base class `actor`, which is a base class for all **map objects** in the game.
 
 You can simplify type casting by using the word `let`:
 

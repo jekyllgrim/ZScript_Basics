@@ -11,9 +11,9 @@
    2. Access modifiers
    3. Data types
 6. [Pointers and casting](Pointers_and_casting.md)
-   1.What IS a pointer?
+   1. What IS a pointer?
    2. Basic pointers
-   3.Most important thing about pointers
+   3. Most important thing about pointers
    4. Using pointers in ZScript
    5. Usage of custom pointers
    6. Type casting pointers
