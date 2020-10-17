@@ -6,7 +6,9 @@
 
 ## Basic pointers
 
-One of the primary concepts you need to have a good grasp on to use ZScript is pointers. A **pointer** is, in essence, a type of variable that gives you *access* to something—usually an actor. 
+One of the primary concepts you need to have a good grasp on to use ZScript is pointers. A **pointer** is, in essence, a type of variable that gives you *access* to something—often that's an actor.
+
+A more detailed explanation goes like this: a pointer stores a memory address to some data. It allows you to access that data
 
 DECORATE actually has pointers! But you are limited to using three of them: **master, target** and **tracer**. You’re probably familiar with them, but here’s a quick recap:
 
@@ -44,7 +46,7 @@ This gracious Imp gives the target some shells when it dies (hence, if you kille
 
 - `if (target != null)` checks if `target` exists. This is called **null-checking** (because it checks if a pointer isn't null), and you *have* to do it before trying to call anything on the `target`. 
 
-  - If you don't do the null-check, and for some reason the actor doesn't exist (in this case it can happen when the target is already dead), the game will close with an error (this is known as a **VM abort**).
+  - If you don't do the null-check, and for some reason the actor doesn't exist (in this case it can happen when the target is already dead), the game will try to read data that doesn't exist. As a result it'll close with an error (this is known as a **VM abort**). A null-check tells GZDoom to first *check* if the data exists, and only do what needs to be done if the check passes.
   - You can simplify this check to `if (target)` — it'll work the same way.
 
 - `GiveInventory` is an internal ZScript version of `A_GiveInventory` and it works basically the same way.

@@ -421,7 +421,7 @@ if ((target && target is "PlayerPawn") || (master && master.target && master.tar
 	The syntax for using a ternary operator is as follows:
 
 	```csharp
-	booleanvalue ? valueiftrue : valueiffalse
+	booleanvalue = condition ? valueiftrue : valueiffalse
 	```
 
 	Examples:
