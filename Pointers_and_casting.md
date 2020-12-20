@@ -8,8 +8,6 @@
 
 One of the primary concepts you need to have a good grasp on to use ZScript is pointers. A **pointer** is, in essence, a type of variable that gives you *access* to something—often that's an actor.
 
-A more detailed explanation goes like this: a pointer stores a memory address to some data. It allows you to access that data
-
 DECORATE actually has pointers! But you are limited to using three of them: **master, target** and **tracer**. You’re probably familiar with them, but here’s a quick recap:
 
 - `Target` is the most common pointer and it’s automatically used by monsters and projectiles:
