@@ -32,7 +32,7 @@ Class CacoSingleDad : Cacodemon replaces Cacodemon {
 	}
 	void AngerBaby() {
 		if (baby) {
-			baby.A_PlaySound("caco/active");
+			baby.A_StartSound("caco/active");
 			baby.A_SetTranslation("BabyAngry");
 			baby.speed *= 2; 
 			baby.floatspeed*= 1.5;
