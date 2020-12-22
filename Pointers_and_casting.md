@@ -115,7 +115,7 @@ Class CacoDaddy : Cacodemon {
 	Death:
 		TNT1 A 0 {
 			if (tracer) {	//null-check tracer
-				tracer.A_PlaySound("caco/active");	//play Cacodemon "wake up" sound on tracer
+				tracer.A_StartSound("caco/active");	//play Cacodemon "wake up" sound on tracer
 				tracer.A_SetTranslation("BabyAngry");	//change translation, as defined in TRNSLATE
 				tracer.speed *= 2;	//multiply tracer's speed by 2 
 				tracer.floatspeed*= 1.5;	//multiply tracer's floatspeed by 1.5
@@ -155,7 +155,7 @@ Class CacoDaddy : Cacodemon {
 	Death:
 		TNT1 A 0 {
 			if (baby) {
-				baby.A_PlaySound("caco/active");
+				baby.A_StartSound("caco/active");
 				baby.A_SetTranslation("BabyAngry");
 				baby.speed *= 2; 
 				baby.floatspeed*= 1.5;
@@ -176,7 +176,7 @@ The behavior barely changes, but we're now using a custom pointer baby instead o
 
 What exactly happens: `baby = Spawn("CacoBaby",pos)` spawns an actor named CacoBaby at the position `pos` (CacoDaddy's position) *and* casts CacoBaby to the variable `baby`. 
 
-You may wonder why we're not using `A_SpawnItemEx` here. That's because ZScript `Spawn` function not only spawns an actor but also tells us what actor was spawned—as a result, we can immediately cast it to the variable. `A_SpawnItemEx`, however, spawns an actor but does not return any data. (See [Custom Functions](Custom_Functions.md) to learn more about return values.)
+You may wonder why we're not using `A_SpawnItemEx` here. That's because ZScript `Spawn` function not only spawns an actor but also tells us what actor was spawned—as a result, we can immediately cast it to the variable. `A_SpawnItemEx`, however, spawns an actor but returns two sets of data instead of one and casting with it is a little more complex. (See [Custom Functions](Custom_Functions.md) to learn more about return values.)
 
 One minor downside is that `Spawn` uses global offsets, not relative, so we can't spawn CacoBaby 64 units in front of CacoDaddy. But that's not a problem, since we can spawn it and then immediately move it using `Warp` (a ZScript function similar to `A_Warp`):
 
@@ -222,7 +222,7 @@ Class CacoSingleDad : Cacodemon {
 	Death:
 		TNT1 A 0 {
 			if (baby) {
-				baby.A_PlaySound("caco/active");
+				baby.A_StartSound("caco/active");
 				baby.A_SetTranslation("BabyAngry");
 				baby.speed *= 2; 
 				baby.floatspeed*= 1.5;
