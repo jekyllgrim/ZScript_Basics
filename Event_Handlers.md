@@ -109,7 +109,7 @@ Notes:
 - `Console.PrintF` is a Java-like function that prints stuff into the console and the standard Doom message area. It's often used for debugging as well: it works similarly to `A_Log` and allows passing values to it via `%d`, `%f` and such, which are described [here](https://zdoom.org/wiki/String#Methods).
 - Since `EventHandler` is not an actor, to use ZScript Actor functions from it you need to explicitly tell it it's an actor function. `Actor.Spawn` tells it to use `Spawn` as defined in `Actor`. You won't need to do it for DECORATE action functions.
 
-It's important that this event handler could be optimized like so:
+This event handler could also be written the following way:
 
 ```csharp
 Class RewardStuff : EventHandler {
@@ -128,9 +128,7 @@ Class RewardStuff : EventHandler {
 }
 ```
 
-In this version we inverted the check: instead of doing "if A and B and C and D — do the thing" it's doing "if not A, do nothing; otherwise if not B, do nothing; otherwise if not C, do nothing; otherwise if not D, do nothing".
-
-This makes the string of checks shorter, and whenever any of the checks is false, `return;` is called and the function is cut off. In other words, this way in most cases GZDoom will have to do fewer checks: one or two most of the time, instead of doing *all* 4 checks *every* time a thing is spawned. This can affect the game's performance.
+It doesn't make any difference performance-wise (both `||` and `&&` strings of checks will be cut off as soon as one check returns false), but it's arguably easier to read because it contains fewer curly braces.
 
 
 
