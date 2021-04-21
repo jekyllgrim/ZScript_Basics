@@ -530,6 +530,12 @@ Another common example of a bit field is player input: whenever player presses a
 * `~`  — **bitwise NOT**. It's most commonly used in combination with `&=` to unset flags as follows:
 
 	```csharp
+	myflags &= ~FLAGNAME;
+	```
+
+	This will remove `FLAGNAME` flag from the `myFlags` fields;
+
+	```csharp
 	action void CustomFireBullets(double spread_xy, double spread_z, int numbullets, int damageperbullet, class<Actor> pufftype = "BulletPuff", int flags = 1, double range = 0, class<Actor> missile = null, double Spawnheight = 32, double Spawnofs_xy = 0) {
 	    if (random(0,10) > 8)
 	        flags &= ~FBF_USEAMMO;
