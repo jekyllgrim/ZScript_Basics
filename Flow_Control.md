@@ -8,9 +8,9 @@
 
 When you call functions, change values and do other things within a code block (an anonymous function, a virtual function override, etc.), these changes are executed in a certain order, following the specified conditions. To control this flow, you need to know how to use **statements** and **operators**.
 
-## Operators
+## Operators and operands
 
-**Operators** are symbols that define relationships and interactions between **operands**. In the expression `A + B` A and B are operands, while `+` is the operator of addition. In the expression `if (A == B)` A and B are operands, and `==` is a relational operator that checks if operands' values are equal to each other.
+**Operators** are symbols that define relationships and interactions between **operands**. In the expression `A + B` A and B are operands, while `+` is the <u>operator of addition</u>. In the expression `if (A == B)` A and B are operands, and `==` is a <u>relational operator</u> that checks if operands' values are equal to each other.
 
 Operators used in ZScript are similar to the ones used in the C-family languages. They can be split into the following categories:
 
@@ -59,11 +59,20 @@ Basic arithmetic operations like addition, subtraction, multiplication, division
 
 - `/` — **division**:
 
-	```csharp
-	double projvel = Distance3D(target) / 35; //defines a double value 'projvel that is equal to the distance to target divided by 35 
-	```
+  ```csharp
+  double projvel = Distance3D(target) / 35; //defines a double value 'projvel' that is equal to the distance to target divided by 35 
+  ```
 
-	(If a projectile is then fired at the `target` with velocity `projvel`, it'll reach the goal within 35 tics, i.e. a second)
+  (If a projectile is then fired at the `target` with velocity `projvel`, it'll reach the goal within 35 tics, i.e. a second)
+
+  **IMPORTANT NOTE:** In many programming languages there are two separate division operators: one for integer division and one for float-point (or double) division. In ZScript there's only one, which means that if both numbers are integers, the result will be an integer as well, and the part of the number after the point will be automatically truncated (removed). So, for example, `5 / 2` in ZScript equals `2`, not `2.5`.
+
+  This can be avoided by making sure that one or both operands are doubles, by doing one of the following:
+
+  - giving it a point, optionally followed by a zero, i.e. `5.0` or `5.`;
+  - explicitly defining it as a double by doing `double(5)`.
+
+  So, `5. / 2`, as well as `5 / 2.` equals `2.5`.
 
 - `%`  — **modulus operation** returns the remainder after dividing the first operand by the second operand:
 
@@ -93,6 +102,28 @@ Basic arithmetic operations like addition, subtraction, multiplication, division
 	```
 
 	(`steps--` is the same as doing `steps = steps - 1`)
+
+#### Note on placement of increment/decrement operators
+
+Operators of incrementation can be placed both after and before a value. So, both `value++` and `++value` are correct. The difference only occurs if you perform multiple operations, such as incrementing and checking the value at the same time. For example:
+
+```csharp
+int myVal = 5;
+bool isBigger = myVal++ > 5;
+```
+
+In the above example `myVal` is *first* checked against 5, and *after that* `myVal` is incremented. As a result, boolean `isBigger` will be false, because at the moment of checking `myVal` will still be equal to 5.
+
+Compare:
+
+```csharp
+int myVal = 5;
+bool isBigger = ++myVal > 5;
+```
+
+In this example `myVal` is *first* incremented, and *after that* checked against 5. As such, `isBigger` will be true, because `myVal` will be equal to 6 before the check.
+
+It's a relatively niche case, but it's something important to be aware of.
 
 
 
@@ -252,12 +283,14 @@ Used to *check* whether two values are equal, or whether one is greater than, le
 
 * `~==` — checks if the first operand is ***approximately* equal to** the second one: this is the same check as `==` but it can be used with doubles to add a very small margin of error to the check. It's very often used with velocity checks (as you remember, `vel` is a vector3 that consists of 3 doubles):
 
-	```csharp
-	if (vel ~== (0,0,0))
-	// Will return true if the calling actor's velocity is approximately equal to zero
-	```
+  ```csharp
+  if (vel ~== (0,0,0))
+  // Will return true if the calling actor's velocity is approximately equal to zero
+  ```
 
-	For all intents and purposes this check is the same as `if (vel == (0,0,0))`, however it's less resource intensive because the precision of the check will be slightly lower. It's recommended to use this operator instead of `==` for similar checks if they're used often. It doesn't work with integer values.
+  For all intents and purposes this check is pretty much the same as `if (vel == (0,0,0))`, but edge cases are possible, so for doubles it's recommended. It's slightly less performance efficient than `==`, but most of the time the difference is negligible.
+
+  Doesn't work with integer values.
 
 * `>` — checks if the first operand is **greater than** the second:
 
@@ -310,6 +343,21 @@ These operators are used to combine multiple checks.
 	// Returns true if the (previously defined) variable i is above zero and under or equal to 100
 	```
 
+Note, in case there are multiple checks, the game won't proceed to the next check unless the previous one is true. So, for example in this case:
+
+```cs
+override void DoEffect() {
+	super.DoEffect();
+    if (owner && owner is "PlayerPawn") {
+        [...]
+    }
+}
+```
+
+...if `owner` is null, the string of checks will stop there. As such, the following `owner is "PlayerPawn"` check will not result in a VM abort, because if `owner` is null, the next check simply won't be executed.
+
+What it means, always put the most important and the simplest check first, because this will be both safe *and* more performance efficient.
+
 * `||` — logical OR. This operator is used to check if *any* of the operands/statements is true:
 
 	```csharp
@@ -322,30 +370,7 @@ These operators are used to combine multiple checks.
 	// Returns true if the calling actor is not moving or if it's on the floor (or, for some reason, below it)
 	```
 	
-	OR checks are faster than AND checks: the game will return false and won't execute more checks if the first check is false, whereas with AND checks the game will always unconditionally check all of them. As such, if you have multiple conditions for a block, sometimes you can invert them and optimize your check:
-	
-	```csharp
-	//slower version:
-	override void PostBeginPlay() {
-	super.PostBeginPlay();
-		if (master && target && target.bISMONSTER) {
-			target.GiveInventory("FXControl",1);
-		}
-	}
-	
-	//faster version:
-	override void PostBeginPlay() {
-		super.PostBeginPlay();
-		if (!master || !target || !target.bISMONSTER) {
-			return;
-		}
-	    target.GiveInventory("FXControl",1);
-	}
-	```
-	
-	In this example with the faster version the game will run one check and immediately stop if it's false; and only if the first check is true will it go to the second check. Which means the cutoff in the sequence of checks may happen as soon as after one or two checks, whereas in the slower versions all three checks are called every time. This is a good practice to follow, since when something like this is performed very often, it may be relevant for performance.
-	
-	(Note that if `!target` check is false, this by definition means `target` isn't null, so you don't need to add an extra null-check before checking `target.bISMONSTER`.)
+	OR checks work the same way as AND checks, just inverted. Which means, if the first condition is true, it won't proceed to the second condition.
 	
 * `!` — logical NOT. This operator allows to **invert** *any* check or even a whole statement. For example:
 
@@ -354,7 +379,7 @@ These operators are used to combine multiple checks.
 	```
 
 	```csharp
-	if (!(vel == (0,0,0) || !bNOGRAVITY)
+	if (!(vel == (0,0,0)) || !bNOGRAVITY)
 	// Returns true if the calling actor's velocity is NOT zero OR the calling actor does not have a NOGRAVITY flag
 	```
 
@@ -409,13 +434,6 @@ if ((target && target is "PlayerPawn") || (master && master.target && master.tar
 	}
 	```
 
-* `&` — **bitwise AND**. There are many bitwise operators, but most of the time you'll only need this one. You'll need it to check values of bitwise fields. One common example of such as field is keys that are currently being pressed by the player—if you have a pointer to the player, the pointer to the key field is `player.cmd.buttons`. If you want to check if the player is pressing a specific key, you're not checking *all* keys, you're just checking if the specific key you need is included in the field:
-
-	```csharp
-	if (player.cmd.buttons & BT_FIRE)
-	//will return true if the player is currently pressing the Fire key, among others
-	```
-
 * `?` — **ternary operator**, functions as a shorter version of an if/else block. Doesn't affect performance and is only used for convenience. 
 
 	The syntax for using a ternary operator is as follows:
@@ -467,7 +485,61 @@ if ((target && target is "PlayerPawn") || (master && master.target && master.tar
 	A_SetMass(bBOSS ? 1000 : 100);
 	```
 
-	
+
+### Bitwise operators
+
+Bitwise operators are used to deal with **[bit fields](https://en.wikipedia.org/wiki/Bit_field**). Many of them are likely to appear only in rather advanced code, but it's still important to understand at least the general concepts behind them, and some of these operators are actually very useful and common.
+
+Bit fields are a specific type of data structure. In GZDoom their primary application is function flags. For example, `A_WeaponReady` supports various flags, such as `WRF_NOPRIMARY`, `WRF_NOSECONDARY`, `WRF_NOSWITCH`. The flags argument is special, because it's a single argument that can have multiple values combined in any order and number. It's possible because the flags argument is actually an integer value that functions as a **bit field**: what it means is that internally each flag is a number, those numbers are added to each when you define the flags, and the final number tells the game which combination of flags to use. The flag names, such as "WRF_NOPRIMARY", are just aliases for the actual numeric values.
+
+It's important to know that, because as a result you can't use operators such as `==` with flags; instead they need special **bitwise operators** that can interact with the bit field that contains the flags.
+
+Another common example of a bit field is player input: whenever player presses a button, the bit field that contains the inputs is changed. Obviously, multiple buttons can be pressed at the same time, so the field dynamically stores those values. You can get access to the player's input bit field either by using `GetPlayerInput()` function or just by accessing the `cmd.buttons` field when you have a pointer to the player (so, for example, from a weapon state it'll be `player.cmd.buttons`).
+
+* `|` — **bitwise OR**. Most commonly used to combine flags together, for example:
+
+	```csharp
+	A_WeaponReady(WRF_NOSECONDARY|WRF_NOSWITCH); //this will make the weapon ready for fire but won't let you either fire the secondary attack or switch the weapon
+	```
+
+* `|=` — a combination of OR and a setter, it's primarily used to set flags. It functions by appending flags to the bit field, so that you can set multiple flags this way without clearing the field:
+
+	```csharp
+	action void CustomWeaponReady (int flags = 0) {
+		if (invoker.ammo1 && invoker.ammo2 && (invoker.ammo2 != invoker.ammo1) && (invoker.ammo2.amount > 0) && (invoker.ammo1.amount < invoker.ammo1.maxamount))
+			flags |= WRF_ALLOWRELOAD;
+		A_WeaponReady (flags);
+	}
+	```
+
+	This custom version of `A_WeaponReady` is designed to work with weapons that use `ammotype1` for magazine ammo and `ammotype2` for reserve ammo. It defines a custom `flags` bit field. Then it performs a long string of checks: it checks whether `ammotype1` and `ammotype2` are defined; then checks that those aren't the same ammo class; then checks if the player has more than 0 but less than maximum amount of secondary ammo; finally, if all those checks pass it'll append the `WRF_ALLOWRELOAD` flag to the field, and *then* call the classic `A_WeaponReady` with the flags you defined.
+
+	What's nice is that you can also pass the other existing A_WeaponReady flags to it, for example `CustomWeaponReady(WRF_NOSECONDARY)` will work as well: if you do that and the string of checks returns true, it'll call `A_WeaponReady(WRF_NOSECONDARY|WRF_ALLOWRELOAD)`.
+
+* `&` — **bitwise AND**. Most commonly used to check if a value is present in the bit field. For example:
+
+	```csharp
+	if (player.cmd.buttons & BT_FIRE)
+	//will return true if the player is currently pressing the Fire key, among others
+	```
+
+	As mentioned above, `==` won't work here because the `cmd.buttons` field contains all currently pressed keys. By using `&` you check if the player is pressing anything *as well as* the key you're checking for.
+
+* `&=` — a combination of bitwise AND and a setter. It's most common application is to unset flags in combination with `~` (see below).
+
+* `~`  — **bitwise NOT**. It's most commonly used in combination with `&=` to unset flags as follows:
+
+	```csharp
+	action void CustomFireBullets(double spread_xy, double spread_z, int numbullets, int damageperbullet, class<Actor> pufftype = "BulletPuff", int flags = 1, double range = 0, class<Actor> missile = null, double Spawnheight = 32, double Spawnofs_xy = 0) {
+	    if (random(0,10) > 8)
+	        flags &= ~FBF_USEAMMO;
+	    A_FireBullets(spread_xy, spread_z, numbullets, damageperbullet, pufftype, flags, range, missile, Spawnheight, Spawnofs_xy);
+	}
+	```
+
+	This function is identical to `A_FireBullets`, except it'll randomly (with about a 80% chance) *unset* the FBF_USEAMMO flag, and then it'll call `A_FireBullets` with all the other arguments as you defined them.
+
+	*Note:* This is an awkward example purely for illustrative purposes, and I wouldn't actually recommend using it. In practice the use of this operator most commonly appears in custom functions with custom bit fields.
 
 ## Statements
 
