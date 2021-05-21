@@ -1,4 +1,4 @@
-**🟢 [<<< BACKTO START](README.md)**
+🟢 [<<< BACK TO START](README.md)
 
 🔵[<< Previous: Classes instead of actors](Classes_instead_of_actors.md)
 
