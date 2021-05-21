@@ -1,6 +1,8 @@
-### [<<< Back to  start](README.md)
+**🟢 [<<< BACKTO START**](README.md)
 
-[<< Previous: Variables and data types](Variables_and_data_types.md)
+🔵 [<< Previous: Variables and data types](Variables_and_data_types.md)
+
+------
 
 # Pointers and casting
 
@@ -439,6 +441,6 @@ Notes:
 * If you're setting `sprite` directly, the sprites you're providing via `GetSpriteIndex` need to be defined *somewhere* in order to be loaded into memory when GZDoom starts. This can be done anywhere—you can even simply define a dummy class somewhere that only has one state used to load sprites.
 * `scale` and `alpha` values in the example above are arbitrary and are provided just as an example.
 
+------
 
-
-### [>> Next: Custom functions](Custom_functions.md)
+🔵 [>> Next: Custom functions](Custom_functions.md)
