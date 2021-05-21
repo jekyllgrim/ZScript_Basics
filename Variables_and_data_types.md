@@ -6,7 +6,13 @@
 
 # Variables, data types and constants
 
-[TOC]
+- [Variables, data types and constants](#variables--data-types-and-constants)
+  * [Overview](#overview)
+    + [Class-scope variables aka fields](#class-scope-variables-aka-fields)
+    + [Local variables](#local-variables)
+  * [Turning variables into actor properties](#turning-variables-into-actor-properties)
+  * [Access modifiers](#access-modifiers)
+  * [Data types](#data-types)
 
 ## Overview
 
