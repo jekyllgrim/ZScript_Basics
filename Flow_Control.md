@@ -1026,7 +1026,7 @@ Actor states in ZScript can be compared to a code block, but they have a number 
 - Everything that goes after a state label and until an operator (such as `stop`, `loop`, `wait`, `goto`) is called a **state sequence**.
 - *Every separate frame* inside a state sequence is called a **state**.
 
-![Graph](https://github.com/jekyllgrim/ZScript_Basics/state_structure.png)
+![Graph](state_structure.png)
 
 (Separate states not highlighted because it'd make the image too noisy, but each frame, such as POSSA, POSSB, etc., is a separate state.)
 
