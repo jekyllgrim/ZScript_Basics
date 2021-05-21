@@ -1,6 +1,8 @@
-### [<<< Back to  start](README.md)
+**🟢 [<<< BACKTO START](README.md)**
 
-[<< Previous: Classes instead of actors](Classes_instead_of_actors.md)
+🔵[<< Previous: Classes instead of actors](Classes_instead_of_actors.md)
+
+------
 
 # Anonymous functions
 
@@ -38,6 +40,6 @@ There are a few things you need to remember when using anonymous functions:
 
 These aspects are described in more detail in the [**Flow Control**](#_Flow_Control) section.
 
+------
 
-
-### [>> Next: Variables and data types](Variables_and_data_types.md)
+🔵 [>> Next: Variables and data types](Variables_and_data_types.md)

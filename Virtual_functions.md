@@ -1,6 +1,8 @@
-### [<<< Back to  start](README.md)
+**🟢 [<<< BACKTO START**](README.md)
 
-[<< Previous: Custom functions](Custom_functions.md)
+🔵 [<< Previous: Custom functions](Custom_functions.md)
+
+------
 
 # Virtual functions
 
@@ -347,6 +349,6 @@ A non-comprehensive of some of the most common virtual functions you'll be overr
 
 A more detailed list can be found on the [ZDoom Wiki](https://zdoom.org/wiki/ZScript_virtual_functions#Actor).
 
+------
 
-
-### [>> Next: Event Handlers](Event_Handlers.md)
+🔵 [>> Next: Event Handlers](Event_Handlers.md)

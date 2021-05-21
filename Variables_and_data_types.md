@@ -1,8 +1,14 @@
-### [<<< Back to  start](README.md)
+**🟢 [<<< BACKTO START**](README.md)
 
-[<< Previous: Anonymous functions](Anonymous_functions.md)
+🔵 [<< Previous: Anonymous functions](Anonymous_functions.md)
 
-# Variables and data types
+------
+
+# Variables, data types and constants
+
+[TOC]
+
+## Overview
 
 If you’ve used ACS, you’re probably familiar with variables. Variables can be defined and used in ZScript in a similar manner, but there are more **data types** that they can hold.
 
@@ -73,14 +79,14 @@ Variable `foo` in this example exists only inside that anonymous function and is
 
 Let's summarize the differences between these two types:
 
-### **Class-scope variables aka fields**
+### Class-scope variables aka fields
 
 - Fields by default can be changed from anywhere (this class, inheriting classes, even other classes if they get access to it—see [Pointers and Casting](#Pointers_and_casting.md)).
 - Fields can’t be declared and receive a value at the same time; when you declare them, they receive a default value (for `int` this is 0), and then you have to modify it somewhere. In the example above `speedups` is initially equal to 0 and it’s increased by 1 when the Imp enters its Pain state for the first time.
 - Fields keep their value while the class exists. That’s why every time we do `speedups += 1`, it increases by 1 and will keep that value throughout whatever the Imp does.
 - Since fields can be accessed from multiple places, it’s a good idea to give them a sensible and understandable name.
 
-### **Local variables**
+### Local variables
 
 - Variables declared inside anonymous functions are available only within that function. 
 - They can be declared *and* given a value within the same line.
@@ -157,11 +163,12 @@ Hence here's a list of various data types. You don't need to immediately learn t
 - **bool** — a boolean variable holds a `true`/`false` value. You can set and check it against true and false, such as `if (foo == true)` (to check if it's true) and `foo = false`; (to set foo to true).
   - The most common example of a bool is actor flags. While flags in the Default block are a special case, since you can set them with + and -, those flags are internally connected to boolean variables named `bFLAGNAME`. You can change the majority of flags on the fly by using those names; for example, you can do `bSHOOTABLE = false;` to suddenly make an actor unshootable.
     - A shorthand for `if (foo == true)` is simply `if (foo)`. And `if (foo == false)` can be replaced with `if (!foo)` (`!` means "not" and inverts any check).
-  - No quotation marks! "True" is a string holding the text "True", while `true` is a boolean value.
+  - No quotation marks! `"True"` is a string holding the text "True", while `true` is a boolean value.
+  - Internally boolean values are also numbers, where 0 is considered `false`, while a non-zero value is `true`. However, while `if (mybool > 0)` is technically correct, you shouldn't use this syntax because you'll just confuse yourself. When possible, always use variables in such a way that their type is obvious from just looking at them.
 - **string** — holds *case-sensitive* text (such as "Adam")
   - Setting and changing it requires using double quotes: `string foo = "Bar";` creates a variable foo that holds the text "Bar". 
-- **name** — holds *case-insensitive* text (i.e. ‘adam’, ‘Adam’ and ‘ADAM’ are all the same)
-  - In contrast to strings setting and changing them can be done by using *single* quotes. You can still use double quotes, but it’s a good idea not to do that, so that when you look at the variable, you’ll immediately know it’s a `name` and not a `string`. In fact, for custom variables in the majority of cases it’s better to use a name than a string, since there are relatively few applications for case-sensitive text.
+- **name** — holds *case-insensitive* text (i.e. 'adam', 'Adam' and 'ADAM' are all the same)
+  - In contrast to strings setting and changing them can be done by using *single* quotes. You can still use double quotes, but it’s a good idea not to do that, so that when you look at the variable, you’ll immediately know it’s a `name` and not a `string` (same as you should do `if (mybool == true)` not `if (mybool > 0)`. In fact, for custom variables in the majority of cases it’s better to use a name than a string, since there are relatively few applications for case-sensitive text.
   - A bunch of stuff in GZDoom are names, for example class names and values of various properties such as `Renderstyle` or `Bouncetype`.
 - **vector2** — holds global (map-wise) 2D coordinates of something, i.e. an object’s `pos.x` and `pos.y`; or an object’s velocity in 2D space, i.e. the object’s `vel.x` and `vel.y`. The contents of this type of variable is two float-point values enclosed in parentheses, such as `(15.0,14.2)`. 
 - **vector3** — similar to vector2, but for 3D space, so it can hold `pos.x`, `pos.y` and `pos.z`, or, in case of velocities, `vel.x`, `vel.y` and `vel.z`. An example of a `vector3` expression that you can use it your code is `pos` which holds the coordinates of the actor it’s called from.
@@ -173,6 +180,6 @@ Hence here's a list of various data types. You don't need to immediately learn t
 - **actor** — a variable that holds an instance of an actor (i.e. a pointer to it). It’s not a name of an actor class, but a *pointer* to a *specific* actor that exists in the level. Learn more in [Pointers and Casting](Pointers_and_casting.md).
 - **state** — holds a reference to a state (such as Spawn, Ready, etc.)
 
+------
 
-
-### [>> Next: Pointers and casting](Pointers_and_casting.md)
+🔵 [>> Next: Pointers and casting](Pointers_and_casting.md)

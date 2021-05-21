@@ -1,6 +1,8 @@
-### [<<< Back to  start](README.md)
+**🟢 [<<< BACKTO START**](README.md)
 
-[<< Previous: Pointers and casting](Pointers_and_casting.md)
+🔵 [<< Previous: Pointers and casting](Pointers_and_casting.md)
+
+------
 
 # Custom functions
 
@@ -203,6 +205,6 @@ This function works as a state jump, such as `A_Jump`: when the function is call
 - Finally, if none of the checks go through, the function returns nothing. `ResolveState()` is the correct way to return states in ZScript (you can't directly put in a state name). `ResolveState` will be covered in more detail in [Flow Control](#_Flow_Control_1).
   - In this case, if the function returns null, the state machine will continue going through the state. In the example above it'll show frame `CPAS E` for 1 tic and then it'll hit `loop` and go back to the beginning of the state.
 
+------
 
-
-### [>> Next: Virtual Functions](Virtual_functions.md)
+🔵 [>> Next: Virtual Functions](Virtual_functions.md)

@@ -1,6 +1,8 @@
-## [<<< Back to  start](README.md)
+**🟢 [<<< BACKTO START**](README.md)
 
-[<< Previous: Virtual Functions](Virtual_functions.md)
+🔵 [<< Previous: Virtual Functions](Virtual_functions.md)
+
+------
 
 # Event Handlers
 
@@ -263,6 +265,6 @@ Some notes of the functions used in this script:
 - `level.time` is a global variable that returns how much time (in tics) has passed since the current map was started. It's a neat and simple way to make sure effects occur only after a specific period of time or with specific intervals (as above). It's necessary in constantly executing functions, such as `Tick()` or `DoEffect()`, since they don't have any analog of `wait` or `delay`.
 - `%` is a [modulo operator](https://en.wikipedia.org/wiki/Modulo_operation): `value1 % value2` will return the remaining number after a division of `value1` by `value2`, known as **modulus**. For example, the expression `5 % 2` would give us modulus 1 because 5 divided by 2 has a quotient of 2 and a remainder of 1, while `9 % 3` would evaluate to 0 because the division of 9 by 3 has a quotient of 3 and leaves a remainder of 0; there is nothing to subtract from 9 after multiplying 3 times 3. Hence, the check `if (level.time % 35 == 0)` will return `true` every 35 tics, because a value such as 105 divided by 35 has a quotient of 3 (since 3 x 35 = 105) and a remainder of 0.
 
+------
 
-
-### [>> Arrays](Arrays.md)
+🔵 [>> Arrays](Arrays.md)

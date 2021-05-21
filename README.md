@@ -7,9 +7,10 @@
 3. [Classes instead of actors](Classes_instead_of_actors.md)
 4. [Anonymous functions](Anonymous_functions.md)
 5. [Variables and data types](Variables_and_data_types.md)
-   1. Turning variables into actor properties
-   2. Access modifiers
-   3. Data types
+   1. Overview
+   2. Turning variables into actor properties
+   3. Access modifiers
+   4. Data types
 6. [Pointers and casting](Pointers_and_casting.md)
    1. Basic pointers
    2. Using pointers in ZScript
@@ -21,11 +22,10 @@
    1. ZScript Virtual Functions
    2. Common ZScript virtual functions
 9. [Event Handlers](Event_Handlers.md)
-10. Arrays
-    1. Dynamic arrays
-    2. Static arrays
-11. [Flow Control](Flow_Control.md)
-12. [Best Practices and Rules of Thumb](Best_Practices.md)
+10. Arrays (TBA)
+11. Constants and enums (TBA)
+12. [Flow Control](Flow_Control.md)
+13. [Best Practices and Rules of Thumb](Best_Practices.md)
 
 ## Introduction
 
@@ -50,6 +50,6 @@ I decided to write this short entry guide to help alleviate exactly that: it cov
 2. While all code examples in the guide are made to be runnable, it's *not* recommended to use them as is: many of them are purposefully inefficient, and the guide tends to iterate over them, improving various aspects while explaining new techniques. Examples are meant to be just that: examples—not ready-made solutions.
 3. This document is a guide, not a wiki. As such, it's designed to be read from beginning to end. Chapters are not self-contained and often rely on information explained earlier in the guide, so it's not recommended to skip anything.
 
+------
 
-
-### [>> Next: Why ZScript?](Why_ZScript.md)
+🔵 [>> Next: Why ZScript?](Why_ZScript.md)

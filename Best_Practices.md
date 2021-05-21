@@ -1,12 +1,12 @@
-## [<<< Back to  start](README.md)
+**🟢 [<<< BACKTO START](README.md)**
 
-
-
---- This chapter is WIP ---
+------
 
 # Best Practices and Rules of Thumb
 
 Even in our day and age there are lot of important best practices that are either unknown to many or often being overlooked. This section describes some of them—most of them are related to ZScript, but some are concerned with modding in general.
+
+[TOC]
 
 
 
