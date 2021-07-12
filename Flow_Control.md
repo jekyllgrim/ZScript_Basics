@@ -454,8 +454,9 @@ Another common example of a bit field is player input: whenever player presses a
 
     ```csharp
     int fflags = DMG_THRUSTLESS;
-    if (random(1,3) == 3)
+    if (random(1,3) == 3) {
     	fflags |= DMG_NO_PAIN;
+    }
     target.DamageMobj(self,self,10,'normal',flags:fflags);
     ```
 
@@ -482,8 +483,9 @@ Another common example of a bit field is player input: whenever player presses a
 
     ```csharp
     int fflags = DMG_THRUSTLESS|DMG_NO_PAIN;
-    if (random[eld](1,3) > 1)
+    if (random(1,3) > 1) {
     	fflags &= ~DMG_NO_PAIN;
+    }
     target.DamageMobj(self,self,10,'normal',flags:fflags);
     ```
 
@@ -689,8 +691,8 @@ Example:
 ```cs
 int i = random(10,15);
 while (i > 0) {
-    A_SpawnItemEx("CustomDebris",xvel:frandom(-5,5),yvel:frandom(-5,5),zvel:frandom(3,6));
-    i--;
+	A_SpawnItemEx("CustomDebris",xvel:frandom(-5,5),yvel:frandom(-5,5),zvel:frandom(3,6));
+	i--;
 }
 ```
 
@@ -701,7 +703,7 @@ The condition doesn't have to be a custom value, it can also be a part of what y
 ```cs
 while (pitch > -45) {
 	A_SpawnProjectile("DoomImpBall",flags:CMF_AIMDIRECTION,pitch:pitch);
-    pitch -= 10;
+	pitch -= 10;
 }
 ```
 
@@ -753,7 +755,7 @@ There are multiple convenient applications for `for` loops. The simplest one is 
 int i = 10;
 while (i > 0) {
 	A_SpawnItemEx("RandomDebris",xvel:frandom(-5,5),yvel:frandom(-5,5),zvel:frandom(3,5));
-    i--;
+	i--;
 }
 
 //this will also repeat 10 times:
@@ -811,28 +813,28 @@ One of the most common advanced applications of `for` loops is iterating through
 // This zombie will drop a trap every 10 seconds.
 // Once it's killed, all existing traps will be destroyed.
 Class ZombieTrapper : Zombieman {
-    array Actor traps; //array of pointers to traps
+	array Actor traps; //array of pointers to traps
 	override void Tick() {
-        super.Tick();
-        //spawn a trap if zombie isn't frozen, and its age is divisible by 350
-        if (!isFrozen() && GetAge() % 350 == 0) {
-            let trp = Spawn("ZombieTrap",pos);
-            if (trp)
-                traps.Push(trp); //push the trap into array
-        }
+		super.Tick();
+		//spawn a trap if zombie isn't frozen, and its age is divisible by 350
+		if (!isFrozen() && GetAge() % 350 == 0) {
+			let trp = Spawn("ZombieTrap",pos);
+			if (trp)
+				traps.Push(trp); //push the trap into array
+		}
 	}
 	States {
 	Death:
 		TNT1 A 0 {
-            //iterate through the array:
-            for (int i = 0; i < traps.Size(); i++) {
-                let trp = traps[i]; //get a pointer to the trap
-                if (trp) //check the pointer isn't null (trap still exists)
-                    trp.Destroy(); //if so, destroy it
-            }
-        }
-        goto super::Death;
-    }
+			//iterate through the array:
+			for (int i = 0; i < traps.Size(); i++) {
+				let trp = traps[i]; //get a pointer to the trap
+				if (trp) //check the pointer isn't null (trap still exists)
+					trp.Destroy(); //if so, destroy it
+			}
+		}
+		goto super::Death;
+	}
 }
 ```
 
@@ -841,12 +843,12 @@ Note, it's very important to remember that an array's **size** is always larger 
 ```cs
 //either this:
 for (int i = 0; i < arrayname.Size(); i++) {
-    arrayname[i].DoSomething();
+	arrayname[i].DoSomething();
 }
     
 //or this:
 for (int i = arrayname.Size() - 1; i >= 0; i--) {
-    arrayname[i].DoSomething();
+	arrayname[i].DoSomething();
 }
 ```
 
@@ -864,9 +866,9 @@ In the following example let's assume you previously created a dynamic array `mo
 ```cs
 bool playerIsTargeted;
 for (int i = 0; i < monsters.Size(); i++) {
-    if (monsters[i] && monsters[i].target && monsters.[i].target.player) {
-        playerIsTargeted = true;
-        break;
+	if (monsters[i] && monsters[i].target && monsters.[i].target.player) {
+		playerIsTargeted = true;
+		break;
     }
 }
 ```
@@ -878,9 +880,9 @@ In the following example a `for` loop is used inside a custom function to find i
 ```cs
 bool hascard;
 for (int i = 0; i < MAXPLAYERS; i++) {
-    if (players[i] && players[i].mo && players.[i].mo.FindInventory("RedCard")) {
-        hascard = true;
-        break;
+	if (players[i] && players[i].mo && players.[i].mo.FindInventory("RedCard")) {
+		hascard = true;
+		break;
     }
 }
 ```
@@ -898,13 +900,13 @@ Notes:
 ```cs
 bool playerIsTargeted;
 for (int i = 0; i < monsters.Size(); i++) {
-    if (!monsters[i])
+	if (!monsters[i])
 		continue; //do nothing if that item in the array is null
-    if (!monsters[i].target)
+	if (!monsters[i].target)
 		continue; //do nothing if the monster has no target
-    if (!monsters.[i].target.player)
+	if (!monsters.[i].target.player)
 		continue; //do nothing if that monster's target isn't player
-    playerIsTargeted = true; //OTHERWISE set the bool to true
+	playerIsTargeted = true; //OTHERWISE set the bool to true
 }
 ```
 
@@ -957,23 +959,23 @@ The structure of a `switch` block in comparison to a series of `if`/`else if` bl
 ```cs
 //if/else:
 if (condition1)
-    DoStuff1();
+	DoStuff1();
 else if (condition2)
-    DoStuff2();
+	DoStuff2();
 else if (condition3)
-    DoStuff3();
+	DoStuff3();
 
 //switch:
 switch {
 case (condition1): 
-        DoStuff1(); 
-        break;
+	DoStuff1(); 
+	break;
 case (condition2): 
-        DoStuff2();
-        break;
+	DoStuff2();
+	break;
 case (condition3): 
-        DoStuff3(); 
-        break;
+	DoStuff3(); 
+	break;
 }
 ```
 
@@ -1159,7 +1161,7 @@ Class ZombieTrapper : Zombieman {
 			Spawn("ZombieTrap",pos);
 		}
 		goto super::Death; //go to regular Zombieman's Death sequence
-    }
+	}
 }
 ```
 
