@@ -62,3 +62,6 @@ When your mod is ready and you want to ship it, you need to pack it into a `.pk3
 
 **Step #7:** You're now ready to create some classes.
 
+------
+
+🔵 [>> Next: Defining classes in zscript](Defining_ZScript_classes.md)
