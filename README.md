@@ -16,8 +16,8 @@ This guide is a beginner-friendly introduction to ZScript, a primary coding lang
 
 ## Contents
 
-1. [Where to start](Where to start.md)
-2. [Defining ZScript classes](Defining ZScript classes.md)
+1. [Where to start](Where_to_start.md)
+2. [Defining ZScript classes](Defining_ZScript_classes.md)
 3. [Why ZScript?](Why_ZScript.md)
 4. [Classes instead of actors](Classes_instead_of_actors.md)
 5. [Anonymous functions](Anonymous_functions.md)
