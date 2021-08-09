@@ -122,7 +122,7 @@ Class SmallerTree : BigTree {
 		Scale 0.5; //this makes the actor's sprite visually smaller
 		Radius 16; //radius and height need to be redefined manually
 		Height 54;
-    }
+	}
 }
 //in this example states aren't redefined because we're reusing the same frames
 ```
@@ -277,7 +277,7 @@ You can also [create a new ammo type](https://zdoom.org/wiki/Creating_new_ammo_t
 
 ### Creating a weapon with a reload mechanic
 
-Weapons with a reload mechanic are very common. Usually to achieve that a special "magazine" ammo type is defined and is used as `AmmoType1` while the reserve ammo is defined as `AmmoType2`. A `Reload` state sequence is used to handle the reload mechanics. Here's an example of a modified Doom Pistol with a reload mechanic:
+Weapons with a reload mechanic are very common. Usually to achieve that a special "magazine" ammo type is defined and is used as `AmmoType` while the reserve ammo is defined as `AmmoType2`. A `Reload` state sequence is used to handle the reload mechanics. Here's an example of a modified Doom Pistol with a reload mechanic:
 
 ```cs
 class PistolWithReload : Pistol //it's based on the existing Pistol, so it inherits all of its properties
