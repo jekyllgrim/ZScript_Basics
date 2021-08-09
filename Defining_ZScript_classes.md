@@ -1,6 +1,6 @@
 🟢 [<<< BACK TO START](README.md)
 
-🔵[<< Previous: Where to start](Where to start.md)
+🔵[<< Previous: Where to start](Where_to_start.md)
 
 ------
 
@@ -12,11 +12,11 @@ ZScript is an [object-oriented](https://en.wikipedia.org/wiki/Object-oriented_pr
 
 Some of the common ZScript base class types are `Actor`, as well as `Inventory` and `Weapon` that are based on `Actor`. Virtually all objects that can be spawned in the map are based on the `Actor` class and therefore are referred to as "actors."
 
-Once you have a [mod folder/archive and your base zscript file set up](Where to start.md), you can start defining some classes. One of the easiest methods of designing classes is looking at how it's done in other mods, or just looking at the existing GZDoom classes. GZDoom's main file `gzdoom.pk3` that can be found in the GZDoom root folder contains all class definitions for Doom, Heretic, Hexen, Strife and Chex Quest games. Note that you never need to copy those classes into your code; you can just inherit from them or design your own code similarly.
+Once you have a [mod folder/archive and your base zscript file set up](Where_to_start.md), you can start defining some classes. One of the easiest methods of designing classes is looking at how it's done in other mods, or just looking at the existing GZDoom classes. GZDoom's main file `gzdoom.pk3` that can be found in the GZDoom root folder contains all class definitions for Doom, Heretic, Hexen, Strife and Chex Quest games. Note that you never need to copy those classes into your code; you can just inherit from them or design your own code similarly.
 
 ## ZDoom Wiki and ZScript vs DECORATE
 
-A good resource that covers most of GZDoom's functionality, including a lot of ZScript is the [ZDoom Wiki](https://zdoom.org/wiki/Main_Page).  However, the wiki has existed since the dawn of ZDoom and as such describes multiple methods, including the ones that are deprecated and no longer recommended for use. Most importantly, a lot of the code examples described on the wiki are written not in ZScript but in [DECORATE](https://zdoom.org/wiki/DECORATE).
+A good resource that covers most of GZDoom's functionality, including a lot of ZScript, is the [ZDoom Wiki](https://zdoom.org/wiki/Main_Page).  However, the wiki has existed since the dawn of ZDoom and as such describes multiple methods, including the ones that are deprecated and no longer recommended for use. Most importantly, a lot of the code examples described on the wiki are written not in ZScript but in [DECORATE](https://zdoom.org/wiki/DECORATE).
 
 DECORATE is a coding language that had been used in GZDoom before ZScript support was added. At the moment it's still supported in GZDoom (since GZDoom is designed for maximum backwards compatibility, so that all older projects are still playable in it), but there's no reason to use it for newer projects because ZScript is an **extension** over DECORATE. 
 
@@ -47,14 +47,14 @@ Class MyClassName : Actor {
 		//flags and properties go here
 		+FLAGNAME //an example of how a flag is set
 		property value; //an example of a property and a value
-    }
+	}
 	//States keyword begins a block of states that define the actor's animation and behavior:
 	States {
 	//when spawned in the world, actors enter their Spawn state by default:
 	Spawn:
 		FRAM A 1; //an example of a sprite name and sprite duration
 		loop; //this will loop the Spawn state
-    }
+	}
 }
 ```
 
@@ -65,7 +65,7 @@ The basic rules for defining your classes are:
 
 ## Actor states
 
-The `States` keyword defines a states block of the actor, where you can use predefined [actor states](https://zdoom.org/wiki/Actor_states) as well as add your own states. States are used by a state machine that displays specific frames and executes attached functions at runtime.
+The `States` keyword defines a states block of the actor where you can use predefined [actor states](https://zdoom.org/wiki/Actor_states) as well as add your own states. States are used by a state machine that displays specific frames and executes attached functions at runtime.
 
 To control the states you need to read about state flow control, which is described on the wiki, as well as in this guide: see [Flow Control: State Control](flow_control.md#state-control). **Don't worry if some of this is confusing at first**; if you're not familiar with states, you'll likely need to keep that page open and check it frequently while coding until you get used to it.
 
@@ -86,7 +86,7 @@ In this example `SPRT` is the sprite name, `A` is a frame letter, and numbers (1
 ### References:
 
 * [Actor states](https://zdoom.org/wiki/Actor_states) on the Wiki
-* [Flow Control: State Control](flow_control.md#state-control) in this guide
+* [Flow Control: State Control](Flow_Control.md#state-control) in this guide
 * [Sprite naming and use](https://zdoom.org/wiki/Sprite) on the Wiki
 
 ## Coding a basic object
