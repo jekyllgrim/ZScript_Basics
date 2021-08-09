@@ -4,7 +4,7 @@ This guide is a beginner-friendly introduction to ZScript, a primary coding lang
 
 🔶 CHOOSE  YOUR PATH 🔶
 
-* If you **do NOT have no prior DECORATE experience** and want to learn ZScript from scratch, start here: 🔵 [>> Where to start](Where_to_start.md).
+* If you **do NOT have prior DECORATE experience** and want to learn ZScript from scratch, start here: 🔵 [>> Where to start](Where_to_start.md).
 
 * If you **DO have prior DECORATE** experience and are considering switching to ZScript, start here: 🔵 [>> Why ZScript?](Why_ZScript.md)
 
