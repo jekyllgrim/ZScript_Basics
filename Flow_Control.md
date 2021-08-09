@@ -1251,3 +1251,21 @@ It's recommended not to use this feature very heavily in custom actors, since it
 ## fail
 
 `Fail` is an operator used specifically by the [`CustomInventory`](https://zdoom.org/wiki/Classes:CustomInventory) class. Calling `fail` at the end of its `Use` state sequence prevents the used item from being removed from the player's inventory. Has no other applications.
+
+## Fall-through (no operator)
+
+If there's nothing at the end of a state sequence, the state machine will just fall through to the next sequence:
+
+```cs
+Fire:
+	WEAP AB 2;
+//fall through to Hold:
+Hold:
+	WEAP C 1 A_FirePistol();
+	WEAP DEF 2;
+	WEAP A 5 A_ReFire(); //jumps back to Hold if Fire is held
+	goto Ready;
+```
+
+This can be created by design (such as in the example above where `A_ReFire()` is used to only loop the Hold sequence without returning to Fire) but can also cause issues if this is done by accident.
+It's important to remember that state labels themselves will never prevent the state machine from progressing. In fact, <u>state labels don't *really* exist</u>—for the game, that is; state labels are only visible to the coder and exist for convenience. That's why flow operators must always be employed to avoid unintentional fall-through from one state sequence to another.
