@@ -51,9 +51,9 @@ Class SpeedyImp : DoomImp {
 
 [^*Note*]: speed is the default Actor speed property, not a custom variable, you can just read and change it directly.
 
-Whenever this Imp is hurt, it'll increase it's speed by x1.2. But this will only happen as long as `speedups` is less than 5, so, no more than 5 times.
+Whenever this Imp is hurt, it'll increase its speed by x1.2. But this will only happen as long as `speedups` is less than 5—so, no more than 5 times.
 
-A variable like that can be declared anywhere in the class but *not* inside the `Default` or `States` blocks. You can access it anywhere in the class, as well as classes that inherit from `SpeedyImp`. This type of variables is known as **fields**.
+A variable like that can be declared anywhere in the class but *not* inside the `Default` or `States` blocks. You can access it from anywhere in the class, as well as classes that inherit from `SpeedyImp`. This type of variables is known as **fields**.
 
 A different method is declaring a variable inside an anonymous function. If you do that, that variable will exist only within that anonymous function:
 
