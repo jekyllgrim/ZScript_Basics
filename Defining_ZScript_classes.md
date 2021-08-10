@@ -67,7 +67,7 @@ The basic rules for defining your classes are:
 
 The `States` keyword defines a states block of the actor where you can use predefined [actor states](https://zdoom.org/wiki/Actor_states) as well as add your own states. States are used by a state machine that displays specific frames and executes attached functions at runtime.
 
-To control the states you need to read about state flow control, which is described on the wiki, as well as in this guide: see [Flow Control: State Control](flow_control.md#state-control). **Don't worry if some of this is confusing at first**; if you're not familiar with states, you'll likely need to keep that page open and check it frequently while coding until you get used to it.
+To control the states you need to read about state flow control, which is described on the wiki, as well as in this guide: see [Flow Control: State Control](Flow_Control.md#state-control). **Don't worry if some of this is confusing at first**; if you're not familiar with states, you'll likely need to keep that page open and check it frequently while coding until you get used to it.
 
 A basic state sequence is defined as follows:
 
