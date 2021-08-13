@@ -1,6 +1,6 @@
 🟢 [<<< BACK TO START](README.md)
 
-🔵 << Previous: Arrays
+🔵 [<< Previous: Arrays](Arrays.md)
 
 ------
 
@@ -807,7 +807,7 @@ for (int i = 0; i < 360; i += 30) {
 }
 ```
 
-One of the most common advanced applications of `for` loops is iterating through (arrays)[#Arrays.md]. For example:
+One of the most common advanced applications of `for` loops is iterating through [arrays](#Arrays.md). For example:
 
 ```cs
 // This zombie will drop a trap every 10 seconds.
