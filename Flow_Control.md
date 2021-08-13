@@ -807,7 +807,7 @@ for (int i = 0; i < 360; i += 30) {
 }
 ```
 
-One of the most common advanced applications of `for` loops is iterating through arrays. For example:
+One of the most common advanced applications of `for` loops is iterating through (arrays)[#Arrays.md]. For example:
 
 ```cs
 // This zombie will drop a trap every 10 seconds.
@@ -867,8 +867,8 @@ In the following example let's assume you previously created a dynamic array `mo
 bool playerIsTargeted;
 for (int i = 0; i < monsters.Size(); i++) {
 	if (monsters[i] && monsters[i].target && monsters.[i].target.player) {
-		playerIsTargeted = true;
-		break;
+            playerIsTargeted = true;
+            break;
     }
 }
 ```
@@ -881,8 +881,8 @@ In the following example a `for` loop is used inside a custom function to find i
 bool hascard;
 for (int i = 0; i < MAXPLAYERS; i++) {
 	if (players[i] && players[i].mo && players.[i].mo.FindInventory("RedCard")) {
-		hascard = true;
-		break;
+            hascard = true;
+            break;
     }
 }
 ```
@@ -929,7 +929,7 @@ It's important to note that `return` can't be used to stop the execution of a sp
 //this function will return true only if ALL players have the desired item:
 bool CheckAllPlayersHaveItem(Class<Inventory> item) {
 	for (int i = 0; i < MAXPLAYERS; i++) {
-		if (!players[i] || players[i].mo)
+		if (!players[i] || !players[i].mo)
 			continue; //do nothing if that player in the players array isn't valid and continue checking
 		if (!players.[i].mo.FindInventory(item))
 			return false; //if the player doesn't have the item, immediately return false
