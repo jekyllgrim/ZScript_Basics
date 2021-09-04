@@ -243,8 +243,7 @@ array <Class<Actor>> classlist;
 ```
 
 
-
-## Array methods
+## Dynamic array methods
 
 The full list of methods (such as `Find`, `Delete`, etc.) is described on [ZDoom Wiki](https://zdoom.org/wiki/Dynamic_arrays). I'll only briefly cover the most basic ones and add some notes to them.
 
@@ -254,7 +253,7 @@ The full list of methods (such as `Find`, `Delete`, etc.) is described on [ZDoom
 
     * **Note:** indexes can contain null data. Always perform a null-check before doing something with an array index.
     * Also remember that you can unintentionally specify an index that is outside of the array's bounds. If your array only contains 3 elements but you try to do `arrayName[10]`, you'll get an out of bounds error and GZDoom will close with a VM abort. That's another reason for checking indexes.
-    * You can also directly *set* index values. For example you can do `arrayname[index] = pointer` to redefine a specific element of the array. Note that whatever was contained in that index previously will be removed from the array.
+    * You can also directly *set* index values. Note that whatever was contained in that index previously will be removed from the array. You  also
 
 * `Size()` returns the current size of the array (i.e. how many elements it has). Can be used both on const and dynamic arrays.
 
@@ -262,7 +261,7 @@ The full list of methods (such as `Find`, `Delete`, etc.) is described on [ZDoom
 
 * `Find(item)` method tries to find `item`, i.e. a specific piece of data (such as actor), inside the array. If found, it'll return a pointer to that data.
 
-    * **Note:** IMPORTANT AND EXTREMELY UNINTUITIVE! When `Find` can't find the object, it does not return `null` or `false`; instead it returns an integer value that is equal to the array's size. So, if you want to make sure a piece of data actually **exists** in your array, you need to check for it as follows:
+    * **Note:** IMPORTANT AND EXTREMELY UNINTUITIVE! When `Find` can't find the object, it does not return `null` or `false` (because it's supposed to return a number); instead it returns an integer value that is equal to the array's size. So, if you want to make sure a piece of data actually **exists** in your array, you need to check for it as follows:
 
     ```cs
     if (arrayName.Find(pointer) != arrayName.Size()) {
@@ -273,7 +272,7 @@ The full list of methods (such as `Find`, `Delete`, etc.) is described on [ZDoom
     }
     ```
 
-* `Push(item)` pushes the `item` into the array. This means that the item will be added to the array, it'll receive a new index and the array's size will increase by 1. In contrast to doing `arrayname[index] = pointer`, this will never override any of the previously existing elements.
+* `Push(pointer)` pushes the `item` into the array. This means that the item will be added to the array, it'll receive a new index and the array's size will increase by 1. In contrast to doing `arrayname[index] = pointer`, this will never override any of the previously existing elements.
 
 * `Pop(pointer)` is the exact opposite of `Push`: it removes the **last** item from the array and reduces the array's size by 1.
 
@@ -283,6 +282,22 @@ The full list of methods (such as `Find`, `Delete`, etc.) is described on [ZDoom
     * If you have an array of actor pointers, deleting a pointer from the array doesn't do anything to object: the object doesn't get destroyed or otherwise modified, the array just loses a pointer to it.
 
 * `Clear()` removes all items from the array and shrinks its size to 0. Just like `Delete`, if you have an array of actor pointers, clearing that array doesn't do anything to the objects it was pointing to: the objects don't get destroyed or otherwise modified, the array just loses pointers to them.
+
+## Fixed-size arrays
+
+Fixed-size arrays, sometimes also called fixed arrays, are a variant of dynamic arrays that always have a fixed size. That means they always have the same number of indexes allocated, even if those indexes contain no data.
+
+Fixed-size arrays are defined as follows:
+
+```cs
+//pseudocode:
+type arrayName[size]; //'size' defines the number of elements
+
+//real code example:
+Class<Actor> traps[5];
+```
+
+Fixed-size arrays are similar to dynamic arrays in the sense that their contents can be change dynamically. However, they don't have access to any of the dynamic array methods except `Size()`. You can't use `Pop()`, `Push()`, `Clear()` and other methods, since they all implying changing the array's size, which is obviously not an option with a fixed-size array. Instead, your only option to set and clear data is using `arrayName[index] = value`.
 
 ------
 
