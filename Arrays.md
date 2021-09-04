@@ -40,16 +40,16 @@ Class RandomTallTorch : RedTorch {
 		"TRED",
 		"TBLU",
 		"TGRN"
-    };
+	};
 	override void PostBeginPlay() {
 		super.PostBeginPlay();
 		sprite = GetSpriteIndex( torchSprite[random(0,2)] ); //randomly returns either 'TRED', or 'TBLU', or 'TGRN'
-    }
+	}
 	States {
 	Spawn:
 		#### ABCD 4 bright;
 		loop;
-    }
+	}
 }
 ```
 
@@ -67,23 +67,23 @@ Class RandomTallTorchWithALight : RedTorch {
 		"TRED",
 		"TBLU",
 		"TGRN"
-    };
+	};
 	static const name torchLight[] = {
 		"BIGREDTORCH",
 		"BIGBLUETORCH",
 		"BIGGREENTORCH"
-    };
+	};
 	override void PostBeginPlay() {
 		super.PostBeginPlay();
 		int i = random(0,2); //get a random number
 		sprite = GetSpriteIndex( torchSprite[i] ); //set the sprite
 		A_AttachLightDef("0",torchLight[i]); //attach the corresponding light
-    }
+	}
 	States {
 	Spawn:
 		#### ABCD 4 bright;
 		loop;
-    }
+	}
 }
 ```
 

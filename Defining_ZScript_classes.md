@@ -67,7 +67,7 @@ The basic rules for defining your classes are:
 
 The `States` keyword defines a states block of the actor where you can use predefined [actor states](https://zdoom.org/wiki/Actor_states) as well as add your own states. States are used by a state machine that displays specific frames and executes attached functions at runtime.
 
-To control the states you need to read about state flow control, which is described on the wiki, as well as in this guide: see [Flow Control: State Control](flow_control.md#state-control). **Don't worry if some of this is confusing at first**; if you're not familiar with states, you'll likely need to keep that page open and check it frequently while coding until you get used to it.
+To control the states you need to read about state flow control, which is described on the wiki, as well as in this guide: see [Flow Control: State Control](Flow_Control.md#state-control). **Don't worry if some of this is confusing at first**; if you're not familiar with states, you'll likely need to keep that page open and check it frequently while coding until you get used to it.
 
 A basic state sequence is defined as follows:
 
@@ -292,7 +292,18 @@ class PistolWithReload : Pistol //it's based on the existing Pistol, so it inher
 	States
 	{
 	Ready:
-		PISG A 1 A_WeaponReady(WRF_ALLOWRELOAD); //WRF_ALLOWRELOAD flag enables the Reload button and Reload sequence
+		PISG A 1
+		{
+			int flags; //this defines an integer number
+			//Check that ammo1 is lower than maxamount and ammo2 is above 0:
+			if (invoker.ammo1.amount < invoker.ammo1.maxamount && invoker.ammo2.amount > 0)
+			{
+				//if true, set flags to WRF_ALLOWRELOAD, which is a A_WeaponReady() flag that allows using the Reload state sequence:
+				flags |= WRF_ALLOWRELOAD;
+			}
+			//pass the resulting value to A_WeaponReady (which will be either 0 or WRF_ALLOWRELOAD):
+			A_WeaponReady(flags);
+		}
 		Loop;
 	Fire:
 		PISG A 4 A_JumpIfNoAmmo("Reload"); //if PistolMagazine ammo is 0, jumps to Reload instead of playing the animation
