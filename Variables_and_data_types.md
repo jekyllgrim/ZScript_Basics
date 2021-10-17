@@ -168,11 +168,62 @@ It's usually not something you need to worry about, but in general if you *know*
 
 
 
+## Accessing variables from weapon states
+
+If you've defined a variable in a weapon, to access it from the weapon's state you will need to use the `invoker` prefix:
+
+```cs
+class MyPlasma : Weapon
+{
+	int heatCounter; //this will hold the amount of heat accumulated by the weapon
+	States
+	{
+	Ready:
+		WEAP A 1
+		{
+			A_WeaponReady();
+			invoker.heatCounter = 0; //reset the heat to 0 in Ready state
+		}
+		loop;
+	Fire:
+		WEAP B 1
+		{
+			A_FireProjectile("Plasmaball");
+			invoker.heatCounter++; //accumulate heat when firing
+			//if the heat is too high, jump to Cooldown sequence:
+			if (invoker.heatCounter >= 50)
+				return ResolveState("Cooldown");
+			//otherwise continue to the next state as normal:
+			return ResolveState(null);
+		}
+	[...] //the rest of the weapon's code
+	}
+}
+```
+
+This is required to clearly differentiate a variable defined on the weapon from variables defined on the player. Player variables, on the other hand, can be accessed by using the variable's name directly:
+
+```cs
+//this weapon has a zoom function which slows the player down by 20%:
+UseScope:
+	WEAP A 1
+	{
+		speed = default.speed * 0.8;
+		A_ZoomFactor(1.3);
+	}
+```
+
+This is only true for the weapon states, however. If you access a variable from the weapon's virtual function, this rule doesn't apply.
+
+You will find more information on accessing and manipulating data in weapon context in the [Weapons, overlays and PSprite](Weapons.md) chapter.
+
+
+
 ## Data types
 
-Of course, `int` isn't the only existing variable type. In fact, variables can hold multiple types of data. It's important to have a general understanding of these data types, since actor properties and function arguments in Doom are also essentially variables and they also hold data of various types. 
+Of course, `int` isn't the only existing variable type. In fact, variables can any type of data that exists in GZDoom. It's important to have a general understanding of these data types, since actor properties and function arguments in Doom are also essentially variables and they also hold data of various types. 
 
-Hence here's a list of various data types. You don't need to immediately learn them by heart, but rather use it as a reference:
+Hence here's a list of various data types. You don't need to immediately learn them by heart, but rather use it as a reference. This list might not be exhaustive.
 
 - **int** — holds an integer number (such as 1, 2, 3, 10, 500, etc.)
   - Many existing properties are also integer values, for example `damage` and `health`. That’s why projectiles can’t deal 2.5 points of damage, only 2 or 3.
@@ -196,7 +247,23 @@ Hence here's a list of various data types. You don't need to immediately learn t
   - The `<Actor>` part can be substituted for something else, if you want to limit this variable to being able to hold a pointer to only something specific, for example `Class<Ammo>`.
   - Note that while it holds a name, it's not the same as a `name`. `Class<Actor>` isn't just a line of text; it also contains information that tells the game that this is, in fact, an existing actor class. In contrast, a `name` simply contains text and nothing else.
 - **actor** — a variable that holds an instance of an actor (i.e. a pointer to it). It’s not a name of an actor class, but a *pointer* to a *specific* actor that exists in the level. Learn more in [Pointers and Casting](Pointers_and_casting.md).
-- **state** — holds a reference to a state (such as Spawn, Ready, etc.)
+- **stateLabel** — holds a reference to a state sequence name, aka state label, such as "Ready", "Fire", etc. Note, state labels are not strings, they're a special type of data, and in fact strings can't be converted to state labels or vice versa. `StateLabel` type is commonly used as function arguments: for example, in the [`A_Jump`](https://zdoom.org/wiki/A_Jump) function the first argument is an integer number defining the jump chance, while the second argument is a state label defining the jump destination.
+- **state** — holds a reference to a state. Not to be confused with state sequences or state labels. (See [State control](Flow_Control.md#state-control) for details on the differences.) For example, doing `state st = FindState("Ready"),` creates a variable `st` that holds a pointer to the first state in the `Ready` sequence.
+    - One commonly used state-type variable used in actors is `curstate`: it holds a pointer to the state the actor is currently in. It can be used in combination with [`InStateSequence`](https://zdoom.org/wiki/InStateSequence) function to check which state *sequence* the actor is in with `if ( InStateSequence(pointer.curstate, pointer.FindState("Label") )`, where `poitner` is a pointer to actor and "Label" is a state label.
+    - Another native actor state variable is `SpawnState` which holds a pointer to the first state in the Spawn sequence.
+- `SpriteID` — holds a reference to a sprite. All actors have `sprite`, which is a `SpriteID`-type variable that always holds their current sprite; you can use it to make one actor copy the appearance of another by doing `pointer1.sprite = pointer2.sprite`. (Note that "appearance" includes many more characteristics, such as scale, alpha, renderstyle, etc.)
+    - Note that `SpriteID` isn't a sprite *name*; instead it's a special internal identifier of a sprite. Converting a sprite name to a SpriteID requires `GetSpriteIndex()` function. E.g.: `sprite = GetSpriteIndex("BAL1")` will set the current actor's sprite to BAL1, the sprite used by Imp's fireballs. Note that you can also modify `frame` to modify the frame letter of a sprite, where `0` is `A`, `1` is `B` and so on.
+    - You can also get a pointer to the sprite used in any state simply by having a pointer to that state. For example, normally you can check `SpawnState.sprite` in any actor to get the first sprite used in the actor's Spawn state sequence. In this sense `sprite` is identical to `curstate.sprite`.
+- `TextureID` — holds a reference to an image (texture, graphic) but not a sprite. Similarly to SpriteID, this isn't a name of the texture but rather an internal identifier. You normally won't need this in actors; instead this is commonly used in UI and HUDs.
+
+Elements of the map itself can also be interacted with in ZScript, and as such you can get pointers to them. One commonly used way to do that is the [`LineTrace`](https://zdoom.org/wiki/LineTrace) function that fires an invisible ray and returns a pointer to what it hits (an actor, a sector, a linedef, etc.). Also actors contain a number of native fields that are meant to hold pointers to map elements; some of these a mentioned below.
+
+Some of the data types that can contain pointers to map elements are:
+
+- **Line** — holds a pointer to a linedef. Actors have a `line`-type `BlockingLine` pointer that contains a pointer to a linedef the actor crosses or hits (for example, projectiles get it when they explode due to hitting a wall).
+- **Sector** — holts a pointer to a sector. All actors have a `sector` type variable `cursector`, which holds the sector the actor is currently in.
+- **F3DFloor** — holds a pointer to a 3D floor.
+- **SecPlane** — holds a pointer to a plane (a floor or a ceiling). Any sector has two native `SecPlane`-type variables: `floorplane` and `ceilingplane`. 3D floors, similarly, have `bottom` and `top` pointers to their bottom and top planes.
 
 ------
 
