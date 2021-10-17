@@ -31,7 +31,7 @@ This guide is a beginner-friendly introduction to ZScript, a primary coding lang
    2. Using pointers in ZScript
    3. Casting and custom pointers
    4. Type casting
-8. [Custom functions](Custom_functions.md)
+8. [Custom functions and function types](Custom_functions.md)
    1. Non-void functions and return values
 9. [Virtual Functions](Virtual_functions.md)
    1. ZScript Virtual Functions
