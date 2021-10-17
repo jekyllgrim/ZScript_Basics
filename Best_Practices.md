@@ -20,40 +20,44 @@ Your instinctive reaction, most likely, is to say, "I can read my code just fine
 2. You'll have a much harder time getting help from others—and not because everyone is a snob who only wants to read well-written code, but because it's *genuinely* hard to read somebody else's code that isn't well-organized.
 3. While an average player may not be concerned with it, clean code will make a good impression on other modders and creators.
 
-In short: check out [existing indentation styles](https://en.wikipedia.org/wiki/Indentation_style), pick K&R or Allman (the vast majority are using one of those) and use it consistently. Remember, this is how it should look (using K&R because this is the style I use in my mod and throughout this guide):
+In short: check out [existing indentation styles](https://en.wikipedia.org/wiki/Indentation_style), pick Allman or K&R (since the absolute majority are using one of those) and use it consistently. Remember, this is how it should look (using Allman because this is the style I use throughout this guide):
 
 ```csharp
-Class MyClass : Actor {		//level 1 header
-	int foo;				//level 2 code
+Class MyClass : Actor		 //level 1 header
+{
+	int foo;			    //level 2 code
 	string bar;
 	property bar : bar;
-	Default {				//level 2 header
+	Default 			    //level 2 header
+	{
 		property1;			//level 3 code
 		property2;
 		property3;
 		+FLAGNAME
-	}					//end of level 2 block
-	states {				//level 2 header
-	Spawn:					
-		SPRT A 1;			//level 3 code
+	}                        //end of level 2 block
+	States {                 //another level 2 header
+	Spawn:                   //state labels may or may not be indended to level 3 (see notes below)
+		SPRT A 1;           //level 3 code
 		loop;
 	Death:
 		SPRT B 5 A_Function;
-		SPRT CD 5 {			//level 4 header
+		SPRT CD 5           //level 4 header
+		{
 			A_Function1();	//level 4 code
 			A_Function2();
-		}					//end of level 4 block
+		}				  //end of level 4 block
 		SPRT E -1;
 		stop;
 	}					//end of level 2 block
 }						//end of level 1 block
 ```
 
-There *is* some discussion regarding how to indent the contents of the `states` block though, but both of these options should be fine:
+There *is* some discussion regarding how to indent the contents of the `States` block though, but both of these options should be fine:
 
 ```csharp
-//considers state labels as new-level code:
-	states {
+//considers state labels as new-level headers:
+	States 
+	{
 		Spawn:            
 			SPRT A 1;
 			loop;
@@ -63,7 +67,8 @@ There *is* some discussion regarding how to indent the contents of the `states` 
 	} 					//this awkward closing brace is too far
 
 //only considers state contents as new-level code, but not the labels:
-	states {
+	States 
+	{
 	Spawn:
 		SPRT A 1;
 		loop;
@@ -121,7 +126,7 @@ However, a next-level strategy would be using a *folder* instead of an archive. 
 
 GZDoom can run folders in the same way it can run archives:
 
-```
+```css
 gzdoom.exe -iwad doom2.wad -file FOLDERNAME
 ```
 
@@ -132,6 +137,21 @@ So, what are the advantages of this method? Basically, there are two.
 First, you can stop using SLADE. Or rather, you'll likely still need to use it to set sprite offsets, optimize PNGs and use [TEXTURES](https://zdoom.org/wiki/TEXTURES) visual editor, but otherwise you can easily use other software to edit your files. You can use something like Notepad++ with [ZScript syntax highlighting](https://forum.zdoom.org/viewtopic.php?f=37&t=46674) to edit your scripts—while they won't have pop-up tips, like SLADE does, you will have a much easier time saving them and switching between tabs. In fact, you won't have to worry that you forgot to save something before closing the archive, saving changes will be faster, and there won't be any chance of SLADE corrupting data (which *can* happen sometimes).
 
 Second, you'll be able to upload your mod to a GitHub repository.
+
+
+
+## Using a consistent naming convention for your classes
+
+Very often, when creating their first custom classes, new modders resort to names like `Demon1`, `Pistol_`, `MyShotgun` and such. None of these are particularly great for the following reasons:
+
+* Many mods nowadays are compatible with each other, or other users may make compatibility patches for them. If that happens, using such generic class names will likely result in name conflicts with other mods, and you'll have more tedious work on your hands.
+* You may face name conflicts even with existing GZDoom classes. For example, `Demon1` is actually [an existing Hexen actor](https://zdoom.org/wiki/Classes:Demon1).
+* More specific names function as a sort of a "signature" that helps to clearly define which mod/author they're from. This makes your code cleaner if you're, for example, using classes/libraries made by other users in your project.
+
+To make a good naming convention, note the following:
+
+* A class name should be descriptive for *you*, not for the player. Players never see class names; they either see pickupmessages or tags, which are defined via properties (and, ideally, via the LANGUAGE lump). Class names are a technical thing and they should be convenient for you. For instance, if you have a custom strong powerup in your mod, don't name the class `HugeFrigginPowerup`; rather use something descriptive, such as `Regen_Speed_Powerup`.
+* It's common practice to use the same prefixes for all your classes within a project. Often those prefixes match the name of the project (for example, `D4D_Shotgun` for a Shotgun in the [Doom 4 Doom](https://github.com/MajorCooke/Doom4Doom) mod) or are initials of the author (`MK_Matrix4` for a special math class by [Marisa Kirisame](https://doomwiki.org/wiki/Marisa_Kirisame)).
 
 
 
