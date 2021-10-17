@@ -10,10 +10,11 @@ When you call functions, change values and do other things within a code block (
 
 This chapter will also cover flow control in **actor states**, which work similarly to functions but not exactly in the same way.
 
-- [Flow Control](#flow-control)
+## Table of Contents
+
 - [Operators and operands](#operators-and-operands)
   * [Arithmetic operators](#arithmetic-operators)
-    + [Note on placement of increment/decrement operators](#note-on-placement-of-increment-decrement-operators)
+    + [Note on placement of increment/decrement operators](#Note-on-placement-of-increment/decrement-operators)
   * [Assignment operators](#assignment-operators)
   * [Relational operators](#relational-operators)
   * [Logical operators](#logical-operators)
@@ -21,14 +22,7 @@ This chapter will also cover flow control in **actor states**, which work simila
   * [Miscellaneous operators](#miscellaneous-operators)
 - [Statements](#statements)
   * [Conditional blocks](#conditional-blocks)
-    + [if](#if)
-    + [else](#else)
-    + [if else](#if-else)
   * [Loop control](#loop-control)
-    + [while](#while)
-    + [for](#for)
-    + [break](#break)
-    + [continue](#continue)
   * [Return and return values](#return-and-return-values)
   * [Switch](#switch)
 - [State control](#state-control)
@@ -36,9 +30,9 @@ This chapter will also cover flow control in **actor states**, which work simila
   * [loop](#loop)
   * [wait](#wait)
   * [goto](#goto)
-    + [Using `goto` and inheritance](#using--goto--and-inheritance)
-    + [Using `goto` with offset](#using--goto--with-offset)
   * [fail](#fail)
+  * [Fall-through (no operator)](#Fall-through-(no-operator))
+  * [State jumps](#State-jumps)
 
 # Operators and operands
 
@@ -117,7 +111,8 @@ Basic arithmetic operations like addition, subtraction, multiplication, division
 
     ```csharp
     int steps;	//defines an integer variable 'steps'
-    if (steps < 10) {	//checks if the value of 'steps' is under 10
+    if (steps < 10)
+    {	//checks if the value of 'steps' is under 10
     	steps++;	//if true, adds 1 to the current value of 'steps'
     }
     ```
@@ -128,11 +123,12 @@ Basic arithmetic operations like addition, subtraction, multiplication, division
 
     ```csharp
     int steps;	//defines an integer variable 'steps'
-    if (steps > 0) {	//checks if the value of 'steps' is over 0
+    if (steps > 0)
+    {	//checks if the value of 'steps' is over 0
     	steps--;	//if true, subtracts 1 from the current value of 'steps'
     }
     ```
-
+    
     (`steps--` is the same as doing `steps = steps - 1`)
 
 ### Note on placement of increment/decrement operators
@@ -257,7 +253,8 @@ Used to *check* whether two values are equal, or whether one is greater than, le
 
     ```csharp
     bool mybool;
-    if (mybool == false) {
+    if (mybool == false)
+    {
     	mybool = true;
     }
     ```
@@ -339,10 +336,12 @@ Used to *check* whether two values are equal, or whether one is greater than, le
 
     ```csharp
     int i = pos.z - target.pos.z;
-    if (i >= 0) {
+    if (i >= 0)
+    {
     	//execute this block if the calling actor's vertical position is above or equal to the target's position
     }
-    else {
+    else
+    {
     	//otherwise execute this block
     }
     ```
@@ -377,9 +376,11 @@ These operators are used to combine multiple checks.
 Note, in case there are multiple checks, the game won't proceed to the next check unless the previous one is true. So, for example in this case:
 
 ```cs
-override void DoEffect() {
+override void DoEffect()
+{
 	super.DoEffect();
-    if (owner && owner is "PlayerPawn") {
+    if (owner && owner is "PlayerPawn")
+	{
         [...]
     }
 }
@@ -454,7 +455,8 @@ Another common example of a bit field is player input: whenever player presses a
 
     ```csharp
     int fflags = DMG_THRUSTLESS;
-    if (random(1,3) == 3) {
+    if (random(1,3) == 3)
+    {
     	fflags |= DMG_NO_PAIN;
     }
     target.DamageMobj(self,self,10,'normal',flags:fflags);
@@ -483,7 +485,8 @@ Another common example of a bit field is player input: whenever player presses a
 
     ```csharp
     int fflags = DMG_THRUSTLESS|DMG_NO_PAIN;
-    if (random(1,3) > 1) {
+    if (random(1,3) > 1)
+    {
     	fflags &= ~DMG_NO_PAIN;
     }
     target.DamageMobj(self,self,10,'normal',flags:fflags);
@@ -499,7 +502,8 @@ Another common example of a bit field is player input: whenever player presses a
     
     //in some other place in the code:
     actor a = Spawn("Imp1",pos);
-    if (a is "DoomImp") {
+    if (a is "DoomImp")
+    {
     	//this check will return true because the spawned Imp1 inherits from DoomImp
     }
     ```
@@ -512,10 +516,12 @@ Another common example of a bit field is player input: whenever player presses a
     
     //in some other place in the code:
     actor a = Spawn("Imp1",pos);
-    if (a.GetClassName() == "DoomImp") {
+    if (a.GetClassName() == "DoomImp")
+    {
     	//this will return false because Imp1 and DoomImp are different class names
     }
-    else if (a is "DoomImp") {
+    else if (a is "DoomImp")
+    {
     	//this will return true
     }
     ```
@@ -533,10 +539,12 @@ Another common example of a bit field is player input: whenever player presses a
     ```csharp
     //regular if/else block:
     int i;
-    if (bNOGRAVITY) {
+    if (bNOGRAVITY)
+    {
         i = 10;	//sets the value to 10 if the calling actor has +NOGRAVITY flag
     }
-    else {
+    else
+    {
         i = 5;	//otherwise sets the value to 5
     }
     
@@ -545,24 +553,28 @@ Another common example of a bit field is player input: whenever player presses a
     ```
 
     Among other things, using it can be convenient in function arguments:
-
+    
     ```csharp
     //all three variants below will set the calling actor's mass to 1000 if they have +BOSS flag, otherwise the mass will be set to 100
     
     //basic if/else:
-    if (bBOSS) {
+    if (bBOSS)
+    {
         A_SetMass(1000);
     }
-    else {
+    else
+    {
         A_SetMass(100);
     }
     
     //a more versatile but longer version:
     int i;
-    if (bBOSS) {
+    if (bBOSS)
+    {
         i = 1000;
     }
-    else {
+    else
+    {
         i = 100;
     }
     A_SetMass(i);
@@ -578,7 +590,8 @@ Statements in ZScript (similarly to C# and other C-style languages) are special 
 Every statement is defined as follows:
 
 ```cs
-keyword (condition) {
+keyword (condition)
+{
 	code;
 }
 ```
@@ -594,7 +607,7 @@ If you have experience with ACS, it's important to know at this point that **ZSc
 
 In all of those cases all of the code defined in a specific function/override is executed from top to bottom but *instantly*, within a single tic (or frame). If you want to delay some of the code, you have to find a way to manually call it later, in a different game tic.
 
-_**Note:** there's no completely fixed terminology regarding the classification of statements, and it's also important to remember that ZScript contains fewer statements than C# and other C-style languages. As such, the classification used in this guide may be purposefully simplified for the sake of clarity and beginner-friendliness._
+> *Note:* there's no completely fixed terminology regarding the classification of statements, and it's also important to remember that ZScript contains fewer statements than C# and other C-style languages. As such, the classification used in this guide may be purposefully simplified for the sake of clarity and beginner-friendliness.
 
 ## Conditional blocks
 
@@ -604,7 +617,8 @@ _**Note:** there's no completely fixed terminology regarding the classification 
 
 ```csharp
 //pseudocode:
-if (condition == true) {
+if (condition == true)
+{
 	DoStuff();
 }
 ```
@@ -612,7 +626,8 @@ if (condition == true) {
 ```cs
 //Real code:
 int num = random(0,100);
-if (num >= 80) {
+if (num >= 80)
+{
     A_Explode();
 }
 ```
@@ -622,7 +637,8 @@ In this example `num >= 80` is the condition. If `num` (a previously defined ran
 It can be simplified as follows:
 
 ```csharp
-if (random(0,100) >= 80) {
+if (random(0,100) >= 80)
+{
 	A_Explode();
 }
 ```
@@ -635,10 +651,12 @@ Note that in the example above `random` automatically creates an integer value, 
 
 ```cs
 //pseudocode:
-if (condition == true) {
+if (condition == true)
+{
     DoThis();
 }
-else {
+else
+{
     DoThat();
 }
 ```
@@ -648,7 +666,8 @@ The `else` block must be defined immediately after the end of the `if` block; yo
 **You don't *have* to** define an `else` block.:
 
 ```cs
-if (condition) {
+if (condition)
+{
     Do();
 }
 else {} //don't do this, it's pointless!
@@ -659,10 +678,12 @@ else {} //don't do this, it's pointless!
 `if else` is a combined statement that also follows an `if` block and is called when the original condition is false, but it also defines an extra condition:
 
 ```cs
-if (condition1 == true) {
+if (condition1 == true)
+{
     DoThis();
 }
-else if (condition2 == true) {
+else if (condition2 == true)
+{
     DoThat();
 }
 ```
@@ -680,7 +701,8 @@ You can define various types of loops within ZScript code, and there are special
 `while` is a statement that begins a loop which will be executed as long as the condition in that loop is true:
 
 ```cs
-while (condition == true) {
+while (condition == true)
+{
     DoStuff();
     //if the 'condition' becomes false in the process, the loop will end
 }
@@ -690,7 +712,8 @@ Example:
 
 ```cs
 int i = random(10,15);
-while (i > 0) {
+while (i > 0)
+{
 	A_SpawnItemEx("CustomDebris",xvel:frandom(-5,5),yvel:frandom(-5,5),zvel:frandom(3,6));
 	i--;
 }
@@ -701,7 +724,8 @@ In the above block the function `A_SpawnItemEx` is designed to spawn a custom de
 The condition doesn't have to be a custom value, it can also be a part of what you're doing in the loop:
 
 ```cs
-while (pitch > -45) {
+while (pitch > -45)
+{
 	A_SpawnProjectile("DoomImpBall",flags:CMF_AIMDIRECTION,pitch:pitch);
 	pitch -= 10;
 }
@@ -725,7 +749,8 @@ In a `for` loop the "counter value" is an initial value (e.g. an integer number)
 A typical `for` loop looks like this:
 
 ```cs
-for (int i = 10; i > 0; i--) {
+for (int i = 10; i > 0; i--)
+{
     //this block will be repeated 10 times
 }
 ```
@@ -735,7 +760,8 @@ In the block above the loop first defines an integer value `i` that is equal to 
 You can invert the values, it won't make any difference:
 
 ```cs
-for (int i = 0; i < 10; i++) {
+for (int i = 0; i < 10; i++)
+{
     //this block will be repeated 10 times
 }
 ```
@@ -753,13 +779,15 @@ There are multiple convenient applications for `for` loops. The simplest one is 
 ```cs
 //this will repeat 10 times:
 int i = 10;
-while (i > 0) {
+while (i > 0)
+{
 	A_SpawnItemEx("RandomDebris",xvel:frandom(-5,5),yvel:frandom(-5,5),zvel:frandom(3,5));
 	i--;
 }
 
 //this will also repeat 10 times:
-for (int i = 10; i > 0; i--) {
+for (int i = 10; i > 0; i--)
+{
 	A_SpawnItemEx("RandomDebris",xvel:frandom(-5,5),yvel:frandom(-5,5),zvel:frandom(3,5));
 }
 ```
@@ -768,7 +796,8 @@ Note that you can make the initial value randomized if you want a random number 
 
 ```cs
 //this loop will execute between 8-12 times:
-for (int i = random(8,12); i > 0; i--) {
+for (int i = random(8,12); i > 0; i--)
+{
 	A_SpawnItemEx("RandomDebris",xvel:frandom(-5,5),yvel:frandom(-5,5),zvel:frandom(3,5));
 }
 ```
@@ -782,7 +811,8 @@ Note that normally **you should only randomize the counter value**, not the cond
     since a random value will need to be defined with every iteration, and that requires
     some CPU resources.
 */
-for (int i = 0; i < random(8,12); i++) {
+for (int i = 0; i < random(8,12); i++)
+{
 	A_SpawnItemEx("RandomDebris",xvel:frandom(-5,5),yvel:frandom(-5,5),zvel:frandom(3,5));
 }
 ```
@@ -790,7 +820,8 @@ for (int i = 0; i < random(8,12); i++) {
 The counter value `i` is a variable that exists within the loop itself and can be used literally there:
 
 ```cs
-for (int i = 0; i < 5; i++) {
+for (int i = 0; i < 5; i++)
+{
     /*	Spawnheight of the spawned projectile is defined as i * 8, which means
     	that 5 imp orbs will be fired, each spawned 8 units above the previous one:
     */
@@ -802,7 +833,8 @@ While usually the change is defined as incrementing `i` by 1, it's also perfectl
 
 ```cs
 // This will fire imp fireballs in a circle, a new fireball every 30 degrees (i.e. 12 fireballs in total):
-for (int i = 0; i < 360; i += 30) {
+for (int i = 0; i < 360; i += 30)
+{
 	A_SpawnProjectile("DoomImpBall", angle: i);
 }
 ```
@@ -812,22 +844,27 @@ One of the most common advanced applications of `for` loops is iterating through
 ```cs
 // This zombie will drop a trap every 10 seconds.
 // Once it's killed, all existing traps will be destroyed.
-Class ZombieTrapper : Zombieman {
+class ZombieTrapper : Zombieman
+{
 	array Actor traps; //array of pointers to traps
-	override void Tick() {
+	override void Tick()
+	{
 		super.Tick();
 		//spawn a trap if zombie isn't frozen, and its age is divisible by 350
-		if (!isFrozen() && GetAge() % 350 == 0) {
+		if (!isFrozen() && GetAge() % 350 == 0)
+		{
 			let trp = Spawn("ZombieTrap",pos);
 			if (trp)
 				traps.Push(trp); //push the trap into array
 		}
 	}
-	States {
+	States 
+	{
 	Death:
 		TNT1 A 0 {
 			//iterate through the array:
-			for (int i = 0; i < traps.Size(); i++) {
+			for (int i = 0; i < traps.Size(); i++)
+			{
 				let trp = traps[i]; //get a pointer to the trap
 				if (trp) //check the pointer isn't null (trap still exists)
 					trp.Destroy(); //if so, destroy it
@@ -842,12 +879,14 @@ Note, it's very important to remember that an array's **size** is always larger 
 
 ```cs
 //either this:
-for (int i = 0; i < arrayname.Size(); i++) {
+for (int i = 0; i < arrayname.Size(); i++)
+{
 	arrayname[i].DoSomething();
 }
     
 //or this:
-for (int i = arrayname.Size() - 1; i >= 0; i--) {
+for (int i = arrayname.Size() - 1; i >= 0; i--)
+{
 	arrayname[i].DoSomething();
 }
 ```
@@ -865,11 +904,13 @@ In the following example let's assume you previously created a dynamic array `mo
 
 ```cs
 bool playerIsTargeted;
-for (int i = 0; i < monsters.Size(); i++) {
-	if (monsters[i] && monsters[i].target && monsters.[i].target.player) {
+for (int i = 0; i < monsters.Size(); i++)
+{
+	if (monsters[i] && monsters[i].target && monsters.[i].target.player)
+	{
             playerIsTargeted = true;
             break;
-    }
+	}
 }
 ```
 
@@ -879,11 +920,13 @@ In the following example a `for` loop is used inside a custom function to find i
 
 ```cs
 bool hascard;
-for (int i = 0; i < MAXPLAYERS; i++) {
-	if (players[i] && players[i].mo && players.[i].mo.FindInventory("RedCard")) {
+for (int i = 0; i < MAXPLAYERS; i++)
+{
+	if (players[i] && players[i].mo && players.[i].mo.FindInventory("RedCard"))
+	{
             hascard = true;
             break;
-    }
+	}
 }
 ```
 
@@ -899,7 +942,8 @@ Notes:
 
 ```cs
 bool playerIsTargeted;
-for (int i = 0; i < monsters.Size(); i++) {
+for (int i = 0; i < monsters.Size(); i++)
+{
 	if (!monsters[i])
 		continue; //do nothing if that item in the array is null
 	if (!monsters[i].target)
@@ -915,7 +959,8 @@ for (int i = 0; i < monsters.Size(); i++) {
 `return` keyword has two uses: it tells ends the execution of a function, and, if possible, it also defines a return value. The use of `return` is mostly covered in the [Custom functions](Custom_functions.md#non-void-functions-and-return-values) chapter. To briefly reiterate, `return` can be used to stop the execution of a function—be it a custom function or an override of an existing virtual function:
 
 ```cs
-override void Tick() {
+override void Tick()
+{
 	super.Tick();
 	if (isFrozen())
 		return; //stop execution if the monster is frozen
@@ -927,8 +972,10 @@ It's important to note that `return` can't be used to stop the execution of a sp
 
 ```cs
 //this function will return true only if ALL players have the desired item:
-bool CheckAllPlayersHaveItem(Class<Inventory> item) {
-	for (int i = 0; i < MAXPLAYERS; i++) {
+bool CheckAllPlayersHaveItem(Class<Inventory> item)
+{
+	for (int i = 0; i < MAXPLAYERS; i++)
+	{
 		if (!players[i] || !players[i].mo)
 			continue; //do nothing if that player in the players array isn't valid and continue checking
 		if (!players.[i].mo.FindInventory(item))
@@ -943,7 +990,8 @@ In the example above as soon as `return false;` is called, the `for` loop will s
 Anonymous functions in actor states also have a return value—the next state to jump to, which can be obtained via `ResolveState(<state label>)`:
 
 ```cs
-TNT1 A 0 {
+TNT1 A 0
+{
 	if (CountInv("Clip") <= 0)
 		return ResolveState("Reload"); //if no ammo, jump to Reload sequence
 	return ResolveState(null); //otherwise, don't jump, move on to the next frame
@@ -966,7 +1014,8 @@ else if (condition3)
 	DoStuff3();
 
 //switch:
-switch {
+switch
+{
 case (condition1): 
 	DoStuff1(); 
 	break;
@@ -988,9 +1037,11 @@ In terms of structure a `switch` block is very similar to a `States` block of an
 A `switch` block, unfortunately, is limited in what data types you can use in it: it can only check for names and integer values. One good application for it is, for example, in a `CheckReplacement` event, if you use it to handle actor replacements in your mod instead of the `replaces` keyword:
 
 ```cs
-override void CheckReplacement(replaceEvent e) {
+override void CheckReplacement(replaceEvent e)
+{
 	let classname = e.Replacee.GetClassName();
-	switch (classname) {
+	switch (classname)
+	{
 	case 'Zombieman':
 		e.Replacement = "MyZombieman";
 		break;
@@ -1008,7 +1059,8 @@ override void CheckReplacement(replaceEvent e) {
 You can insert randomization inside a switch block as well:
 
 ```cs
-	switch (classname) {
+	switch (classname)
+	{
 	case 'Zombieman':
 		if (frandom(0,10) > 8.5)
 			e.Replacement = "Cyberdemon";
@@ -1090,7 +1142,7 @@ Ready:
 	loop;
 ```
 
-*However,* it's fine to loop a zero-duration state that has a built-in jump. For example, `A_Raise()` jumps to the Ready sequence as soon as the weapon has been raised, and by calling it on a zero-duration state you can make weapon selection instant:
+*However,* it's fine to loop a zero-duration state that has a jump attached. For example, `A_Raise()` jumps to the Ready sequence as soon as the weapon sprite has been raised high enough, and by calling it on a zero-duration state you can make weapon selection instant:
 
 ```cs
 Select:
@@ -1108,7 +1160,7 @@ Loops the most recent state. Can be more convenient than `loop` if you need spec
 ```cs
 Spawn:
 	FRAM ABCD 2;
-	wait; //this will loop FRAMD
+	wait; //this will loop frame D only
 ```
 
 It's also a good way to loop the execution of a specific function without looping the whole animation. For example, the projectile below will slowly fade out while increasing in size, and it'll continue fading out until it disappears even when there are no more sprites to animate:
@@ -1116,7 +1168,8 @@ It's also a good way to loop the execution of a specific function without loopin
 ```cs
 Death:
 	BAL1 CCDDE 2 bright;
-	BAL1 E 2 bright {
+	BAL1 E 2 bright
+	{
 		A_FadeOut(0.05);
 		scale *= 1.05;
     }
@@ -1137,7 +1190,7 @@ This can be useful for effects such as smoke clouds.
 		Goto See; //jumps back to See state sequence
 ```
 
-`goto` supports offsets: `goto <state label> +n` where `n` is a number that tells it how far to jump from the specified state label:
+`goto` supports offsets: `goto <state label> +#` where `#` is a number that tells it how far to jump from the specified state label:
 
 ```cs
 //from ChainGunGuy:
@@ -1154,10 +1207,13 @@ This can be useful for effects such as smoke clouds.
 `goto super::<state label>` will jump to the parent's state label, if actor has one:
 
 ```cs
-Class ZombieTrapper : Zombieman {
-	States {
+class ZombieTrapper : Zombieman
+{
+	States
+	{
 	Death:
-		TNT1 A 0 {
+		TNT1 A 0 
+		{
 			Spawn("ZombieTrap",pos);
 		}
 		goto super::Death; //go to regular Zombieman's Death sequence
@@ -1170,8 +1226,10 @@ Class ZombieTrapper : Zombieman {
 It's important to remember that `goto` performs the jump *within the actor*, it's unaffected by inheritance. `Goto Label` in the parent actor will always jump to the `Label` sequence inside that actor, even if the child actor defines the same state label:
 
 ```cs
-Class ParentActor : Actor {
-	states {
+class ParentActor : Actor
+{
+	States 
+	{
 	Spawn:
 		FRAM ABC 1;
 		goto Death; //this will only go to Death within this actor
@@ -1181,8 +1239,10 @@ Class ParentActor : Actor {
 	}
 }
 
-Class ChildActor : ParentActor {
-	states {
+class ChildActor : ParentActor
+{
+	States
+	{
 	Death: //this will never be entered, because parent Death will be used instead
 		FRAM AB 1;
 		loop;
@@ -1193,8 +1253,10 @@ Class ChildActor : ParentActor {
 The only way to create `goto`s that work properly with inheritance is to use dynamic jumps instead—i.e. the `A_Jump*` functions or `return ResolveState("<state label>")`. For example:
 
 ```cs
-Class ParentActor : Actor {
-	states {
+class ParentActor : Actor
+{
+	States
+	{
 	Spawn:
 		FRAM ABC 1;
 		TNT1 A 0 A_Jump(256,"Death");
@@ -1205,8 +1267,10 @@ Class ParentActor : Actor {
 	}
 }
 
-Class ChildActor : ParentActor {
-	states {
+class ChildActor : ParentActor 
+{
+	States
+	{
 	Death: //this will be entered properly
 		FRAM AB 1;
 		loop;
@@ -1217,10 +1281,13 @@ Class ChildActor : ParentActor {
 This will also work:
 
 ```cs
-TNT1 A 0 {
+TNT1 A 0
+{
 	return ResolveState("Death");
 }
 ```
+
+(See [Dynamic and static jumps](#Dynamic--and--static--jumps) below for more details.)
 
 The reverse, however, is not a problem: since child actors inherit all of their parents states, `goto` will enter a parent's state correctly. That's why you can create a monster replacement with only a `Missile` sequence that ends with `Goto See` and it'll use its parent's `See` sequence correctly.
 
@@ -1269,3 +1336,169 @@ Hold:
 
 This can be created by design (such as in the example above where `A_ReFire()` is used to only loop the Hold sequence without returning to Fire) but can also cause issues if this is done by accident.
 It's important to remember that state labels themselves will never prevent the state machine from progressing. In fact, <u>state labels don't *really* exist</u>—for the game, that is; state labels are only visible to the coder and exist for convenience. That's why flow operators must always be employed to avoid unintentional fall-through from one state sequence to another.
+
+## State jumps
+
+State jumps are cases when the execution of one state sequence stops and moves to another state or state sequence. There are different ways to categorize state jumps and different ways to perform them.
+
+### Dynamic and static jumps
+
+Jumps can be dynamic and static. `Goto` is the only example of a static jump in ZScript. As for dynamic jumps, the most common example are the various `A_Jump*` functions in ZScript/Decorat (those include `A_JumpIf`, `A_JumpIfNoAmmo`, `A_JumpIfInventory` and [others](https://zdoom.org/wiki/Category:Decorate_Jump_functions)).
+
+As described in the [Using `goto` and inheritance](#using--goto--and-inheritance) section above, `goto` can't be properly inherited because it'll jump into a state in the original actor. That happens precisely because it's a static jump; you can create an inheritance-friendly state transition by using a dynamic jump instead:
+
+```cs
+//static jump:
+Spawn:
+	FRAM ABC 1;
+	goto Death;
+
+
+//an equivalent with a dynamic jump:
+Spawn:
+	FRAM ABC 1;
+	TNT1 A 0 A_Jump(256,"Death");
+	wait;
+```
+
+### Jumps in anonymous functions
+
+One of the common issues people face when transitioning from DECORATE to ZScript is their jump functions not working as expected in anonymous functions:
+
+```cs
+//this does not work:
+TNT1 A 0
+{
+	A_Explode();
+	A_Quake();
+	A_JumpIfHealthLower(25, "Death");
+}
+```
+
+To work, jump functions called from anonymous functions require a `return` keyword to work:
+
+```cs
+TNT1 A 0
+{
+	A_Explode();
+	A_Quake();
+	return A_JumpIfHealthLower(25, "Death");
+}
+```
+
+But there's a number of things that should be kept in mind. And it's better to fully understand how exactly the state machine performs and why jumps have to be returned.
+
+Every tic actors try to progress their states and move from the current state to the next one. States actually have **return values**: a state's return value is the next state that the state machine should go to. By default that value is `null` which is interpreted as "the next state in the states block"—this is how normal actor animation/state execution works.
+
+So, by default states silently call `return null` and move to the next frame. `A_Jump` and similar functions also implicitly call a `return` if they're the only function attached to a state:
+
+```cs
+TNT1 A 0 A_Jump(256, "Death"); //returns "Death" with 100% probability
+```
+
+```cs
+TNT1 A 0 A_Jump(128, "Death"); //this returns "Death" with 50% chance, or returns null (= proceed to next state)
+```
+
+However, if you have an anonymous function block, return values have to be defined *explicitly*—and that's why you need a `return <jump function>` in order for a jump function to work correctly.
+
+There is a number of caveats here, though. The first one is that `A_Jump*` **always** performs a state jump: it either returns a state you specify, or `null` and jump to the next state. As a result, you can't place `A_Jump` in the middle of an anonymous function, because nothing that comes after it will ever be executed. For example:
+
+```cs
+FRAM A 1
+{
+	A_Quake();
+	return A_Jump(128, "Death"); //this jumps to "Death" 50% chance or returns null...
+	A_Explode(); // This will never be called!
+}
+FRAM B 1;	// ...the null return jumps here
+```
+
+So, if you call any form of `A_Jump*`, there's no way to force it to return *nothing*; it'll always return a state and perform a jump.
+
+However, there are ZScript-specific jump methods that allow performing multiple jumps from different places.
+
+### Finding and returning states in ZScript
+
+To have more control over state jumps, you can find and returns the desired states manually instead of using ready-made functions. 
+
+There are two functions that can find a state by checking for a specific state label:
+
+- `FindState("State label")` looks for the specified state label and returns the first state of that state sequence.
+- `ResolveState("State label")` works similarly but is also context-aware. This basically means that it can be safely called from weapon or CustomInventory states, and ZScript will properly look for the state within said weapon/CustomInventory, not being confused about whether it should look for a state label on the player pawn holding it. Calling `return FindState(...)` from a Weapon/CustomInventory will result in an "ambiguous context" error and GZDoom will abort.
+    - It will also work on regular actors, so most of the time it's safe to use `ResolveState()` in any context.
+- If you have a conditional state return anywhere within the function, you have to put `return null` at the end of that function to explicitly tell it that if the first jump doesn't happen, it has to go to the next state.
+    - In weapons you have to use `return ResolveState(null)` instead. (See [Weapons, overlays and PSprite](Weapons.md) for more details.)
+
+Using `FindState()` and `ResolveState()` allows us to create conditional jumps inside anonymous functions:
+
+```cs
+Fire:
+	PISG A 1
+	{
+		//check if the amount of primary ammo is too low and jump to Reload if so:
+		if (ammo1.amount < ammouse1)
+		{
+			return ResolveState("Reload");
+		}
+		//otherwise continue execution:
+		A_GunFlash();
+		A_FirePistol();
+		//explicitly move to the next state:
+		return ResolveState(null);
+    }
+	PISG B 1;
+	[...] //the rest of the sequence
+```
+
+It's important to remember that if you use `return` with `FindState()` or `ResolveState()` somewhere within the anonymous function, you have to cover all possible cases. If one jump is conditional (like a jump to the "Reload" sequence in the example above), then you have to add another return at the end of the anonymous function to tell it where to go if the first condition isn't met. If you don't have any specific alternative condition, then you have to add `return null` to tell the function to simply continue with the current state sequence (or `return ResolveState(null)`, if you're doing it from a weapon state).
+
+To illustrate:
+
+```cs
+//This does not work, GZDoom won't run:
+TNT1 A 0
+{
+	if (condition == true)
+	{
+		return ResolveState("GoHere"); //jump if the condition is true
+	}
+	DoStuff();
+	DoMoreStuff();
+	//the function doesn't know where to go if the above condition is false
+}
+
+//This will work properly:
+TNT1 A 0
+{
+	if (condition == true)
+	{
+		return ResolveState("GoHere"); //jump if the condition is true
+	}
+	DoStuff();
+	DoMoreStuff();
+	return ResolveState(null); //proceed to next state
+}
+```
+
+
+
+In contrast to returning `A_Jump*` functions, this method allows using multiple conditions:
+
+```cs
+Death:
+	TNT1 A 0
+	{
+		if (health <= -60)
+			return FindState("XDeath");
+		if (health <= -15)
+			return FindState("Dismemberment");
+		return null;
+    }
+	goto super::Death; //go to the original Death sequence
+Dismemberment:
+	[...] //special new animation
+```
+
+In this example there are several variations of the death animation for the monster. (Note, when a monster is killed, their health may become negative, so the above code is valid.) If the monster's health was pushed far below zero, it shows a gibbing animation, but if it's only under -15, it jumps to a new Dismemberment sequence. If neither condition is meant (the monster is dead but its health is between 0 and -15), it displays its parent's Death sequence.
+
