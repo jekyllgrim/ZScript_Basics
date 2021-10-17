@@ -28,10 +28,13 @@ In ZScript pointers are much more flexible. The first difference is how you use 
 You can use the same syntax to call functions on a specific actor from another actor, like so:
 
 ```csharp
-Class GraciousImp : DoomImp {
-	states {
+class GraciousImp : DoomImp
+{
+	States
+	{
 	Death:
-		TNT1 A 0 {
+		TNT1 A 0
+		{
 			if (target != null)	//checks that target exists before doing anything
 				target.GiveInventory("Shell",20);	//if so, give it 20 shells
 		}
@@ -55,7 +58,8 @@ This gracious Imp gives the target some shells when it dies (hence, if you kille
 
   ```csharp
   //this is OK:
-  if (target) {
+  if (target)
+  {
   	target.GiveInventory("Shell",20);
   }
   
@@ -64,7 +68,8 @@ This gracious Imp gives the target some shells when it dies (hence, if you kille
   	target.GiveInventory("Shell",20);
   
   //this is OK:
-  if (target) {
+  if (target)
+  {
   	target.GiveInventory("Shotgun",1)
   	target.GiveInventory("Shell",20);
   }
@@ -74,7 +79,7 @@ This gracious Imp gives the target some shells when it dies (hence, if you kille
   	target.GiveInventory("Shotgun",1)
   	target.GiveInventory("Shell",20); //this will ignore the null-check
   ```
-
+  
   
 
 Now let's make something more advanced. We'll use a tracer pointer that is normally not used by monsters. But first, to make it a bit more colorful, we'll create a TRNSLATE lump and add some translations:
@@ -95,8 +100,10 @@ BabyCalm = "0:255=%[0.05,0.01,0.84]:[1.39,1.96,2.00]"
 
 ```csharp
 //This is a smaller version of Cacodemon that has x2 health and is blue:
-Class CacoBaby : Cacodemon {
-	Default {
+class CacoBaby : Cacodemon
+{
+	Default
+	{
 		health 800;
 		radius 16;
 		height 30;
@@ -107,16 +114,20 @@ Class CacoBaby : Cacodemon {
 	}
 }
 
-Class CacoDaddy : Cacodemon {
-	states {
+class CacoDaddy : Cacodemon
+{
+	States 
+	{
 	Spawn:
 		//spawn Cacobaby: SXF_ISTRACER will make it CacoDaddy's tracer
 		TNT1 A 0 NoDelay A_SpawnItemEx("Cacobaby",64,flags:SXF_ISTRACER);	
 		HEAD A 10 A_Look;
 		wait;	//loops the last frame instead of the whole state, in contrast to loop
 	Death:
-		TNT1 A 0 {
-			if (tracer) {	//null-check tracer
+		TNT1 A 0
+		{
+			if (tracer) //null-check tracer
+			{
 				tracer.A_StartSound("caco/active");	//play Cacodemon "wake up" sound on tracer
 				tracer.A_SetTranslation("BabyAngry");	//change translation, as defined in TRNSLATE
 				tracer.speed *= 2;	//multiply tracer's speed by 2 
@@ -129,7 +140,7 @@ Class CacoDaddy : Cacodemon {
 }
 ```
 
-[^*Note*]: Don't forget that you have to use **NoDelay** if you want to do something in the very first frame of the Spawn state. Otherwise Doom skips that function.
+> *Note*: Don't forget that you have to use **NoDelay** if you want to do something in the very first frame of the Spawn state. Otherwise Doom skips that function.
 
 The daddy Caco spawns a baby Caco when it appears, and makes the baby its `tracer`. When the daddy dies, it checks if its `tracer` still exists, and if so, does a bunch of stuff **on the** **tracer**: plays a sound, changes its `translation` and `speed`, and removes its ability to enter Pain state. The baby is out for blood.
 
@@ -145,18 +156,23 @@ But casting and custom pointers is where the actual fun begins. **Casting** is c
 First, creating the pointers. Just like any variables, they can be class-wide or local. Let's modify our daddy Cacodemon slightly:
 
 ```csharp
-Class CacoDaddy : Cacodemon {
-	actor baby;	//create a variable baby (notice its type is actor)
-	states {
+class CacoDaddy : Cacodemon
+{
+	Actor baby;	//create a variable baby (notice its type is actor)
+	States 
+	{
 	Spawn:
-		TNT1 A 0 NoDelay {
+		TNT1 A 0 NoDelay 
+		{
 			baby = Spawn("CacoBaby",pos);	
 		}
 		HEAD A 10 A_Look;
 		wait;
 	Death:
-		TNT1 A 0 {
-			if (baby) {
+		TNT1 A 0 
+		{
+			if (baby) 
+			{
 				baby.A_StartSound("caco/active");
 				baby.A_SetTranslation("BabyAngry");
 				baby.speed *= 2; 
@@ -184,7 +200,8 @@ One minor downside is that `Spawn` uses global offsets, not relative, so we can'
 
 ```csharp
 Spawn:
-	TNT1 A 0 NoDelay {
+	TNT1 A 0 NoDelay 
+	{
 		baby = Spawn("CacoBaby",pos);
 		if (baby)	//don't forget to immediately null-check the pointer!
 			baby.Warp(self,64,0,0);	//moves the spawned baby 64 units in front of self (CacoDaddy)
@@ -193,7 +210,7 @@ Spawn:
 	wait;
 ```
 
-[^*Note*]: For this simple example, we're not checking the position here at all, so if CacoDaddy was in front of a wall, the baby can end up inside a wall.
+> *Note*: For this simple example, we're not checking the position here at all, so if CacoDaddy was in front of a wall, the baby can end up inside a wall.
 
 `Self`, as you probably already guessed, is a pointer to the current actor; since we're calling this from CacoDaddy, `self` is CacoDaddy. The full syntax for `Warp` is **Warp(pointer, xoffsets, yoffsets, zoffsets)**, and the offsets are relative, just like with `A_Warp`, so we move the spawned baby 64 units in front of `self` (CacoDaddy).  (`Self` is an existing pointer, you don't need to define or cast it.)
 
@@ -203,13 +220,17 @@ Now, we can go even further with this. Instead of using two different actors, we
 
 ```csharp
 //don't try to use 'replaces Cacodemon', or they'll be spawning each other continuously:
-Class CacoSingleDad : Cacodemon { 	
-	actor baby;
-	states {
+class CacoSingleDad : Cacodemon 
+{
+	Actor baby;
+	States 
+	{
 	Spawn:
-		TNT1 A 0 NoDelay {
+		TNT1 A 0 NoDelay 
+		{
 			baby = Spawn("Cacodemon",pos);
-			if (baby) {
+			if (baby) 
+			{
 				baby.Warp(self,64,0,0);
 				baby.A_SetHealth(800);
 				baby.A_SetSize(16,30);
@@ -222,8 +243,10 @@ Class CacoSingleDad : Cacodemon {
 		HEAD A 10 A_Look;
 		wait;
 	Death:
-		TNT1 A 0 {
-			if (baby) {
+		TNT1 A 0 
+		{
+			if (baby) 
+			{
 				baby.A_StartSound("caco/active");
 				baby.A_SetTranslation("BabyAngry");
 				baby.speed *= 2; 
@@ -236,16 +259,19 @@ Class CacoSingleDad : Cacodemon {
 }
 ```
 
-[^*Note*]: Some properties, such as `speed` can be set directly on an actor, but others are read-only and require a "setter" function, such as `A_SetSize`. If you try to modify something, but GZDoom tells you that "expression must be a modifiable value", this often means you can't modify that value directly, look for a setter function.
+> *Note*: Some properties, such as `speed` can be set directly on an actor, but others are read-only and require a "setter" function, such as `A_SetSize`. If you try to modify something, but GZDoom tells you that "expression must be a modifiable value", this often means you can't modify that value directly, look for a setter function.
 
 By doing the above, we spawn the baby Cacodemon and immediately set all of properties: `health`, `speed`, `translation`, etc. Obviously, now you can't use this CacoSingleDad to directly replace Cacodemons, because if you do that, you'll end up with an endless cycle of CacoSingleDads spawning each other. There are several ways we could go around it. For example, we could do this in Spawn:
 
   ```csharp
 Spawn:
-	TNT1 A 0 NoDelay {
-		if (!master) {	//the following block will only execute if the actor does NOT have a master
+	TNT1 A 0 NoDelay 
+	{
+		if (!master)	//the following block will only execute if the actor does NOT have a master
+        {
 			baby = Spawn("Cacodemon",pos);
-			if (baby) {
+			if (baby) 
+			{
 				baby.master = self;	//we set the spawning actor as the master of the spawnee
 				baby.Warp(self,64,0,0);
 				baby.A_SetHealth(800);
@@ -265,9 +291,11 @@ Spawn:
 
 ```csharp
 Spawn:
-	TNT1 A 0 NoDelay {
+	TNT1 A 0 NoDelay 
+	{
 		baby = Spawn("Cacodemon",pos,NO_REPLACE);
-		if (baby) {
+		if (baby) 
+		{
 			baby.Warp(self,64,0,0);
 			baby.A_SetHealth(800);
 			baby.A_SetSize(16,30);
@@ -298,6 +326,7 @@ private static void BrainishExplosion(vector3 pos)	//defines a function for Boss
 		boom.SetDamage(0);	//disables collision since it's not needed
 		boom.tics -= random[BrainScream](0, 7);	//changes duration of the frames randomly
 		if (boom.tics < 1) boom.tics = 1;	//makes sure duration isn't less than 1
+    }
 }
 ```
 
@@ -311,12 +340,16 @@ Let's say we want to make a version of Baron of Hell that drops a big Soulsphere
 
 ```csharp
 //Doesn't actually work:
-Class PrinceOfHell : BaronOfHell {
-	states {
+class PrinceOfHell : BaronOfHell 
+{
+	States 
+	{
 	Death:
-		TNT1 A 0 {
-			actor orb = Spawn("Soulsphere",pos);
-			if (orb) {
+		TNT1 A 0 
+		{
+			Actor orb = Spawn("Soulsphere",pos);
+			if (orb) 
+			{
 				orb.amount = 300;
 				orb.maxamount = 300;
 				orb.pickupmessage = "Overcharge!";
@@ -334,12 +367,16 @@ The reason is simple: we're casting Soulsphere as **actor**, but properties like
 
 ```csharp
 //this will work:
-Class PrinceOfHell : BaronOfHell {
-	states {
+class PrinceOfHell : BaronOfHell 
+{
+	States 
+	{
 	Death:
-		TNT1 A 0 {
+		TNT1 A 0 
+		{
 			inventory orb = Inventory(Spawn("Soulsphere",pos));
-			if (orb) {
+			if (orb) 
+			{
 				orb.amount = 300;
 				orb.maxamount = 300;
 				orb.pickupmessage = "Overcharge!";
@@ -366,68 +403,81 @@ let orb = Inventory(Spawn("Soulsphere",pos));
 You'll need to use type casting for your own custom actors and their functions as well. Let's take a more advanced example: say, you created a sprite light halo and you want to attach it to torches. You have 3 versions of a halo (red, green, blue) and you don't want to define separate actors for each; instead you want to have only one actor and you want it to change its color depending on which torch spawned it. You can do this:
 
 ```csharp
-Class UniversalLightHalo : Actor {
+class UniversalLightHalo : Actor 
+{
 	name halocolor;			//this will hold the color
-	Default {
+	Default 
+	{
 		+NOINTERACTION		//disables gravity and collision
 		Renderstyle 'add';
 		alpha 0.35;
 		scale 0.5;
 	}
-	states {
-		Spawn:
-			TNT1 A 0 NoDelay {
-			//using 'sprite' allows you to manually set which sprite t o use:
-				if (halocolor == 'red')
-					sprite = GetSpriteIndex("HRED");
-				else if (halocolor == 'blue')
-					sprite = GetSpriteIndex("HBLU");
-				else if (halocolor == 'green')
-					sprite = GetSpriteIndex("HGRN");
-			}
-			#### A -1;		//#### means "use previous sprite"
-			stop;
-		Load: //this fake state is used to simply load sprites into memory
-			HRED A 0;
-			HBLU A 0;
-			HGRN A 0;
-			stop;	//this state will never be entered, but better add stop for consistency
+	States 
+	{
+	Spawn:
+		TNT1 A 0 NoDelay 
+		{
+		//using 'sprite' allows you to manually set which sprite t o use:
+			if (halocolor == 'red')
+				sprite = GetSpriteIndex("HRED");
+			else if (halocolor == 'blue')
+				sprite = GetSpriteIndex("HBLU");
+			else if (halocolor == 'green')
+				sprite = GetSpriteIndex("HGRN");
+		}
+		#### A -1;		//#### means "use previous sprite"
+		stop;
+	Load: //this fake state is used to simply load sprites into memory
+		HRED A 0;
+		HBLU A 0;
+		HGRN A 0;
+		stop;	//this state will never be entered, but better add stop for consistency
 	}
 }
 	
-Class CustomRedTorch : RedTorch replaces RedTorch {
-	states {
-		Spawn:
-			TNT1 A 0 NoDelay {
-				let halo = UniversalLightHalo(Spawn("UniversalLightHalo",(pos.x,pos.y,pos.z+48)));
-				if (halo)
-					halo.halocolor = 'Red';
-			}
-			goto super::spawn;
+class CustomRedTorch : RedTorch replaces RedTorch 
+{
+	States 
+	{
+	Spawn:
+		TNT1 A 0 NoDelay 
+		{
+			let halo = UniversalLightHalo(Spawn("UniversalLightHalo",(pos.x,pos.y,pos.z+48)));
+			if (halo)
+				halo.halocolor = 'Red';
+		}
+		goto super::spawn;
 	}
 }
 	
-Class CustomGreenTorch : GreenTorch replaces GreenTorch {
-	states {
-		Spawn:
-			TNT1 A 0 NoDelay {
-				let halo = UniversalLightHalo(Spawn("UniversalLightHalo",(pos.x,pos.y,pos.z+48)));
-				if (halo)
-					halo.halocolor = 'Green';
-			}
-			goto super::spawn;
+Class CustomGreenTorch : GreenTorch replaces GreenTorch 
+{
+	States 
+	{
+	Spawn:
+		TNT1 A 0 NoDelay
+		{
+			let halo = UniversalLightHalo(Spawn("UniversalLightHalo",(pos.x,pos.y,pos.z+48)));
+			if (halo)
+				halo.halocolor = 'Green';
+		}
+		goto super::spawn;
 	}
 }
 
-Class CustomBlueTorch : BlueTorch replaces BlueTorch {
-	states {
-		Spawn:
-			TNT1 A 0 NoDelay {
-				let halo = UniversalLightHalo(Spawn("UniversalLightHalo",(pos.x,pos.y,pos.z+48)));
-				if (halo)
-					halo.halocolor = 'Blue';
-			}
-			goto super::spawn;
+Class CustomBlueTorch : BlueTorch replaces BlueTorch
+{
+	States 
+	{
+	Spawn:
+		TNT1 A 0 NoDelay 
+		{
+			let halo = UniversalLightHalo(Spawn("UniversalLightHalo",(pos.x,pos.y,pos.z+48)));
+			if (halo)
+				halo.halocolor = 'Blue';
+		}
+		goto super::spawn;
 	}
 }
 ```

@@ -15,11 +15,14 @@ virtual void MyCoolFunction()
 There are two primary uses for it. First, a child class can override its parent's virtual function and make it do something else:
 
 ```csharp
-Class CacoSingleDad : Cacodemon {
-	actor baby;
-	virtual void SpawnBaby() {
+class CacoSingleDad : Cacodemon 
+{
+	Actor baby;
+	virtual void SpawnBaby() 
+	{
 		baby = Spawn("Cacodemon",pos,NO_REPLACE);
-		if (baby) {
+		if (baby) 
+		{
 			baby.Warp(self,64,0,0);
 			baby.A_SetHealth(800);
 			baby.A_SetSize(16,30);
@@ -31,8 +34,10 @@ Class CacoSingleDad : Cacodemon {
 	}
 }
 
-Class SomeOtherCaco : CacoSingleDad {
-	override void SpawnBaby() {
+class SomeOtherCaco : CacoSingleDad 
+{
+	override void SpawnBaby() 
+	{
 		actor a = Spawn("Cacodemon",pos,NO_REPLACE);
 		if (a)
 			a.master = self;
@@ -47,11 +52,14 @@ However, this doesn't seem especially useful, does it?
 What is done more commonly with virtual functions is that they're overridden not to *replace* their contents, but rather to *add* some stuff to what they normally do:
 
 ```csharp
-Class CacoSingleDad : Cacodemon {
-	actor baby;
-	virtual void SpawnBaby() {
+class CacoSingleDad : Cacodemon 
+{
+	Actor baby;
+	virtual void SpawnBaby() 
+	{
 		baby = Spawn("Cacodemon",pos,NO_REPLACE);
-		if (baby) {
+		if (baby) 
+		{
 			baby.Warp(self,64,0,0);
 			baby.A_SetHealth(800);
 			baby.A_SetSize(16,30);
@@ -63,10 +71,13 @@ Class CacoSingleDad : Cacodemon {
 	}
 }
 
-Class SomeOtherCaco : CacoSingleDad {
-	override void SpawnBaby() {
+class SomeOtherCaco : CacoSingleDad 
+{
+	override void SpawnBaby() 
+	{
 		super.SpawnBaby();			//calls the original SpawnBaby() first
-		if (baby) {
+		if (baby) 
+		{
 			baby.A_SetScale(0.4);
 			baby.master = self;
 		}
@@ -87,11 +98,14 @@ The base **Actor** class has a lot of virtual functions attached to it which it 
 One of the most common virtuals you'll be using this way is `Tick()`: a virtual function that is called by all actors every game tic. It performs everything actors need to do continuously: changes positions, velocity, checks for collision and a bunch of other things. You can add your own effects into that function:
 
 ```csharp
-Class TemporaryZombieman : Zombieman {
-	Default {
+class TemporaryZombieman : Zombieman 
+{
+	Default 
+	{
 		renderstyle 'Translucent';
 	}
-	override void Tick() {
+	override void Tick() 
+	{
 		super.Tick();	//don't forget to call this! otherwise your actor will be frozen and won't interact with the world
 		A_FadeOut(0.01);
 	}
@@ -103,11 +117,14 @@ This Zombieman will continuously (and relatively quickly) fade out as it exists.
 Remember that `Tick()` is called even when the actor is frozen, so normally you need to add a check for that:
 
 ```csharp
-Class TemporaryZombieman : Zombieman {
-	Default {
+class TemporaryZombieman : Zombieman 
+{
+	Default 
+	{
 		renderstyle 'Translucent';
 	}
-	override void Tick() {		
+	override void Tick() 
+	{
 		super.Tick();
 		if (!isFrozen())
 			A_FadeOut(0.01);
@@ -128,14 +145,17 @@ Notes:
 There's a ton of things you can do this way. A common example when using Tick() is convenient is when your actor needs to continuously spawn some sort special effect every tick (such as a trail or an after-image). Here's a handy example of doing an after-image this way:
 
 ```csharp
-Class BlurryCacoBall : CacoDemonBall {
-	override void Tick() {
+class BlurryCacoBall : CacoDemonBall 
+{
+	override void Tick() 
+	{
 		super.Tick();
 		if (isFrozen())		//check if the actor is frozen
 			return;			//if so, we stop here and don't do anything else
 		actor img = Spawn("CacoBall_AfterImage",pos);	//spawn after-image and cast it
 	//transfer current actor's alpha, renderstyle and sprite frame to the spawned after-image
-        if (img) {
+        if (img) 
+		{
 			img.A_SetRenderstyle(alpha,GetRenderstyle());
 			img.sprite = sprite;	//sprite is the current sprite, such as "BAL2"
 			img.frame = frame;		//frame is a frame letter, such as A, B, C
@@ -143,13 +163,17 @@ Class BlurryCacoBall : CacoDemonBall {
 	}
 }
 
-Class CacoBall_AfterImage : Actor {
-	Default {
+class CacoBall_AfterImage : Actor 
+{
+	Default 
+	{
 		+NOINTERACTION //makes this actor non-interactive (no gravity or collision)
 	}
-	states {
+	States 
+	{
 	Spawn:
-		#### # 1 {	//#### # means "use previous sprite & frame" (as set by BlurryCacoBall earlier)
+		#### # 1	//#### # means "use previous sprite & frame" (as set by BlurryCacoBall earlier)
+		{
 			A_FadeOut(0.05);
 			scale *= 0.95;
 		}
@@ -164,9 +188,11 @@ This principle applies to most virtual functions. Here's another example with `P
 
 ```csharp
 //pseudocode:
-Class MyActor : Actor {
+class MyActor : Actor 
+{
 	int myvalue;
-	override void PostBeginPlay() {
+	override void PostBeginPlay() 
+	{
 		super.PostBeginPlay();
 		myvalue = 10;
 	}
@@ -180,18 +206,23 @@ As explained earlier, when you declare class-scope variables, like `myvalue` abo
 There are many, many other virtual functions that you will need to override. And remember: you won't always need to call **super** on them; sometimes you'll need to completely fill in what the function does, without calling its original version. Let's take a quick look at `ModifyDamage()` — an **Inventory** function used by protective items such as PowerProtection (a power-up that reduces incoming damage). This function gets the damage that is supposed to be dealt to the owner of the item, and then uses `newdamage` argument to tell the game how much damage to actually deal:
 
 ```csharp
-Class CustomProtection : Inventory {
-	Default {
+class CustomProtection : Inventory 
+{
+	Default 
+	{
 		inventory.maxamount 1;
 	}
 	
-	override void ModifyDamage (int damage, Name damageType, out int newdamage, bool passive, Actor inflictor = null, Actor source = null, int flags = 0) {
+	override void ModifyDamage (int damage, Name damageType, out int newdamage, bool passive, Actor inflictor = null, Actor source = null, int flags = 0) 
+	{
         //check if the inflictor has a MISSILE flag:
-		if (inflictor.bMISSILE) {
+		if (inflictor.bMISSILE) 
+		{
 			newdamage = damage * 0.5;
 		}
 		//otherwise check if the inflictor has ISMONSTER but not FRIENDLY, and is alive:
-		else if (inflictor.bISMONSTER && !inflictor.bFRIENDLY && inflictor.health > 0) {
+		else if (inflictor.bISMONSTER && !inflictor.bFRIENDLY && inflictor.health > 0) 
+		{
 			newdamage = damage * 0.1;
 		}
 	}
@@ -261,8 +292,10 @@ Apart from dealing damage, it also *returns* an integer number: normally it shou
 Here's an example of how this override is used:
 
 ```csharp
-Class ZombieTroopman : Zombieman {
-	override int DamageMobj(Actor inflictor, Actor source, int damage, Name mod, int flags, double angle) {
+class ZombieTroopman : Zombieman 
+{
+	override int DamageMobj(Actor inflictor, Actor source, int damage, Name mod, int flags, double angle) 
+	{
 		if (source && source is "Zombieman")
 			return 0;
 		return super.DamageMobj(inflictor, source, Damage, mod, flags, angle);		
@@ -275,8 +308,10 @@ This version of Zombieman checks whether the `source` of the attack was another 
 As mentioned above, you can also *call* `DamageMobj` to—you guessed it—damage an actor. You can even do it from a `DamageMobj` override:
 
 ```csharp
-Class RetaliatingZombieman : Zombieman {
-	override int DamageMobj(Actor inflictor, Actor source, int damage, Name mod, int flags, double angle) {
+class RetaliatingZombieman : Zombieman 
+{
+	override int DamageMobj(Actor inflictor, Actor source, int damage, Name mod, int flags, double angle) 
+	{
 		if (source)
 			source.DamageMobj(self,self,damage,'normal'); //deals damage to whatever damaged it
 		return super.DamageMobj(inflictor, source, Damage, mod, flags, angle);		
@@ -293,9 +328,11 @@ This annoying Zombieman calls `DamageMobj` on the actor that dealt damage to the
 Let's say you want to create a projectile that can pierce enemies and damage them, but don't want to use +RIPPER flag, since with this flag projectile will damage the enemy continuously, as it's flying through them. Instead, you want the projectile to always damage the enemy once and only once. That can be achieved with `SpecialMissileHit` we just talked about, and `DamageMobj`:
 
 ```csharp
-Class PenetratingBullet : FastProjectile {
+class PenetratingBullet : FastProjectile 
+{
 	actor hitvictim; //this custom pointer will store the last actor hit by the projectile
-	Default {
+	Default 
+	{
 		speed 85;	
 		damage 0; //we need this to be 0 since we'll be dealing damage manually
 		radius 2;
@@ -303,15 +340,18 @@ Class PenetratingBullet : FastProjectile {
 		scale 0.2;
 		obituary "%o was shot down.";
 	}	
-    override int SpecialMissileHit(actor victim) {
+    override int SpecialMissileHit(actor victim) 
+	{
 		//check that the victim (the actor hit) is NOT the same as hitvictim (last actor hit):
-        if (victim && target && victim != target && victim != hitvictim) {	
+        if (victim && target && victim != target && victim != hitvictim) 
+		{	
 			victim.DamageMobj(self,target,10,'normal'); //deal exactly 10 damage to victim
 			hitvictim = victim;			//store the vicitm we just damaged as 'hitvictim'
 		}
 		return 1;						//keep flying
 	}
-	states {			//we're just reusing Rocket sprites
+	States			//we're just reusing Rocket sprites
+	{
 	Spawn:
 		MISL A 1;
 		loop;

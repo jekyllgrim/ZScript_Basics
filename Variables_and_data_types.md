@@ -31,15 +31,20 @@ bool tobeornot;		//creates a variable 'tobeornot' that holds a 'true' or 'false'
 Here’s a simple example of declaring a variable in a class and using it:
 
 ```csharp
-Class SpeedyImp : DoomImp {
+class SpeedyImp : DoomImp 
+{
 	int speedups;	//creates a variable that can hold an integer number
-	Default {
+	Default 
+	{
 		health 300;
 	}
-	states {
+	States 
+	{
 	Pain:
-		TNT1 A 0 {
-			if (speedups < 5) {	//check if the value is less than 5
+		TNT1 A 0 
+			{
+			if (speedups < 5)	//check if the value is less than 5
+			{
 				speedups += 1;	//if so, increase the value by one
 				speed *= 1.2;	//and multiply imp's speed by 1.2
 			}
@@ -49,7 +54,7 @@ Class SpeedyImp : DoomImp {
 }
 ```
 
-[^*Note*]: speed is the default Actor speed property, not a custom variable, you can just read and change it directly.
+> *Note*: speed is the default Actor speed property, not a custom variable, you can just read and change it directly.
 
 Whenever this Imp is hurt, it'll increase its speed by x1.2. But this will only happen as long as `speedups` is less than 5—so, no more than 5 times.
 
@@ -58,15 +63,20 @@ A variable like that can be declared anywhere in the class but *not* inside the 
 A different method is declaring a variable inside an anonymous function. If you do that, that variable will exist only within that anonymous function:
 
 ```csharp
-Class WeirdImp : DoomImp {
+class WeirdImp : DoomImp
+{
 	int speedups;			//this variable is available anywhere in the class
-	Default {
+	Default 
+	{
 		health 500;
 	}
-	states {
+	States 
+	{
 	Pain:
-		TNT1 A 0 {
-			if (speedups < 10) {
+		TNT1 A 0 
+		{
+			if (speedups < 10) 
+			{
 				speedups++;			//++ is the same as +=1
 // create a temporary variable s that holds a random value between 0.8 and 1.2:
 				double foo = frandom(0.8,1.2);	
@@ -114,10 +124,12 @@ property propname : varname;
 An actual example:
 
 ```csharp
-Class WeirdImp : DoomImp {
+class WeirdImp : DoomImp 
+{
 	int speedups;					//defines variable 'speedups'
 	property speedups : speedups;	//assigns the variable to a property with the same name
-	Default {
+	Default 
+	{
 		WeirdImp.speedups 10;		//defines the default value for the variable
 	}
 }

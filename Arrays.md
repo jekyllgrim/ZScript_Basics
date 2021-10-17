@@ -22,7 +22,8 @@ A static constant array is basically a simple list of values. They're defined as
 
 ```cs
 //pseudocode:
-static const type arrayName[] = {
+static const type arrayName[] = 
+{
 	element1,
 	element2,
 	element3, //you can have any number of elements
@@ -35,17 +36,21 @@ Here `type` is the [data type](Variables_and_data_types.md#data-types) and `arra
 In the example below a static array is used to set the actor's sprite randomly:
 
 ```cs
-Class RandomTallTorch : RedTorch {
-	static const name torchSprite[] = {
+Class RandomTallTorch : RedTorch 
+{
+	static const name torchSprite[] = 
+	{
 		"TRED",
 		"TBLU",
 		"TGRN"
 	};
-	override void PostBeginPlay() {
+	override void PostBeginPlay() 
+	{
 		super.PostBeginPlay();
 		sprite = GetSpriteIndex( torchSprite[random(0,2)] ); //randomly returns either 'TRED', or 'TBLU', or 'TGRN'
 	}
-	States {
+	States 
+	{
 	Spawn:
 		#### ABCD 4 bright;
 		loop;
@@ -62,24 +67,29 @@ You can access any entry in an array using `arrayName[index]` where `index` is t
 We can take the actor above to the next level by also attaching a random dynamic light:
 
 ```cs
-Class RandomTallTorchWithALight : RedTorch {
-	static const name torchSprite[] = {
+Class RandomTallTorchWithALight : RedTorch 
+{
+	static const name torchSprite[] = 
+	{
 		"TRED",
 		"TBLU",
 		"TGRN"
 	};
-	static const name torchLight[] = {
+	static const name torchLight[] = 
+	{
 		"BIGREDTORCH",
 		"BIGBLUETORCH",
 		"BIGGREENTORCH"
 	};
-	override void PostBeginPlay() {
+	override void PostBeginPlay() 
+	{
 		super.PostBeginPlay();
 		int i = random(0,2); //get a random number
 		sprite = GetSpriteIndex( torchSprite[i] ); //set the sprite
 		A_AttachLightDef("0",torchLight[i]); //attach the corresponding light
 	}
-	States {
+	States 
+	{
 	Spawn:
 		#### ABCD 4 bright;
 		loop;
@@ -111,9 +121,11 @@ Here's how this can be achieved:
 
 ```cs
 //This turret uses TLMP sprites, so it looks like a tall lamp from Doom:
-Class ImpBallTurret : Actor {
+Class ImpBallTurret : Actor 
+{
 	array <Actor> projectiles; //this will contain pointers to fired projectiles
-	Default {
+	Default 
+	{
 		monster;
 		health 300;
 		height 56;
@@ -122,12 +134,14 @@ Class ImpBallTurret : Actor {
 		+NOBLOOD
 		+DONTTHRUST //it shouldn't be moveable by damage
 	}
-	States {
+	States 
+	{
 	// Since it doesn't need to walk around, we just check if it can see 
 	// a player to kill, and just jump to Missile state if it can:
 	Spawn:
 		TLMP C 10; 
-		TNT1 A 0 {
+		TNT1 A 0 
+		{
 			A_LookEx(LOF_NOSOUNDCHECK|LOF_NOJUMP,fov:360);
 			if (target && CheckSight(target))
 				SetStateLabel("Missile");
@@ -135,7 +149,8 @@ Class ImpBallTurret : Actor {
 		loop;
 	Missile:
 		TLMP CBA 1;
-		TLMP A 2 {
+		TLMP A 2 
+		{
 			A_FaceTarget();
 			// Instead of just spawning a projectile, we first
 			// cast it  to a pointer:
@@ -146,20 +161,24 @@ Class ImpBallTurret : Actor {
 				projectiles.Push(proj);
 		}
 		TLMP BC 2;
-		TNT1 A 0 {
+		TNT1 A 0 
+		{
 			//continue firing if the turret still sees its victim:
 			if (target && CheckSight(target))
 				SetStateLabel("Missile");
 		}
 		goto Spawn;
 	Death:
-		TNT1 A 0 {
+		TNT1 A 0 
+		{
 			// When the turret dies, use a for loop to iterate
 			// through all the indexes of the projectiles array:
-			for (int i = 0; i < projectiles.Size(); i++) {
+			for (int i = 0; i < projectiles.Size(); i++) 
+			{
 				// Double-check the pointer isn't null, then stop                 
 				// the projectile and play its Death sequence:
-				if (projectiles[i]) {
+				if (projectiles[i]) 
+				{
 					projectiles[i].A_Stop();
 					projectiles[i].SetStateLabel("Death");
 				}
@@ -184,28 +203,36 @@ For a more in-depth example of using arrays let's define a system that limits th
 ```cs
 //Note: don't forget to add the event handler using MAPINFO
 
-Class LostSoulNumberControl : EventHandler {
+Class LostSoulNumberControl : EventHandler 
+{
 	Array <Actor> lostsouls;
 	//clear the array upon map start
-	override void WorldLoaded(WorldEvent e) {
+	override void WorldLoaded(WorldEvent e) 
+	{
 		lostsouls.Clear();
 	}
 	//add a thing into a corresponding array when it gets spawned
-	override void WorldThingSpawned(WorldEvent e) {
-		if (e.thing && e.thing is "LostSoul") {
+	override void WorldThingSpawned(WorldEvent e) 
+	{
+		if (e.thing && e.thing is "LostSoul") 
+		{
 			lostsouls.Push(e.thing);
 		}
 	}
 	//remove the LostSoul from the array when it's removed
-	override void WorldThingDestroyed(WorldEvent e) {
-		if (e.thing && e.thing is "LostSoul") {
+	override void WorldThingDestroyed(WorldEvent e) 
+	{
+		if (e.thing && e.thing is "LostSoul") 
+		{
 			lostsouls.Delete(lostsouls.Find(a));	
 		}
 	}
 	//continuously check if the number of actors is bigger than allowed. if true, destroy the oldest actors
-	override void WorldTick() {
+	override void WorldTick() 
+	{
 		//I chose 50 as a maximum number for this example
-		while (lostsouls.Size() > 50) {
+		while (lostsouls.Size() > 50) 
+		{
 			if (lostsouls[0])
 				lostsouls[0].Destroy(); //0 is always the index if the oldest actor
 		}
@@ -264,10 +291,12 @@ The full list of methods (such as `Find`, `Delete`, etc.) is described on [ZDoom
     * **Note:** IMPORTANT AND EXTREMELY UNINTUITIVE! When `Find` can't find the object, it does not return `null` or `false` (because it's supposed to return a number); instead it returns an integer value that is equal to the array's size. So, if you want to make sure a piece of data actually **exists** in your array, you need to check for it as follows:
 
     ```cs
-    if (arrayName.Find(pointer) != arrayName.Size()) {
+    if (arrayName.Find(pointer) != arrayName.Size()) 
+    {
     	//'pointer' has been found in the array
     }
-    else {
+    else 
+    {
     	//'pointer' doesn't exist in the array
     }
     ```

@@ -13,14 +13,16 @@ To create an event handler, you need to define a class that inherits from `Event
 ```csharp
 //ZScript:
 
-Class MyCustomStuffHandler : EventHandler {
+class MyCustomStuffHandler : EventHandler 
+{
 	//custom stuff goes here
 }
 
 
 //MAPINFO:
 
-Gameinfo {
+Gameinfo 
+{
 	AddEventHandlers = "MyCustomStuffHandler"
 }
 ```
@@ -30,8 +32,10 @@ By overriding virtual functions of an event handler, you can make stuff happen i
 Here's a simple event handler:
 
 ```csharp
-Class CorpseDestroyer : EventHandler {
-	override void WorldThingDied (Worldevent e) {
+class CorpseDestroyer : EventHandler 
+{
+	override void WorldThingDied (Worldevent e) 
+	{
 		if (e.thing && e.thing.bISMONSTER);
 			e.thing.destroy();
 	}
@@ -53,24 +57,30 @@ So, this handler will remove anything that we kill. However, it's not very elega
 Let's say we want to fade it out. But we can't make it via an event handler—this event is called only once when the monster is killed, so we can't loop `A_FadeOut` in it. For something like this `Inventory` objects are usually used as containers for special effects, like so:
 
 ```csharp
-Class CorpseFadeHandler : EventHandler {
-	override void WorldThingDied (WorldEvent e) {		
+class CorpseFadeHandler : EventHandler 
+{
+	override void WorldThingDied (WorldEvent e) 
+	{
 		if (e.thing && e.thing.bISMONSTER)	//check the killed actor exists and is a monster
 			e.thing.GiveInventory("CorpseFader",1);	//if so, give it this inventory token
 	}
 }
 
-Class CorpseFader : Inventory {
-	Default {
+class CorpseFader : Inventory 
+{
+	Default 
+	{
 		inventory.maxamount 1;
 	}	
-	override void AttachToOwner (Actor user) {
-		super.AttachToOwner(user);
-        //once the item is attached, set owner's renderstyle to 'Translucent':
+	override void AttachToOwner (Actor other) 
+	{
+		super.AttachToOwner(other);
+		//once the item is attached, set owner's renderstyle to 'Translucent':
 		if (owner)
 			owner.A_SetRenderstyle(alpha,Style_Translucent); 
 	}
-	override void DoEffect() {
+	override void DoEffect() 
+	{
 		super.DoEffect();
 		if (!owner)
 			return;
@@ -88,14 +98,18 @@ Let's take a look at a few other examples.
 This handler could be used as a basis for a reward/score system:
 
 ```csharp
-Class RewardStuff : EventHandler {
+class RewardStuff : EventHandler 
+{
 	int killedmonsters; //this will serve as a counter
-	override void WorldThingDied (worldevent e) {
+	override void WorldThingDied (worldevent e) 
+	{
 		//check the thing is a monster and was killed by the player:
-		if (e.thing && e.thing.bISMONSTER && e.thing.target && e.thing.target.player) {
+		if (e.thing && e.thing.bISMONSTER && e.thing.target && e.thing.target.player) 
+		{
 			killedmonsters++;	//increase the counter by 1			
-			Console.Printf("Monsters killed: %d",killedmonsters); //print the resulting number
-			if (killedmonsters >= 50) {
+			console.Printf("Monsters killed: %d",killedmonsters); //print the resulting number
+			if (killedmonsters >= 50) 
+			{
 				Actor.Spawn("Megasphere",e.thing.target.pos); //spawn a megasphere under the player
 				Console.Printf("Here's a megasphere");
 				killedmonsters = 0;				//reset counter
@@ -114,14 +128,17 @@ Notes:
 This event handler could also be written the following way:
 
 ```csharp
-Class RewardStuff : EventHandler {
+class RewardStuff : EventHandler
+{
 	int killedmonsters;
-	override void WorldThingDied (worldevent e) {
+	override void WorldThingDied (worldevent e) 
+	{
 		if (!e.thing || !e.thing.bISMONSTER || !e.thing.target || !e.thing.target.player)
 			return;
 		killedmonsters++;
 		Console.Printf("Monsters killed: %d",killedmonsters);
-		if (killedmonsters >= 50) {
+		if (killedmonsters >= 50) 
+		{
 			Actor.Spawn("Megasphere",e.thing.target.pos);
 			Console.Printf("Here's a megasphere");
 			killedmonsters = 0;
@@ -137,23 +154,28 @@ It doesn't make any difference performance-wise (both `||` and `&&` strings of c
 Handlers can be used to store global data, similarly to global variables in ACS. To retrieve that data from a class you'll need to cast your event handler just like you cast custom actors:
 
 ```csharp
-Class CheckMonsterAmount : EventHandler {
+Class CheckMonsterAmount : EventHandler
+{
 	int alivemonsters;	//this simple int will hold the number of alive monsters
 	//called when an actor is spawned in map:
-	override void WorldThingSpawned (worldevent e) { 
+	override void WorldThingSpawned (worldevent e) 
+	{ 
         //check if actor exists, is a monster and isn't friendly:
 		if (e.thing && e.thing.bISMONSTER && !e.thing.bFRIENDLY)	
 			alivemonsters++; 	//if so, increase counter
 	}
 	//called when an actor dies in a map:
-	override void WorldThingDied (worldevent e) {
+	override void WorldThingDied (worldevent e) 
+	{
 		if (e.thing && e.thing.bISMONSTER && !!e.thing.bFRIENDLY)
 			alivemonsters--;	//decrease counter
 	}
 }
 
-Class CyberdemonLeader : Cyberdemon replaces Cyberdemon {
-	override void PostBeginPlay() {
+class CyberdemonLeader : Cyberdemon replaces Cyberdemon 
+{
+	override void PostBeginPlay() 
+	{
 		super.PostBeginPlay();
 		//cast the event handler just like you cast actors:
 		let event = CheckMonsterAmount(EventHandler.Find("CheckMonsterAmount"));
@@ -174,8 +196,10 @@ Finally, here's a slightly more advanced example where an event handler and a du
 /*	This is our control item: when in player's inventory, it'll control
 	bleed buildup and bleed damage:
 */
-Class PlayerBleedControl : Inventory {
-	Default {
+class PlayerBleedControl : Inventory
+{
+	Default 
+	{
 		+INVENTORY.UNDROPPABLE
 		+INVENTORY.UNTOSSABLE
 		inventory.maxamount 1;
@@ -186,7 +210,8 @@ Class PlayerBleedControl : Inventory {
 	actor bleedsource;	//holds the actor that dealt damage, for proper kill credit
 
 	//runs every tic the item is in possession:
-	override void DoEffect () {
+	override void DoEffect ()
+	{
 		super.DoEffect();
 		//null-check the owner:
 		if (!owner)
@@ -195,11 +220,13 @@ Class PlayerBleedControl : Inventory {
 		//Console.Printf("Bleed buildup: %d; Bleeding: %d",bleedbuildup,isbleeding); 
 
 		//this thing only runs once a second:
-		if (level.time % 35 == 0) {
+		if (level.time % 35 == 0) 
+		{
 			//decrease buildup value by 1, keeping it within 0-100 range
 			bleedbuildup = Clamp(bleedbuildup - 1, 0, 100);
 			//if currently bleeding, deal damage:
-			if (isbleeding)	 {
+			if (isbleeding)
+			{
 				/*	Damage value is equal to 20% of buildup, but always between 1-5,
 					so, the higher bleedbuildup is, the greater the damage.
 					Also, damage ignores armor, powerups and doesn't move the player:
@@ -211,7 +238,8 @@ Class PlayerBleedControl : Inventory {
 				So, the lower the buildup, the higher is the chance that we stop
 				bleeding. This simulates wound drying over time.
 			*/
-			if (random(1,80) > bleedbuildup) {			
+			if (random(1,80) > bleedbuildup) 
+			{
 				isbleeding = false;					
 			}
 		}
@@ -219,15 +247,17 @@ Class PlayerBleedControl : Inventory {
 }
 
 // This event handler gives the control item and activates the bleeding itself:
-
-Class BleedingHandler : EventHandler {
+class BleedingHandler : EventHandler 
+{
 	//check if spawned thing is a player and doesn't have the control item:
-	override void WorldThingSpawned (WorldEvent e) {         
+	override void WorldThingSpawned (WorldEvent e)
+	{
 		if (e.thing.player && !e.thing.FindInventory("PlayerBleedControl"))            
 			e.thing.GiveInventory("PlayerBleedControl",1);	//if so, give them the item				
 	}
 	//this is called whenever an actor is damaged:
-	override void WorldThingDamaged (WorldEvent e) {										
+	override void WorldThingDamaged (WorldEvent e) 
+	{
 		//do nothing if the thing doesn't exist:
 		if (!e.thing != "bleed")
 			return;									
@@ -241,7 +271,8 @@ Class BleedingHandler : EventHandler {
 		//if successful, raise buildup value to the same number as dealt damage:
 		bleeder.bleedbuildup = Clamp(bleeder.bleedbuildup + e.Damage, 0, 100);
 		//immediately after, run the resulting buildup value against a random 0-100 value:
-		if (random(1,100) < bleeder.bleedbuildup) {
+		if (random(1,100) < bleeder.bleedbuildup)
+		{
 			//if check passed, start bleeding:
 			bleeder.isbleeding = true;
 			//and save the actor that dealt damage for proper kill credit if player bleeds out:

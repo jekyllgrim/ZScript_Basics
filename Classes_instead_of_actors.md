@@ -19,12 +19,14 @@ There are also some simple differences in syntax. Here’s a comparison of templ
 ```csharp
 //DECORATE:
 
-Actor MyActor {
+Actor MyActor 
+{
 	property1
 	property2
 	property3
 	+FLAGNAME
-	states {
+	States 
+	{
 	Spawn:
 		SPRT A 1
 		loop
@@ -43,14 +45,17 @@ Actor MyActor {
 //at the top of your main zscript file you need to declare version (once)
 version "4.2.4" 
 
-Class MyClass : Actor {
-	Default {
+Class MyClass : Actor 
+{
+	Default 
+	{
 		property1;
 		property2;
 		property3;
 		+FLAGNAME
 	}
-	states {
+	States 
+	{
 	Spawn:
 		SPRT A 1;
 		loop;

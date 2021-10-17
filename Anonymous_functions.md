@@ -20,7 +20,8 @@ TNT1 A 0 A_FireBullets(5,1,1,0)
 …You can do this:
 
 ```csharp
-TNT1 A 0 {
+TNT1 A 0 
+{
 	A_GunFlash();
 	A_Recoil(2);
 	A_SpawnItemEx("EmptyCasing");

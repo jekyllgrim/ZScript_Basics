@@ -42,14 +42,16 @@ Functions, flags and properties are what makes an actor work.
 The basic actor definition would look as follows:
 
 ```cs
-Class MyClassName : Actor {
-	Default {
-		//flags and properties go here
-		+FLAGNAME //an example of how a flag is set
+Class MyClassName : Actor 
+{
+	Default //flags and properties go into the Defaults block
+	{		
+		+FLAGNAME //an example of how a flag is set (semicolon at the end is optional)
 		property value; //an example of a property and a value
 	}
 	//States keyword begins a block of states that define the actor's animation and behavior:
-	States {
+	States 
+	{
 	//when spawned in the world, actors enter their Spawn state by default:
 	Spawn:
 		FRAM A 1; //an example of a sprite name and sprite duration
@@ -72,7 +74,8 @@ To control the states you need to read about state flow control, which is descri
 A basic state sequence is defined as follows:
 
 ```cs
-States {
+States 
+{
 StateLabel:
 	SPRT A 1;
 	SPRT B 2 A_Function();
@@ -117,8 +120,10 @@ class BigTree : Actor
 If you want to define a custom version of `BigTree` that is similar to the existing one, you can do it by [using inheritance](https://zdoom.org/wiki/Using_inheritance):
 
 ```cs
-Class SmallerTree : BigTree {
-	Default {
+class SmallerTree : BigTree
+{
+	Default 
+	{
 		Scale 0.5; //this makes the actor's sprite visually smaller
 		Radius 16; //radius and height need to be redefined manually
 		Height 54;
