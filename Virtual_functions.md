@@ -137,8 +137,8 @@ Notes:
 - `IsFrozen()` is a ZScript bool that returns `true` if the actor that calls it is currently frozen, which can happen when:
   - "freeze" cheat has been entered in the console;
   - the player has a PowerTimeFreezer powerup and the actor in question does *not* have a NOTIMEFREEZE flag;
-  - naturally, there can be other scripts that for whatever reason freeze actors.
--  Boolean checks such as `if (bool == true)` can be shortened to `if (bool)`. And `!` means "not" and cab be used to invert any check. `if (!isFrozen())` is the same as `if (IsFrozen() == false)`.
+  - any other custom scripts that for whatever reason freeze actors.
+-  Boolean checks such as `if (bool == true)` can be shortened to `if (bool)`. And `!` means "not" and cab be used to invert any check. `if (!isFrozen())` is the same as `if (IsFrozen() == false)`. See [Flow Control, Statements](Flow_Control.md#statements) for more information.
 
 
 
@@ -239,9 +239,9 @@ Notice that both `Tick()` and `PostBeginPlay()` are **void** functions (they hav
 
 A good example of that is `SpecialMissileHit()` — an integer function that is called by projectiles when they collide with an actor. When a projectile collides with an actor, it calls `SpecialMissileHit()`, which returns an integer number that tells the projectile what to do: 
 
-- `-1` (default) will make the projectile do what it does normally (explode, rip through if it has +RIPPER flag, etc.); 
-- `1` will make the projectile pass through the actor (it doesn't need a +RIPPER flag for that, it'll simply fly through instead of colliding);
-- `0` will destroy the projectile (remove it completely without doing anything else).
+- `-1` (default) will make the projectile do what it would normally do in accordance with its properties and flags (i.e. explode, or die, or rip through if it has +RIPPER flag, etc.);
+- `1` will make the projectile unconditionally pass through the actor without colliding (+RIPPER or other flags aren't required for that; in fact, they are ignored in this case);
+- `0` will unconditionally destroy the projectile (remove it completely without doing anything else; it won't be put into its Death sequence either).
 
 This function is used in Hexen by MageStaffFX2—a homing projectile fired by Bloodscourge, the most powerful Mage weapon:
 
@@ -264,7 +264,7 @@ Notice that `SpecialMissileHit()` also gets a pointer `victim` of type actor: th
 In the example above the projectile does the following:
 
 1. Checks that the `victim` isn't the `target` (shooter of the projectile*), or a player (any player) or a boss (has +BOSS flag)
-   1. *If you wonder why you need to check if the projectile didn't hit the shooter—it's because when spawned, projectiles basically spawn "inside" the player and they *will* collide with them, unless this check is added.
+   1. *If you wonder why you need to check if the projectile didn't hit the shooter—it's because when spawned, projectiles basically spawn inside the actor that shot them, and they *will* collide with them, unless this check is added.
 2. If all checks pass, it deals damage to the victim by calling `DamageMobj()` function (see below) and keeps going.
 3. Otherwise (i.e. If the victim is the shooter, *or* a player, *or* a boss), the projectile explodes.
 
@@ -272,9 +272,11 @@ In the example above the projectile does the following:
 
 As you can see, virtual functions are already attached to actors, and you can mix your own stuff into them to add various effects. However, you can also *call* them just like you call regular actor functions. A common example of a function that you may often need to both override and call is `DamageMobj()`:
 
-**int DamageMobj (Actor inflictor, Actor source, int damage, Name mod, int flags = 0, double angle = 0)**
+```cs
+int DamageMobj (Actor inflictor, Actor source, int damage, Name mod, int flags = 0, double angle = 0)
+```
 
-Called by the actor whenever it takes damage.
+It's called by the actor whenever it takes damage.
 
 - **inflictor** - The actor pointer dealing the damage. Missiles are used here, with their owners being the *source*.
 - **source** - The actor pointer which claims responsibility for the damage, responsible for causing infighting.
