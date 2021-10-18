@@ -6,6 +6,8 @@
 
 # Custom functions and function types
 
+## Defining custom functions
+
 Sometimes you need to perform a bunch of similar actions in multiple places and/or multiple actors. Usually you can simplify things by creating a custom function. Most functions will look like this:
 
 ```csharp
@@ -18,7 +20,7 @@ type name (arguments)
 
 Functions have to be defined inside a class and by default only that class will be able to call them—this type of function is called a **method**. 
 
-Functions that can be called from *anywhere* are also possible: they're called **static** functions and they're covered in [a later subsection of this chapter](#Static-functions).
+Non-method functions are possible—those are known as **static functions** and they're described in a [later subsection](#Static-functions).
 
 Let's revisit our **CacoSingleDad** for an actual example:
 
@@ -139,7 +141,7 @@ You can notice that this function doesn't actually cover everything we used in C
 
 A note on **function names**: you can give your functions any names you like, but in general it's a good idea to not use DECORATE's naming convention (which would be `A_FunctionName`) simply to avoid confusing yourself: this way you'll be able to tell at a glance that it's not a DECORATE function. However, it *can* be a good idea to use some sort of a custom prefix, such as your mod's initials.
 
-## Non-void functions and return values
+### Non-void functions and return values
 
 Void functions are the functions that do stuff and don't return any data. But there are many cases when you need to retrieve some sort of data using a function. Here's a very basic example:
 
@@ -250,7 +252,7 @@ In short, keep the following points in mind:
 
 * If you're defining a weapon function that is meant to be called from a weapon state, usually it has to be an `action` function.
 * If you're defining a custom function used in a non-weapon actor, it doesn't matter if it's an action function.
-* [Virtual functions](Virtual_functions.md) can't be action functions.
+* Action functions can't be **virtual** or **static** (see below).
 
 
 
@@ -265,10 +267,12 @@ static void MyFunction()
 }
 ```
 
-Static functions still have to be defined within a class, and to call them from another class, you'll have to use the original class's name as a prefix:
+Static functions are *not* **methods**, since they're not bound to the class they're defined it.
+
+However, static functions still have to be defined within a class, and to call them from another class, you'll have to use the original class's name as a prefix:
 
 ```cs
-class FunctionHolderClass : Actor
+class FunctionContainer : Actor
 {
 	static void MyFunction()
 	{
@@ -283,10 +287,76 @@ class SomeOtherClass : Actor
 	Spawn:
 		TNT1 A 0 NoDelay
 		{
-			FunctionHolderClass.MyFunction();
+			FunctionContainer.MyFunction();
 		}
 	[...] //the rest of the actor's code
     }
+}
+```
+
+Static functions are designed specifically to be available to all classes. However, that also means that static functions don't have the concept of `self`: the class where they're defined in (`FunctionContainer` in the example above) can't be `self` because it serves simply as a container for the function; whereas the class that ends up actually calling the function (`SomeOtherClass` in the example above) is ignored, since the defined function can't magically guess which class will be calling it.
+
+Static functions are usually used to get some data. For example, here's a simple sign function that returns -1 or 1 based on whether the number given to it is positive or negative:
+
+```cs
+class MathContainer : Actor
+{
+	int Sign (double i) 
+	{
+		if (i >= 0)
+			return 1;
+		return -1;
+	}
+}
+```
+
+To call it you'd call `MathContainer.Sign(<number>)` where <number> would be the required number.
+
+Note that in this case the container class doesn't even have to inherit from `Actor`, it could be based on `Object`, but inheriting from `Actor` gives it access to actor functions, which may be useful in some cases.
+
+Many existing ZScript functions are static. For example, the [`InStateSequence`](https://zdoom.org/wiki/InStateSequence) function that allows to check which state sequence the actor is currently in. It can be used to do that outside of states, e.g.:
+
+```cs
+override void Tick()
+{
+	super.Tick();
+	if (InStateSequence(curstate,FindState("Spawn"))
+	{
+		Spawn("RocketTrail",pos);
+    }
+}
+```
+
+This override will make the actor spawn a rocket trail behind itself but only while it's in the Spawn sequence. Note, if you have a pointer to an actor, you can check which state that actor is currently in as well:
+
+```cs
+class FearfulCacodemon : Cacodemon
+{
+	override void Tick() 
+	{
+		super.Tick();
+		if (target && InStateSequence(target.curstate, target.FindState("Missile")))
+			bFRIGHTENED = true;
+		else
+			bFRIGHTENED = false;
+	}
+}
+```
+
+This version of a Cacodemon will check if its `target` is in a "Missile" state sequence (this is the sequence used by player pawns when the player is firing a weapon), and if so, it'll set its FRIGHTENED flag to true, so the monster is feeling.
+
+Note that we're calling `InStateSequence`, not `target.InStateSequence`: this is precisely because the function is static, and the actual caller of it *doesn't matter*. What does matter is that we use the correct pointers to the state (`target.curstate` checks the *target's* current state) and state label (`target.FindState()` looks for a specific state label in the *target*), but who calls the function itself is irrelevant.
+
+Note: the example above can be shortened as follows:
+
+```cs
+class FearfulCacodemon : Cacodemon
+{
+	override void Tick() 
+	{
+		super.Tick();
+		bFRIGHTENED = (target && InStateSequence(target.curstate,target.FindState("Missile"));
+	}
 }
 ```
 
@@ -296,7 +366,7 @@ class SomeOtherClass : Actor
 
 Virtual functions are a special type of method that can be overridden in a child class, similarly to how child classes can override the parent's flags, properties and states.
 
-Virtual functions is a pretty big topic, so they're covered in more detail in the next chapter.
+Virtual functions is a pretty big topic, so they're covered in more detail in the [next chapter](Virtual_functions.md).
 
 ------
 
