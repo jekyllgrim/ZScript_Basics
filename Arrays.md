@@ -280,13 +280,13 @@ The full list of methods (such as `Find`, `Delete`, etc.) is described on [ZDoom
 
     * **Note:** indexes can contain null data. Always perform a null-check before doing something with an array index.
     * Also remember that you can unintentionally specify an index that is outside of the array's bounds. If your array only contains 3 elements but you try to do `arrayName[10]`, you'll get an out of bounds error and GZDoom will close with a VM abort. That's another reason for checking indexes.
-    * You can also directly *set* index values. Note that whatever was contained in that index previously will be removed from the array. You  also
+    * You can also directly *set* index values. Note that whatever was contained in that index previously will be removed from the array.
 
 * `Size()` returns the current size of the array (i.e. how many elements it has). Can be used both on const and dynamic arrays.
 
     * **Note:** array's size will always be larger than the last index in the array by 1. For example, if you have an array that only contains 1 element, its size will be 1 but the index of that element will be 0. If there are 10 Lost Souls in the `lostsouls` array in the example above, the first Lost Soul will have an index of 0, while the last Lost Soul will have an index of 9, while the size of the array will be 10.
 
-* `Find(item)` method tries to find `item`, i.e. a specific piece of data (such as actor), inside the array. If found, it'll return a pointer to that data.
+* `Find(item)` method tries to find `item`, i.e. a specific piece of data (such as actor), inside the array. If found, it'll return the **index** of that item (not a pointer).
 
     * **Note:** IMPORTANT AND EXTREMELY UNINTUITIVE! When `Find` can't find the object, it does not return `null` or `false` (because it's supposed to return a number); instead it returns an integer value that is equal to the array's size. So, if you want to make sure a piece of data actually **exists** in your array, you need to check for it as follows:
 
@@ -297,13 +297,13 @@ The full list of methods (such as `Find`, `Delete`, etc.) is described on [ZDoom
     }
     else 
     {
-    	//'pointer' doesn't exist in the array
+    	//'pointer' has NOT been found in the array
     }
     ```
 
-* `Push(pointer)` pushes the `item` into the array. This means that the item will be added to the array, it'll receive a new index and the array's size will increase by 1. In contrast to doing `arrayname[index] = pointer`, this will never override any of the previously existing elements.
+* `Push(item)` pushes the `item` into the array. This means that the item will be added to the array, it'll receive a new index and the array's size will increase by 1. In contrast to doing `arrayname[index] = pointer`, this will never override any of the previously existing elements.
 
-* `Pop(pointer)` is the exact opposite of `Push`: it removes the **last** item from the array and reduces the array's size by 1.
+* `Pop()` removes the **last** item from the array and reduces the array's size by 1.
 
 * `Delete(index)` deletes an item with the specified index from the array. 
 
