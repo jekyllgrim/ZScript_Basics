@@ -1,6 +1,6 @@
 🟢 [<<< BACK TO START](README.md)
 
-🔵 [<< Previous: Custom functions](Custom_functions.md)
+🔵 [<< Previous: Custom functions and function types](Custom_functions.md)
 
 ------
 
