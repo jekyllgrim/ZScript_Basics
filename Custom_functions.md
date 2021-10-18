@@ -5,6 +5,14 @@
 ------
 
 # Custom functions and function types
+- [Custom functions and function types](#custom-functions-and-function-types)
+  * [Defining custom functions](#defining-custom-functions)
+    + [Non-void functions and return values](#non-void-functions-and-return-values)
+  * [Action functions](#action-functions)
+  * [Static functions](#static-functions)
+  * [Virtual functions](#virtual-functions)
+
+
 
 ## Defining custom functions
 

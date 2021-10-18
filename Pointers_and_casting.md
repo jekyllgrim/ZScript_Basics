@@ -5,6 +5,11 @@
 ------
 
 # Pointers and casting
+- [Pointers and casting](#pointers-and-casting)
+  * [Basic pointers](#basic-pointers)
+  * [Using pointers in ZScript](#using-pointers-in-zscript)
+  * [Casting and custom pointers](#casting-and-custom-pointers)
+  * [Type casting](#type-casting)
 
 ## Basic pointers
 

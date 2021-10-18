@@ -4,6 +4,14 @@
 
 ------
 
+[Arrays](#arrays)
+
+* [Static constant arrays](#static-constant-arrays)
+* [Dynamic arrays](#dynamic-arrays)
+    + [Note on data types](#note-on-data-types)
+* [Dynamic array methods](#dynamic-array-methods)
+* [Fixed-size arrays](#fixed-size-arrays)
+
 # Arrays
 
 An array is a [variable](Variables_and_data_types.md) that can hold multiple pieces of data instead of one. In essence, arrays are lists.

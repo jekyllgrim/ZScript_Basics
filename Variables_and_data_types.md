@@ -12,6 +12,7 @@
     + [Local variables](#local-variables)
   * [Turning variables into actor properties](#turning-variables-into-actor-properties)
   * [Access modifiers](#access-modifiers)
+  * [Accessing variables from weapon states](#accessing-variables-from-weapon-states)
   * [Data types](#data-types)
 
 ## Overview
