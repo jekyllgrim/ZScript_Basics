@@ -257,7 +257,7 @@ array <vector3> coordinatelist; //an array of vector3 coordinates
 //and so on...
 ```
 
-**Note:** when you're making a an array of class names, you need a space between `>` and `>`:
+**Note:** when you're making a an array of class names, you need a space between `<` and `>`:
 
 ```cs
 //this is valid:
