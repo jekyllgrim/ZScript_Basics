@@ -289,6 +289,10 @@ HeatGaugeFiring:
 
 Note, however, that if your Fire animation ends before the HeatGaugeFiring animation, the HeatGaugeFiring animation will still be drawn before it reaches `stop`, and only then HeatGaugeReady will be drawn.
 
+
+
+*This chapter is a work-in-progress. To be revised/completed.*
+
 ------
 
 🔵 [>> Next: Arrays](Arrays.md)
