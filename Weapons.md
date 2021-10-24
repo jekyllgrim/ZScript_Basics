@@ -1,6 +1,6 @@
 🟢 [<<< BACK TO START](README.md)
 
-🔵 [<< Previous: Virtual Functions](Virtual_functions.md)
+🔵 [<< Previous: Event Handlers](Event_Handlers.md)
 
 ------
 
