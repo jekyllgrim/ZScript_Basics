@@ -6,7 +6,14 @@
 
 Even in our day and age there are lot of important best practices that are either unknown to many or often being overlooked. This section describes some of them—most of them are related to ZScript, but some are concerned with modding in general.
 
-[TOC]
+## Table of Contents
+
+- [Best Practices and Rules of Thumb](#best-practices-and-rules-of-thumb)
+  * [Using a consistent indentation style](#using-a-consistent-indentation-style)
+  * [Using #include](#using--include)
+  * [PK3 instead of WAD and folders instead of archives](#pk3-instead-of-wad-and-folders-instead-of-archives)
+  * [Using a consistent naming convention for your classes](#using-a-consistent-naming-convention-for-your-classes)
+  * [Using GitHub](#using-github)
 
 
 

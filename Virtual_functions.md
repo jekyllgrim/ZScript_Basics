@@ -6,6 +6,8 @@
 
 # Virtual functions
 
+## Overview
+
 `Virtual` is a keyword that makes a function overridable. You can add it before the type of the function when defining it:
 
 ```csharp

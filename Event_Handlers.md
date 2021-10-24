@@ -298,4 +298,4 @@ Some notes of the functions used in this script:
 
 ------
 
-🔵 [>> Arrays](Arrays.md)
+🔵 [>> Next: Weapons, PSprite and overlays](Weapons.md)
