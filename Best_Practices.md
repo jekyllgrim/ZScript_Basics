@@ -30,33 +30,34 @@ Your instinctive reaction, most likely, is to say, "I can read my code just fine
 In short: check out [existing indentation styles](https://en.wikipedia.org/wiki/Indentation_style), pick Allman or K&R (since the absolute majority are using one of those) and use it consistently. Remember, this is how it should look (using Allman because this is the style I use throughout this guide):
 
 ```csharp
-Class MyClass : Actor		 //level 1 header
+Class MyClass : Actor		//level 1 header
 {
-	int foo;			    //level 2 code
+	int foo;			//level 1 code
 	string bar;
 	property bar : bar;
-	Default 			    //level 2 header
+	Default				//level 2 header
 	{
-		property1;			//level 3 code
+		property1;			//level 2 code
 		property2;
 		property3;
 		+FLAGNAME
-	}                        //end of level 2 block
-	States {                 //another level 2 header
-	Spawn:                   //state labels may or may not be indended to level 3 (see notes below)
-		SPRT A 1;           //level 3 code
+	}                      		//end of level 2 block
+	States  			//another level 2 header
+	{                
+	Spawn:                   	//state labels may or may not be indented further (see notes below)
+		SPRT A 1;			//level 2 code
 		loop;
 	Death:
 		SPRT B 5 A_Function;
-		SPRT CD 5           //level 4 header
+		SPRT CD 5           		//level 3 header
 		{
-			A_Function1();	//level 4 code
+			A_Function1();			//level 3 code
 			A_Function2();
-		}				  //end of level 4 block
+		}				//end of level 3 block
 		SPRT E -1;
 		stop;
-	}					//end of level 2 block
-}						//end of level 1 block
+	}				//end of level 2 block
+}				//end of level 1 block
 ```
 
 There *is* some discussion regarding how to indent the contents of the `States` block though, but both of these options should be fine:
@@ -71,9 +72,10 @@ There *is* some discussion regarding how to indent the contents of the `States` 
 		Death:
 			SPRT E -1;
 			stop;
-	} 					//this awkward closing brace is too far
+	} 	//this awkward closing brace is too far
 
-//only considers state contents as new-level code, but not the labels:
+//only considers state contents as new-level code, but not the labels
+//(like in switch blocks):
 	States 
 	{
 	Spawn:
@@ -83,7 +85,6 @@ There *is* some discussion regarding how to indent the contents of the `States` 
 		SPRT E -1;
 		stop;
 	}
-//This is how switch blocks are normally formatted ^
 ```
 
 Final notes:
