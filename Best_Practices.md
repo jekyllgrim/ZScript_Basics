@@ -83,13 +83,12 @@ There *is* some discussion regarding how to indent the contents of the `States` 
 		SPRT E -1;
 		stop;
 	}
-//^ this is how switch statements are formatted in true C-style K&R
+//This is how switch blocks are normally formatted ^
 ```
 
 Final notes:
 
 - GZDoom rather consistently uses Allman (both in its ZScript definitions and the C++ engine code), same goes for most examples on ZDoom Wiki.
-- This guide uses K&R style simply because I've grown to use that in my mods. The only reason I use it is because it's *a bit* faster since there are fewer Enter presses to start a new block. At the same time I consider Allman a bit easier to read.
 - Other styles exist, but consider ZScript is styled after C# / Unrealscript, it makes sense to choose one of the two most popular styles.
 - If you copy-paste a snippet of code from somewhere, don't be lazy and change its indentation to your style if they don't match.
 
