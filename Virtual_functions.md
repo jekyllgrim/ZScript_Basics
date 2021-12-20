@@ -310,6 +310,26 @@ class ZombieTroopman : Zombieman
 
 This version of Zombieman checks whether the `source` of the attack was another Zombieman (or an actor inheriting from Zombieman). If so, it *doesn't* call `super.DamageMobj` and returns 0. In all other cases it deals damage normally and returns the amount of damage that was dealt.
 
+Here's another example of a neat use of `DamageMobj`: you can handle headshot damage by comparing the puff or missile position to the monster's height:
+
+```cs
+class HeadshottableZombieman : Zombieman 
+{
+	override int DamageMobj (Actor inflictor, Actor source, int damage, Name mod, int flags, double angle)
+	{
+		if (inflictor && (inflictor.pos.z - floorz) >= (height * 0.75))
+		{
+			damage *= 2.0;
+		}
+		return super.DamageMobj(inflictor, source, damage, mod, flags, angle);
+	}
+}
+```
+
+In this example if the inflictor's position is in the top 25% range of the monster's height, the damage will be doubled!
+
+
+
 As mentioned above, you can also *call* `DamageMobj` to—you guessed it—damage an actor. You can even do it from a `DamageMobj` override:
 
 ```csharp
