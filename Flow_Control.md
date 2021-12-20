@@ -24,7 +24,6 @@ This chapter will also cover flow control in **actor states**, which work simila
   * [Conditional blocks](#conditional-blocks)
   * [Loop control](#loop-control)
   * [Return and return values](#return-and-return-values)
-  * [Switch](#switch)
 - [State control](#state-control)
   * [stop](#stop)
   * [loop](#loop)
@@ -670,7 +669,7 @@ if (condition)
 {
     Do();
 }
-else {} //don't do this, it's pointless!
+else {} //don't do this if you don't have any code here, it's pointless!
 ```
 
 ### if else
@@ -691,6 +690,98 @@ else if (condition2 == true)
 In the above example `DoThat()` will only be called if `condition` is false AND `condition2` is true.
 
 `if else` can be followed by an `else` block:
+
+```cs
+if (condition1 == true)
+{
+    DoThis();
+}
+else if (condition2 == true)
+{
+    DoThat();
+}
+else
+{
+    DoSomethingElse();
+}
+```
+
+In this example `DoSomethingElse()` will be executed when *both* `condition1` and `condition2` are false.
+
+It's possible to string any number of `if/else if` blocks, but if you have more than 2, using a `switch` block may be recommended instead (see below).
+
+### Switch
+
+A `switch` block is essentially a shorthand for creating multiple `if`/`else if` blocks that simply looks better. There are a few rules regarding `switch` blocks you need to know to effectively utilize them, however.
+
+The structure of a `switch` block in comparison to a series of `if`/`else if` blocks looks as follows:
+
+```cs
+//if/else:
+if (condition1)
+	DoStuff1();
+else if (condition2)
+	DoStuff2();
+else if (condition3)
+	DoStuff3();
+
+//switch:
+switch
+{
+case (condition1): 
+	DoStuff1(); 
+	break;
+case (condition2): 
+	DoStuff2();
+	break;
+case (condition3): 
+	DoStuff3(); 
+	break;
+}
+```
+
+In terms of structure a `switch` block is very similar to a `States` block of an actor (see [State control](#State-control) below for details): 
+
+- `case` keyword defines a sub-block (which in case of an actor would be a state sequence);
+- `break` defines where that specific `case` block should end (similarly to how in state sequences we use `stop`);
+- if `break` is omitted, the execution will just fall through to the next case (that's why using it is important!)
+
+A `switch` block, unfortunately, is limited in what data types you can use in it: it can only check for names and integer values. One good application for it is, for example, in a `CheckReplacement` event, if you use it to handle actor replacements in your mod instead of the `replaces` keyword:
+
+```cs
+override void CheckReplacement(replaceEvent e)
+{
+	let classname = e.Replacee.GetClassName();
+	switch (classname)
+	{
+	case 'Zombieman':
+		e.Replacement = "MyZombieman";
+		break;
+	case 'ShotgunGuy':
+		e.Replacement = "MyShotgunGuy";
+		break;
+	case 'ChaingunGuy':
+		e.Replacement = "MyChaingunGuy";
+		break;
+	[...]//and so on
+    }
+}
+```
+
+You can insert randomization inside a switch block as well:
+
+```cs
+	switch (classname)
+	{
+	case 'Zombieman':
+		if (frandom(0,10) > 8.5)
+			e.Replacement = "Cyberdemon";
+		else 
+			e.Replacement = "MyZombieman";
+		break;
+	[...]
+    }
+```
 
 ## Loop control
 
@@ -996,79 +1087,6 @@ TNT1 A 0
 		return ResolveState("Reload"); //if no ammo, jump to Reload sequence
 	return ResolveState(null); //otherwise, don't jump, move on to the next frame
 }
-```
-
-## Switch
-
-A `switch` block is essentially a shorthand for creating multiple `if`/`else if` blocks that simply looks better. There are a few rules regarding `switch` blocks you need to know to effectively utilize them, however.
-
-The structure of a `switch` block in comparison to a series of `if`/`else if` blocks looks as follows:
-
-```cs
-//if/else:
-if (condition1)
-	DoStuff1();
-else if (condition2)
-	DoStuff2();
-else if (condition3)
-	DoStuff3();
-
-//switch:
-switch
-{
-case (condition1): 
-	DoStuff1(); 
-	break;
-case (condition2): 
-	DoStuff2();
-	break;
-case (condition3): 
-	DoStuff3(); 
-	break;
-}
-```
-
-In terms of structure a `switch` block is very similar to a `States` block of an actor (see [State control](#State-control) below for details): 
-
-- `case` keyword defines a sub-block (which in case of an actor would be a state sequence);
-- `break` defines where that specific `case` block should end (similarly to how in state sequences we use `stop`);
-- if `break` is omitted, the execution will just fall through to the next case (that's why using it is important!)
-
-A `switch` block, unfortunately, is limited in what data types you can use in it: it can only check for names and integer values. One good application for it is, for example, in a `CheckReplacement` event, if you use it to handle actor replacements in your mod instead of the `replaces` keyword:
-
-```cs
-override void CheckReplacement(replaceEvent e)
-{
-	let classname = e.Replacee.GetClassName();
-	switch (classname)
-	{
-	case 'Zombieman':
-		e.Replacement = "MyZombieman";
-		break;
-	case 'ShotgunGuy':
-		e.Replacement = "MyShotgunGuy";
-		break;
-	case 'ChaingunGuy':
-		e.Replacement = "MyChaingunGuy";
-		break;
-	[...]//and so on
-    }
-}
-```
-
-You can insert randomization inside a switch block as well:
-
-```cs
-	switch (classname)
-	{
-	case 'Zombieman':
-		if (frandom(0,10) > 8.5)
-			e.Replacement = "Cyberdemon";
-		else 
-			e.Replacement = "MyZombieman";
-		break;
-	[...]
-    }
 ```
 
 # State control
