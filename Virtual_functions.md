@@ -215,15 +215,16 @@ class CustomProtection : Inventory
 		inventory.maxamount 1;
 	}
 	
-	override void ModifyDamage (int damage, Name damageType, out int newdamage, bool passive, Actor inflictor = null, Actor source = null, int flags = 0) 
+	override void ModifyDamage (int damage, Name damageType, out int newdamage, bool passive, Actor inflictor, Actor source, int flags) 
 	{
-        //check if the inflictor has a MISSILE flag:
-		if (inflictor.bMISSILE) 
+        // check if the inflictor exists and has a MISSILE flag:
+		if (inflictor && inflictor.bMISSILE) 
 		{
 			newdamage = damage * 0.5;
 		}
-		//otherwise check if the inflictor has ISMONSTER but not FRIENDLY, and is alive:
-		else if (inflictor.bISMONSTER && !inflictor.bFRIENDLY && inflictor.health > 0) 
+		// otherwise check if the damage was dealt by the monster directly (i.e. it's a melee attack)
+		// if so, check if the monster is alive and is hostile to the owner of this item:
+		else if (inflictor.bISMONSTER && inflictor.isHostile(owner) && inflictor.health > 0) 
 		{
 			newdamage = damage * 0.1;
 		}
@@ -231,7 +232,7 @@ class CustomProtection : Inventory
 }
 ```
 
-The overridden `ModifyDamage()` above first checks the source of the damage: whether it a missile or a monster itself (i.e. a monster's melee attack). For missiles the damage will be cut in half, while for monsters it'll be reduced by 90%.
+The overridden `ModifyDamage()` above first checks what dealt the damage: whether it a missile or a monster itself (i.e. a monster's melee attack). For missiles the damage will be cut in half, while for monsters (melee attacks) it'll be reduced by 90%.
 
 `ModifyDamage()` gets a bunch of pointers, and we use them to decide what to do. Inflictor is an actor pointer to the object that dealt the damage directly (projectile, puff or a monster in case of a melee attack).
 
