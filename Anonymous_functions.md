@@ -6,6 +6,13 @@
 
 # Anonymous functions
 
+- [Anonymous functions](#anonymous-functions)
+- [Features of anonymous functions](#features-of-anonymous-functions)
+  * [Using parentheses](#using-parentheses)
+  * [Variables and conditions inside anonymous functions](#variables-and-conditions-inside-anonymous-functions)
+  * [Jumps in anonymous functions](#jumps-in-anonymous-functions)
+- [Flow control](#flow-control)
+
 Arguably the first thing you need to get used to when coding in ZScript is anonymous functions. They're not, strictly speaking, necessary, but using them is the primary way to make your code cleaner and prettier.
 
 Also, anonymous functions, technically, aren't a ZScript-only feature because they were introduced a little earlier than ZScript. But that was a brief period, and besides anonymous functions are not supported by Zandronum's version of DECORATE at all, so most of the DECORATE modders aren't closely familiar with this feature.
