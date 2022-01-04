@@ -6,16 +6,13 @@
 
 # Variables, data types and constants
 
-- [Variables, data types and constants](#variables--data-types-and-constants)
-  * [Overview](#overview)
-    + [Class-scope variables aka fields](#class-scope-variables-aka-fields)
-    + [Local variables](#local-variables)
+- [Variables overview](#variables-overview)
   * [Turning variables into actor properties](#turning-variables-into-actor-properties)
   * [Access modifiers](#access-modifiers)
   * [Accessing variables from weapon states](#accessing-variables-from-weapon-states)
-  * [Data types](#data-types)
+- [Data types](#data-types)
 
-## Overview
+# Variables overview
 
 If you’ve used ACS, you’re probably familiar with variables. Variables can be defined and used in ZScript in a similar manner, but there are more **data types** that they can hold.
 
@@ -35,15 +32,17 @@ Here’s a simple example of declaring a variable in a class and using it:
 class SpeedyImp : DoomImp 
 {
 	int speedups;	//creates a variable that can hold an integer number
+
 	Default 
 	{
 		health 300;
 	}
+
 	States 
 	{
 	Pain:
 		TNT1 A 0 
-			{
+		{
 			if (speedups < 5)	//check if the value is less than 5
 			{
 				speedups += 1;	//if so, increase the value by one
@@ -55,7 +54,7 @@ class SpeedyImp : DoomImp
 }
 ```
 
-> *Note*: speed is the default Actor speed property, not a custom variable, you can just read and change it directly.
+> *Note*: speed is the default speed [actor property](https://zdoom.org/wiki/Actor_properties#Behavior), not a custom variable, you can just read and change it directly.
 
 Whenever this Imp is hurt, it'll increase its speed by x1.2. But this will only happen as long as `speedups` is less than 5—so, no more than 5 times.
 
@@ -67,10 +66,12 @@ A different method is declaring a variable inside an anonymous function. If you 
 class WeirdImp : DoomImp
 {
 	int speedups;			//this variable is available anywhere in the class
+
 	Default 
 	{
 		health 500;
 	}
+
 	States 
 	{
 	Pain:
@@ -79,7 +80,7 @@ class WeirdImp : DoomImp
 			if (speedups < 10) 
 			{
 				speedups++;			//++ is the same as +=1
-// create a temporary variable s that holds a random value between 0.8 and 1.2:
+				// create a temporary variable 'foo' that holds a random value between 0.8 and 1.2:
 				double foo = frandom(0.8,1.2);	
 				speed *= foo;		// multiply speed by that value
 				scale /= foo;		// divide scale by the same value
@@ -96,21 +97,19 @@ Variable `foo` in this example exists only inside that anonymous function and is
 
 Let's summarize the differences between these two types:
 
-### Class-scope variables aka fields
+**Class-scope variables aka fields:**
 
 - Fields by default can be changed from anywhere (this class, inheriting classes, even other classes if they get access to it—see [Pointers and Casting](#Pointers_and_casting.md)).
 - Fields can’t be declared and receive a value at the same time; when you declare them, they receive a default value (for `int` this is 0), and then you have to modify it somewhere. In the example above `speedups` is initially equal to 0 and it’s increased by 1 when the Imp enters its Pain state for the first time.
 - Fields keep their value while the class exists. That’s why every time we do `speedups += 1`, it increases by 1 and will keep that value throughout whatever the Imp does.
 - Since fields can be accessed from multiple places, it’s a good idea to give them a sensible and understandable name.
 
-### Local variables
+**Local variables:**
 
 - Variables declared inside anonymous functions are available only within that function. 
 - They can be declared *and* given a value within the same line.
-- Obviously, whenever the function is executed again, this variable will be re-declared and receive the value. That’s why double `foo = frandom(0.8,1.2)` will create a temporary variable `foo` equal to a random value between 0.8 and 1.2 every time Pain state is entered. (Note that actors can enter the Pain state multiple times simultaneously when hit by multiple attacks, such as a shotgun blast.)
+- Obviously, whenever the function is executed again, this variable will be re-declared and receive the value. That’s why double `foo = frandom(0.8,1.2)` will create a temporary variable `foo` equal to a random value between 0.8 and 1.2 every time the Pain state sequence is entered. (Note that actors can enter the Pain state multiple times simultaneously when hit by multiple attacks, such as a shotgun blast.)
 - Their names aren’t that important, since they won’t exist after the function stops executing. Usually something very short is used.
-
-
 
 ## Turning variables into actor properties
 
@@ -129,6 +128,7 @@ class WeirdImp : DoomImp
 {
 	int speedups;					//defines variable 'speedups'
 	property speedups : speedups;	//assigns the variable to a property with the same name
+
 	Default 
 	{
 		WeirdImp.speedups 10;		//defines the default value for the variable
@@ -143,8 +143,6 @@ Notes on the example:
 - All custom properties need to be prefixed with the name of the class where they are defined: hence we're using `WeirdImp.speedups` and not just `speedups` in the `Default {}` block.
 
 This property will be available to the WeirdImp class, as well as to all classes inheriting from it. If you're planning to have a lot of custom properties for all the actors in your mod, it's a good idea to define a custom version of the Actor class, define all properties in it, and then use it as a base class for all your custom classes.
-
-
 
 ## Access modifiers
 
@@ -163,11 +161,9 @@ Access modifier lets you restrict access to the variable, defining what can read
 
 - `protected` — this variable can be changed only from this class and classes inheriting from it but it can’t be changed from anywhere else
 - `private` — this variable is only available to this class and nothing else
-- If left unspecified, the variable will be readable and changeable from anywhere in the game, provided you have a pointer to the class that contains it (see [Pointers and Casting](Pointers_and_casting.md))
+- If left unspecified, the variable will be public—i.e. readable and changeable from anywhere in the game, provided you have a pointer to the class that contains it (see [Pointers and Casting](Pointers_and_casting.md))
 
 It's usually not something you need to worry about, but in general if you *know* that you're declaring a variable that will never be (and shouldn't be) changeable from any other class, it's a good idea to make it `private` (or `protected` if you want it to be accessible to child classes, but not to other classes). This approach is known as [encapsulation](https://en.wikipedia.org/wiki/Encapsulation_(computer_programming)), and the gist of it is: sometimes it's important to be *sure* that this data doesn't get changed accidentally from somewhere else, so better protect it.
-
-
 
 ## Accessing variables from weapon states
 
@@ -177,6 +173,7 @@ If you've defined a variable in a weapon, to access it from the weapon's state y
 class MyPlasma : Weapon
 {
 	int heatCounter; //this will hold the amount of heat accumulated by the weapon
+
 	States
 	{
 	Ready:
@@ -193,7 +190,9 @@ class MyPlasma : Weapon
 			invoker.heatCounter++; //accumulate heat when firing
 			//if the heat is too high, jump to Cooldown sequence:
 			if (invoker.heatCounter >= 50)
+			{
 				return ResolveState("Cooldown");
+			}
 			//otherwise continue to the next state as normal:
 			return ResolveState(null);
 		}
@@ -218,9 +217,7 @@ This is only true for the weapon states, however. If you access a variable from 
 
 You will find more information on accessing and manipulating data in weapon context in the [Weapons, overlays and PSprite](Weapons.md) chapter.
 
-
-
-## Data types
+# Data types
 
 Of course, `int` isn't the only existing variable type. In fact, variables can any type of data that exists in GZDoom. It's important to have a general understanding of these data types, since actor properties and function arguments in Doom are also essentially variables and they also hold data of various types. 
 
