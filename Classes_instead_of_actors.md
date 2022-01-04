@@ -68,9 +68,7 @@ Class MyClass : Actor
 }
 ```
 
-[^Note]: In case you don’t know, this is called pseudocode and it’s widely used as examples in programming manuals as well as by people. Pseudocode is a code that represents the way actual code would look but does not contain actual functions, properties, etc.
-
-
+> *Note:* In case you don’t know, this is called pseudocode and it’s widely used as examples in programming manuals as well as by people. Pseudocode is a code that represents the way actual code would look but does not contain actual functions, properties, etc.
 
 So, what are the differences here?
 
