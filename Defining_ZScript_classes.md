@@ -1,24 +1,37 @@
 🟢 [<<< BACK TO START](README.md)
 
-🔵[<< Previous: Where to start](Where_to_start.md)
+🔵[<< Previous: Where to start](Where_to_start.md)		🔵[>> Next: How to see your classes in the game](How_to_see_your_classes.md)
 
 ------
 
 # Defining ZScript classes
 
-## About ZScript
+* [About classes](#about-classes)
+* [ZDoom Wiki and ZScript vs DECORATE](#zdoom-wiki-and-zscript-vs-decorate)
+* [Creating actors](#creating-actors)
+* [Actor states](#actor-states)
+* [Coding a basic object](#coding-a-basic-object)
+* [Coding a basic monster](#coding-a-basic-monster)
+* [Coding a basic weapon](#coding-a-basic-weapon)
+* [Creating a weapon with a reload mechanic](#creating-a-weapon-with-a-reload-mechanic)
+
+
+
+## About classes
 
 ZScript is an [object-oriented](https://en.wikipedia.org/wiki/Object-oriented_programming) coding language, which means that all of the code that is executed at runtime (during the game) must be defined within a class. This differs it from [ACS](https://zdoom.org/wiki/ACS), another GZDoom coding language used to code map events, which is a list of scripts that define various events that happen in order. 
 
 Some of the common ZScript base class types are `Actor`, as well as `Inventory` and `Weapon` that are based on `Actor`. Virtually all objects that can be spawned in the map are based on the `Actor` class and therefore are referred to as "actors."
 
-Once you have a [mod folder/archive and your base zscript file set up](Where_to_start.md), you can start defining some classes. One of the easiest methods of designing classes is looking at how it's done in other mods, or just looking at the existing GZDoom classes. GZDoom's main file `gzdoom.pk3` that can be found in the GZDoom root folder contains all class definitions for Doom, Heretic, Hexen, Strife and Chex Quest games. Note that you never need to copy those classes into your code; you can just inherit from them or design your own code similarly.
+Once you have a [mod folder/archive and your base zscript file set up](Where_to_start.md), you can start defining some classes. One of the easiest methods of designing classes is looking at how it's done in other mods, or just looking at the existing GZDoom classes. GZDoom's main file `gzdoom.pk3`, which can be found in the GZDoom root folder, contains all class definitions for Doom, Heretic, Hexen, Strife and Chex Quest games. Note that you never need to (and shouldn't!) copy those classes into your code; you can just inherit from them or design your own code similarly.
+
+
 
 ## ZDoom Wiki and ZScript vs DECORATE
 
-A good resource that covers most of GZDoom's functionality, including a lot of ZScript, is the [ZDoom Wiki](https://zdoom.org/wiki/Main_Page).  However, the wiki has existed since the dawn of ZDoom and as such describes multiple methods, including the ones that are deprecated and no longer recommended for use. Most importantly, a lot of the code examples described on the wiki are written not in ZScript but in [DECORATE](https://zdoom.org/wiki/DECORATE).
+A good resource that covers most of GZDoom's functionality, including a lot of ZScript, is the [ZDoom Wiki](https://zdoom.org/wiki/Main_Page).  However, the wiki has existed since the dawn of ZDoom and as such describes multiple methods, including the ones that are deprecated or inefficient and no longer recommended for use. Most importantly, a lot of the code examples described on the wiki are written not in ZScript but in [DECORATE](https://zdoom.org/wiki/DECORATE).
 
-DECORATE is a coding language that had been used in GZDoom before ZScript support was added. At the moment it's still supported in GZDoom (since GZDoom is designed for maximum backwards compatibility, so that all older projects are still playable in it), but there's no reason to use it for newer projects because ZScript is an **extension** over DECORATE. 
+DECORATE is a coding language that had been used in GZDoom before ZScript support was added. At the moment it's still supported by GZDoom (since GZDoom is designed for maximum backwards compatibility, so that all older projects are still playable in it), but there's no reason to use it for newer projects because ZScript is an **extension** over DECORATE. 
 
 **ZScript supports all DECORATE methods and functions**, so all the examples you see on the wiki are still valid, provided you write them [using ZScript syntax](https://zdoom.org/wiki/Coding_language_differences). *However*, due to having a relatively small number of features, DECORATE code tends to use complicated and often inconvenient workarounds that are unnecessary and not recommended in ZScript. As a result it requires a bit of research and critical thinking to use something from DECORATE in ZScript; often it'll be better to code a solution from scratch rather than try and convert DECORATE to ZScript, although the latter is [possible](https://zdoom.org/wiki/Converting_DECORATE_code_to_ZScript).
 
@@ -27,6 +40,8 @@ Still, ZDoom Wiki remains an invaluable modding resource, it describes multiple 
 * [Information about DECORATE and ZScript differences on the wiki](https://zdoom.org/wiki/Coding_language_differences)
 * Some information on the syntax differences in this guide can be found here: [Classes instead of actors](Classes_instead_of_actors.md)
 * Apart from `gzdoom.pk3` you can also look at GZDoom github page to find all [ZScript classes used in GZDoom](https://github.com/coelckers/gzdoom/tree/master/wadsrc/static/zscript).
+
+
 
 ## Creating actors
 
@@ -63,7 +78,9 @@ Class MyClassName : Actor
 The basic rules for defining your classes are:
 
 * Don't use the same names as the existing classes (for example, don't try to code a custom actor named `Zombieman`, give it a different name)
-* To make the actors appear in the game, you either need to create a custom map and place them there manually, or they need to replace existing actors (see below).
+* To make the actors appear in the game, you either need to create a custom map and place them there manually, or they need to replace existing actors. One of the next chapters, [How to see your classes in the game](How_to_see_your_classes.md), explains how this works.
+
+
 
 ## Actor states
 
@@ -91,6 +108,8 @@ In this example `SPRT` is the sprite name, `A` is a frame letter, and numbers (1
 * [Actor states](https://zdoom.org/wiki/Actor_states) on the Wiki
 * [Flow Control: State Control](Flow_Control.md#state-control) in this guide
 * [Sprite naming and use](https://zdoom.org/wiki/Sprite) on the Wiki
+
+
 
 ## Coding a basic object
 
@@ -133,6 +152,8 @@ class SmallerTree : BigTree
 ```
 
 This will create a version of `BigTree` that looks the same but appears twice as smaller and has twice as smaller collision box.
+
+
 
 ## Coding a basic monster
 
@@ -217,6 +238,8 @@ Instead of using predefined attack functions, such as `A_PosAttack`, you can fin
 
 You also don't have to always rely on sound properties to play sounds for you, and instead you can use [A_StartSound](https://zdoom.org/wiki/A_StartSound) function to play desired sounds. Note that those sounds need to be defined in the [SNDINFO](https://zdoom.org/wiki/SNDINFO) lump to be accessible, since you can't use sound file names directly in sound-related functions.
 
+
+
 ## Coding a basic weapon
 
 There are a few rules regarding weapons:
@@ -280,7 +303,9 @@ You can use one of the [generic weapon attack functions](https://zdoom.org/wiki/
 
 You can also [create a new ammo type](https://zdoom.org/wiki/Creating_new_ammo_types) and a custom weapon that uses custom ammo.
 
-### Creating a weapon with a reload mechanic
+
+
+## Creating a weapon with a reload mechanic
 
 Weapons with a reload mechanic are very common. Usually to achieve that a special "magazine" ammo type is defined and is used as `AmmoType` while the reserve ammo is defined as `AmmoType2`. A `Reload` state sequence is used to handle the reload mechanics. Here's an example of a modified Doom Pistol with a reload mechanic:
 
@@ -300,13 +325,15 @@ class PistolWithReload : Pistol //it's based on the existing Pistol, so it inher
 		PISG A 1
 		{
 			int flags; //this defines an integer number
-			//Check that ammo1 is lower than maxamount and ammo2 is above 0:
+			// Check that ammo1 is lower than maxamount and ammo2 is above 0:
 			if (invoker.ammo1.amount < invoker.ammo1.maxamount && invoker.ammo2.amount > 0)
 			{
-				//if true, set flags to WRF_ALLOWRELOAD, which is a A_WeaponReady() flag that allows using the Reload state sequence:
+				// If true, set flags to WRF_ALLOWRELOAD, which is a A_WeaponReady() flag 
+				// that allows using the Reload state sequence:
 				flags |= WRF_ALLOWRELOAD;
 			}
-			//pass the resulting value to A_WeaponReady (which will be either 0 or WRF_ALLOWRELOAD):
+			// Pass the resulting value to A_WeaponReady 
+			// (which will be either 0 or WRF_ALLOWRELOAD):
 			A_WeaponReady(flags);
 		}
 		Loop;
@@ -317,28 +344,29 @@ class PistolWithReload : Pistol //it's based on the existing Pistol, so it inher
 		PISG B 5 A_ReFire;
 		Goto Ready;
 	Reload:
-		PISG AAAA 2 A_WeaponOffset(3,5,WOF_ADD); //simply shifts the weapon downward and to the right
+		PISG AAAA 2 A_WeaponOffset(3, 5, WOF_ADD); //simply shifts the weapon downward and to the right
 		PISG A 15 //wait for 15 tics and perform the following anonymous function:
 		{
 			A_StartSound("misc/w_pkup"); //plays Doom's "weapon pickup" sound
-			//this block executes as long as AmmoType2 is above 0 and AmmoType1 is below its maximum amount (magazine capacity):
+			// This block executes as long as AmmoType2 is above 0
+			// and AmmoType1 is below its maximum amount (magazine capacity):
 			while (invoker.ammo2.amount > 0 && invoker.ammo1.amount < invoker.ammo1.maxamount) 
 			{
-				TakeInventory(invoker.ammo2.GetClass(),1); //take 1 of AmmoType2
-				GiveInventory(invoker.ammo1.GetClass(),1); //give 1 of AmmoType1
+				TakeInventory(invoker.ammo2.GetClass(), 1); //take 1 of AmmoType2
+				GiveInventory(invoker.ammo1.GetClass(), 1); //give 1 of AmmoType1
 			}
 		}
-		PISG AAAA 2 A_WeaponOffset(-3,-5,WOF_ADD); //shift the sprite upward and to the right
+		PISG AAAA 2 A_WeaponOffset(-3, -5, WOF_ADD); //shift the sprite upward and to the right
 		goto Ready;
 	}
 }
 
-//This is the magazine ammo; it's not based on any other ammo type:
+// This is the magazine ammo; it's not based on any other ammo type:
 Class PistolMagazine : Ammo
 {
 	Default
 	{
-		Inventory.Amount 1; //Default given amount
+		Inventory.Amount 1; //default given amount
 		Inventory.MaxAmount 10; //maximum amount (functions as the magazine capacity)
 		Ammo.BackPackAmount 0; //Backpack shouldn't refill our magazines, so this is 0
 		Ammo.BackPackMaxAmount 10; //backpack shouldn't increase our magazine capacity, so this is the same as maxamount
@@ -348,10 +376,14 @@ Class PistolMagazine : Ammo
 }
 ```
 
-There are other ways to achieve a similar result, but this is arguably the most common and the most universal one. The `while` blocked used in the Reload sequence to handle the actual reload can also be turned into a custom function and used in other weapons.
+There are other ways to achieve a similar result, but this is arguably the most universal one. The `while` blocked used in the Reload sequence to handle the actual reload can also be turned into a custom function and used in other weapons.
 
-Anonymous functions used above, as well as custom functions are explained further in the guide, so keep reading!
+Anonymous functions used above, as well as custom functions are explained further in the guide, so keep reading, and you will understand this better!
+
+
 
 ------
 
-🔵 [>> Next: Anonymous functions](Anonymous_functions.md)
+🟢 [<<< BACK TO START](README.md)
+
+🔵[<< Previous: Where to start](Where_to_start.md)		🔵[>> Next: How to see your classes in the game](How_to_see_your_classes.md)

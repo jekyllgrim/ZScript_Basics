@@ -1,6 +1,6 @@
 🟢 [<<< BACK TO START](README.md)
 
-🔵 [<< Previous: Arrays](Arrays.md)
+🔵 [<< Previous: Arrays](Arrays.md)	🔵 [<< Next: Best Practices and Rules of Thumb](Best_Practices.md)
 
 ------
 
@@ -491,6 +491,8 @@ Another common example of a bit field is player input: whenever player presses a
     target.DamageMobj(self,self,10,'normal',flags:fflags);
     ```
 
+
+
 ## Miscellaneous operators
 
 * `is` — checks whether the operand is a specific class *or* is a class that inherits from the given class:
@@ -582,6 +584,8 @@ Another common example of a bit field is player input: whenever player presses a
     A_SetMass(bBOSS ? 1000 : 100);
     ```
 
+
+
 # Statements
 
 Statements in ZScript (similarly to C# and other C-style languages) are special keywords that make sure that specific **code blocks** are executed only if specific conditions are met. Statements define those conditions.
@@ -608,7 +612,11 @@ In all of those cases all of the code defined in a specific function/override is
 
 > *Note:* there's no completely fixed terminology regarding the classification of statements, and it's also important to remember that ZScript contains fewer statements than C# and other C-style languages. As such, the classification used in this guide may be purposefully simplified for the sake of clarity and beginner-friendliness.
 
+
+
 ## Conditional blocks
+
+
 
 ### if
 
@@ -782,6 +790,8 @@ You can insert randomization inside a switch block as well:
 	[...]
     }
 ```
+
+
 
 ## Loop control
 
@@ -1045,6 +1055,8 @@ for (int i = 0; i < monsters.Size(); i++)
 }
 ```
 
+
+
 ## Return and return values
 
 `return` keyword has two uses: it tells ends the execution of a function, and, if possible, it also defines a return value. The use of `return` is mostly covered in the [Custom functions](Custom_functions.md#non-void-functions-and-return-values) chapter. To briefly reiterate, `return` can be used to stop the execution of a function—be it a custom function or an override of an existing virtual function:
@@ -1088,6 +1100,8 @@ TNT1 A 0
 	return ResolveState(null); //otherwise, don't jump, move on to the next frame
 }
 ```
+
+
 
 # State control
 
@@ -1355,6 +1369,8 @@ Hold:
 This can be created by design (such as in the example above where `A_ReFire()` is used to only loop the Hold sequence without returning to Fire) but can also cause issues if this is done by accident.
 It's important to remember that state labels themselves will never prevent the state machine from progressing. In fact, <u>state labels don't *really* exist</u>—for the game, that is; state labels are only visible to the coder and exist for convenience. That's why flow operators must always be employed to avoid unintentional fall-through from one state sequence to another.
 
+
+
 ## State jumps
 
 State jumps are cases when the execution of one state sequence stops and moves to another state or state sequence. There are different ways to categorize state jumps and different ways to perform them.
@@ -1520,3 +1536,10 @@ Dismemberment:
 
 In this example there are several variations of the death animation for the monster. (Note, when a monster is killed, their health may become negative, so the above code is valid.) If the monster's health was pushed far below zero, it shows a gibbing animation, but if it's only under -15, it jumps to a new Dismemberment sequence. If neither condition is meant (the monster is dead but its health is between 0 and -15), it displays its parent's Death sequence.
 
+
+
+------
+
+🟢 [<<< BACK TO START](README.md)
+
+🔵 [<< Previous: Arrays](Arrays.md)	🔵 [<< Next: Best Practices and Rules of Thumb](Best_Practices.md)

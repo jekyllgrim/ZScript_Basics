@@ -1,16 +1,15 @@
 🟢 [<<< BACK TO START](README.md)
 
-🔵 [<< Previous: Pointers and casting](Pointers_and_casting.md)
+🔵 [<< Previous: Pointers and casting](Pointers_and_casting.md)		🔵 [>> Next: Virtual Functions](Virtual_functions.md)
 
 ------
 
 # Custom functions and function types
-- [Custom functions and function types](#custom-functions-and-function-types)
-  * [Defining custom functions](#defining-custom-functions)
-    + [Non-void functions and return values](#non-void-functions-and-return-values)
-  * [Action functions](#action-functions)
-  * [Static functions](#static-functions)
-  * [Virtual functions](#virtual-functions)
+* [Defining custom functions](#defining-custom-functions)
+  + [Non-void functions and return values](#non-void-functions-and-return-values)
+* [Action functions](#action-functions)
+* [Static functions](#static-functions)
+* [Virtual functions](#virtual-functions)
 
 
 
@@ -36,6 +35,7 @@ Let's revisit our **CacoSingleDad** for an actual example:
 class CacoSingleDad : Cacodemon replaces Cacodemon 
 {
 	Actor baby;
+
 	void SpawnBaby()		//defines a function that can be used by CacoSingleDad
     {
 		baby = Spawn("Cacodemon",pos,NO_REPLACE);
@@ -50,6 +50,7 @@ class CacoSingleDad : Cacodemon replaces Cacodemon
 			baby.A_SetTranslation("BabyCalm");
 		}
 	}
+
 	void AngerBaby() 
 	{
 		if (baby) 
@@ -60,7 +61,8 @@ class CacoSingleDad : Cacodemon replaces Cacodemon
 			baby.floatspeed*= 1.5;
 			baby.bNOPAIN = true;
 		}
-	}		
+	}
+	
 	States 
 	{
 	Spawn:
@@ -189,10 +191,12 @@ class ChaingunGuyWithAMagazine : ChaingunGuy
 {
 	int monstermag;	//this variable holds the number of "ammo" in monster's magazine
 	Property monstermag : monstermag;
+
 	Default 
 	{
         ChaingunGuyWithAMagazine.monstermag 40;
     }
+
 	state CustomMonsterRefire(int ChanceToEnd = 0, statelabel endstate = "See") 
 	{ 
 		if (monstermag <= 0)			      //check how much "ammo" is left
@@ -201,6 +205,7 @@ class ChaingunGuyWithAMagazine : ChaingunGuy
 			return ResolveState(endstate);	  //if true, go to end state
 		return null;					     //otherwise don't do anything
 	}
+
 	States 
 	{
 	Missile:
@@ -378,4 +383,6 @@ Virtual functions is a pretty big topic, so they're covered in more detail in th
 
 ------
 
-🔵 [>> Next: Virtual Functions](Virtual_functions.md)
+🟢 [<<< BACK TO START](README.md)
+
+🔵 [<< Previous: Pointers and casting](Pointers_and_casting.md)		🔵 [>> Next: Virtual Functions](Virtual_functions.md)

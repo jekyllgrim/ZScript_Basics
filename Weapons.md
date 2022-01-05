@@ -1,8 +1,10 @@
 🟢 [<<< BACK TO START](README.md)
 
-🔵 [<< Previous: Event Handlers](Event_Handlers.md)
+🔵 [<< Previous: Event Handlers](Event_Handlers.md)		🔵 [>> Next: Arrays](Arrays.md)
 
 ------
+
+*This chapter is a work-in-progress. To be revised/completed.*
 
 # Weapons, overlays and PSprite
 
@@ -295,4 +297,6 @@ Note, however, that if your Fire animation ends before the HeatGaugeFiring anima
 
 ------
 
-🔵 [>> Next: Arrays](Arrays.md)
+🟢 [<<< BACK TO START](README.md)
+
+🔵 [<< Previous: Event Handlers](Event_Handlers.md)		🔵 [>> Next: Arrays](Arrays.md)

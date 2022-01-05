@@ -1,6 +1,6 @@
 🟢 [<<< BACK TO START](README.md)
 
-🔵 [<< Previous: Variables and data types](Variables_and_data_types.md)
+🔵 [<< Previous: Variables and data types](Variables_and_data_types.md)		🔵 [>> Next: Custom functions](Custom_functions.md)
 
 ------
 
@@ -527,4 +527,6 @@ Notes:
 
 ------
 
-🔵 [>> Next: Custom functions](Custom_functions.md)
+🟢 [<<< BACK TO START](README.md)
+
+🔵 [<< Previous: Variables and data types](Variables_and_data_types.md)		🔵 [>> Next: Custom functions](Custom_functions.md)

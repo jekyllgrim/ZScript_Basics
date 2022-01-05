@@ -1,17 +1,21 @@
 🟢 [<<< BACK TO START](README.md)
 
-🔵[<< Previous: Classes instead of actors](Classes_instead_of_actors.md)
+🔵[<< Previous: How to see your classes in the game](How_to_see_your_classes.md)	🔵 [>> Next: Variables and data types](Variables_and_data_types.md)
 
 ------
 
 # Anonymous functions
 
-- [Anonymous functions](#anonymous-functions)
-- [Features of anonymous functions](#features-of-anonymous-functions)
-  * [Using parentheses](#using-parentheses)
-  * [Variables and conditions inside anonymous functions](#variables-and-conditions-inside-anonymous-functions)
-  * [Jumps in anonymous functions](#jumps-in-anonymous-functions)
-- [Flow control](#flow-control)
+  * [Overview](#overview)
+  * [Features of anonymous functions](#features-of-anonymous-functions)
+    + [Using parentheses](#using-parentheses)
+    + [Variables and conditions inside anonymous functions](#variables-and-conditions-inside-anonymous-functions)
+    + [Jumps in anonymous functions](#jumps-in-anonymous-functions)
+  * [Flow control](#flow-control)
+
+
+
+## Overview
 
 Arguably the first thing you need to get used to when coding in ZScript is anonymous functions. They're not, strictly speaking, necessary, but using them is the primary way to make your code cleaner and prettier.
 
@@ -42,11 +46,15 @@ This way you're basically creating a custom function that calls `A_GunFlash`, `A
 
 And that’s much cleaner and more convenient for multiple purposes. 
 
-# Features of anonymous functions
+
+
+## Features of anonymous functions
 
 Here I'll briefly cover some of the points you need to be aware of when using anonymous functions. Please note, most of these will be covered in more detail later on in the guide, so don't worry if you can't immediately fully understand something. This section is mostly an outline what we'll be talking about later.
 
-## Using parentheses
+
+
+### Using parentheses
 
 Let's take a look at the example above again:
 
@@ -90,7 +98,9 @@ TNT1 A 0
 
 For simplicity's sake, you can simply use parentheses in all contexts, then you'll never make a mistake.
 
-## Variables and conditions inside anonymous functions
+
+
+### Variables and conditions inside anonymous functions
 
 Anonymous functions are independent code blocks. That means you can define variables in them and add extra conditions. This is covered in more detail further in the guide, but here's a simple example. Let's say you want to make your weapon deal more damage if the player has [PowerStrength](https://zdoom.org/wiki/Classes:PowerStrength) (the powerup given by Berserk). In DECORATE you would have to use `A_JumpIfInventory` shenanigans, but in ZScript you can use [`FindInventory`](https://zdoom.org/wiki/FindInventory) and an `if/else` block:
 
@@ -134,7 +144,9 @@ TNT1 A 0
 
 If you're not familiar with variables, don't worry, they will be covered in the [Variables and Data Types](Variables_and_data_types.md) chapter and in other parts of the guide, so keep reading!
 
-## Jumps in anonymous functions
+
+
+### Jumps in anonymous functions
 
 This is a "beginner trap" of sorts: there are many A_Jump* functions covered on the wiki, such as [`A_JumpIfInventory`](https://zdoom.org/wiki/A_JumpIfInventory) or [`A_JumpIf`](https://zdoom.org/wiki/A_JumpIf), but if you try to use them directly inside an anonymous function, they simply don't work.
 
@@ -192,10 +204,14 @@ The reason for this is that anonymous functions are, well, functions, and they n
 
 It's also important to know that with anonymous functions using `A_Jump*` and other DECORATE methods is not actually the best approach. Instead of you can use `return ResolveState("Statename")`, which allows creating multiple conditional jumps. That, however, is explained in more detail in the [State Control section of the Flow Control chapter](Flow_Control.md#State-control).
 
-# Flow control
+
+
+## Flow control
 
 The way conditional blocks are define and executed is referred to as "flow control." You don't need to learn everything about it right away, however, there's a whole separate chapter on this topic in this guide: [Flow Control](Flow_Control.md). I recommend keeping that chapter open while reading, so that you can consult it from time to time.
 
 ------
 
-🔵 [>> Next: Variables and data types](Variables_and_data_types.md)
+🟢 [<<< BACK TO START](README.md)
+
+🔵[<< Previous: How to see your classes in the game](How_to_see_your_classes.md)	🔵 [>> Next: Variables and data types](Variables_and_data_types.md)

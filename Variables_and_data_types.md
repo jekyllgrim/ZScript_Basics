@@ -1,18 +1,20 @@
 🟢 [<<< BACK TO START](README.md)
 
-🔵 [<< Previous: Anonymous functions](Anonymous_functions.md)
+🔵 [<< Previous: Anonymous functions](Anonymous_functions.md)	🔵 [>> Next: Pointers and casting](Pointers_and_casting.md)
 
 ------
 
-# Variables, data types and constants
+# Variables and data types
 
-- [Variables overview](#variables-overview)
+  * [Overview](#overview)
   * [Turning variables into actor properties](#turning-variables-into-actor-properties)
   * [Access modifiers](#access-modifiers)
   * [Accessing variables from weapon states](#accessing-variables-from-weapon-states)
-- [Data types](#data-types)
+  * [Data types](#data-types)
 
-# Variables overview
+
+
+## Overview
 
 If you’ve used ACS, you’re probably familiar with variables. Variables can be defined and used in ZScript in a similar manner, but there are more **data types** that they can hold.
 
@@ -111,6 +113,8 @@ Let's summarize the differences between these two types:
 - Obviously, whenever the function is executed again, this variable will be re-declared and receive the value. That’s why double `foo = frandom(0.8,1.2)` will create a temporary variable `foo` equal to a random value between 0.8 and 1.2 every time the Pain state sequence is entered. (Note that actors can enter the Pain state multiple times simultaneously when hit by multiple attacks, such as a shotgun blast.)
 - Their names aren’t that important, since they won’t exist after the function stops executing. Usually something very short is used.
 
+
+
 ## Turning variables into actor properties
 
 You can turn a variable into a custom actor property using this syntax:
@@ -144,6 +148,8 @@ Notes on the example:
 
 This property will be available to the WeirdImp class, as well as to all classes inheriting from it. If you're planning to have a lot of custom properties for all the actors in your mod, it's a good idea to define a custom version of the Actor class, define all properties in it, and then use it as a base class for all your custom classes.
 
+
+
 ## Access modifiers
 
 Usually variables are declared according to the following syntax:
@@ -164,6 +170,8 @@ Access modifier lets you restrict access to the variable, defining what can read
 - If left unspecified, the variable will be public—i.e. readable and changeable from anywhere in the game, provided you have a pointer to the class that contains it (see [Pointers and Casting](Pointers_and_casting.md))
 
 It's usually not something you need to worry about, but in general if you *know* that you're declaring a variable that will never be (and shouldn't be) changeable from any other class, it's a good idea to make it `private` (or `protected` if you want it to be accessible to child classes, but not to other classes). This approach is known as [encapsulation](https://en.wikipedia.org/wiki/Encapsulation_(computer_programming)), and the gist of it is: sometimes it's important to be *sure* that this data doesn't get changed accidentally from somewhere else, so better protect it.
+
+
 
 ## Accessing variables from weapon states
 
@@ -217,7 +225,9 @@ This is only true for the weapon states, however. If you access a variable from 
 
 You will find more information on accessing and manipulating data in weapon context in the [Weapons, overlays and PSprite](Weapons.md) chapter.
 
-# Data types
+
+
+## Data types
 
 Of course, `int` isn't the only existing variable type. In fact, variables can any type of data that exists in GZDoom. It's important to have a general understanding of these data types, since actor properties and function arguments in Doom are also essentially variables and they also hold data of various types. 
 
@@ -263,6 +273,10 @@ Some of the data types that can contain pointers to map elements are:
 - **F3DFloor** — holds a pointer to a 3D floor.
 - **SecPlane** — holds a pointer to a plane (a floor or a ceiling). Any sector has two native `SecPlane`-type variables: `floorplane` and `ceilingplane`. 3D floors, similarly, have `bottom` and `top` pointers to their bottom and top planes.
 
+
+
 ------
 
-🔵 [>> Next: Pointers and casting](Pointers_and_casting.md)
+🟢 [<<< BACK TO START](README.md)
+
+🔵 [<< Previous: Anonymous functions](Anonymous_functions.md)	🔵 [>> Next: Pointers and casting](Pointers_and_casting.md)

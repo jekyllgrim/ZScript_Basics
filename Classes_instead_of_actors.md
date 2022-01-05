@@ -1,6 +1,6 @@
 🟢 [<<< BACK TO START](README.md)
 
-🔵 [<< Previous: Why ZScript?](Why_ZScript.md)
+🔵 [<< Previous: Why ZScript?](Why_ZScript.md)		🔵 [>> Next: How to see your classes in the game](How_to_see_your_classes.md)
 
 ------
 
@@ -80,7 +80,10 @@ So, what are the differences here?
 
 Knowing just these points, you can already start coding in ZScript. Next, we delve into ZScript-only features.
 
+
+
 ------
 
-🔵 [>> Next: Anonymous functions](Anonymous_functions.md)
+🟢 [<<< BACK TO START](README.md)
 
+🔵 [<< Previous: Why ZScript?](Why_ZScript.md)		🔵 [>> Next: How to see your classes in the game](How_to_see_your_classes.md)

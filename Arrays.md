@@ -1,18 +1,21 @@
 🟢 [<<< BACK TO START](README.md)
 
-🔵 [<< Previous: Weapons, PSprite and overlays](Weapons.md)
+🔵 [<< Previous: Weapons, PSprite and overlays](Weapons.md)	🔵 [>> Next: Flow Control](Flow_Control.md)
 
 ------
 
-[Arrays](#arrays)
-
-* [Static constant arrays](#static-constant-arrays)
-* [Dynamic arrays](#dynamic-arrays)
-    + [Note on data types](#note-on-data-types)
-* [Dynamic array methods](#dynamic-array-methods)
-* [Fixed-size arrays](#fixed-size-arrays)
-
 # Arrays
+
+  * [Overview](#overview)
+  * [Static constant arrays](#static-constant-arrays)
+  * [Dynamic arrays](#dynamic-arrays)
+    + [Note on data types](#note-on-data-types)
+  * [Dynamic array methods](#dynamic-array-methods)
+  * [Fixed-size arrays](#fixed-size-arrays)
+
+
+
+## Overview
 
 An array is a [variable](Variables_and_data_types.md) that can hold multiple pieces of data instead of one. In essence, arrays are lists.
 
@@ -23,6 +26,8 @@ The main terms related to arrays are:
 * **Element** or **item**: an entry in an array that contains some data.
 * **Index**: the position of an element in an array. Indexes start at 0.
 * **Size**: how many indexes there are in the array.
+
+
 
 ## Static constant arrays
 
@@ -106,6 +111,8 @@ Class RandomTallTorchWithALight : RedTorch
 ```
 
 [`A_AttachLightDef`](https://zdoom.org/wiki/A_AttachLightDef) is a function that allows attaching light definitions as defined in GLDEFS or DOOMDEFS lump. As such, remember that the code above will only work if you have `lights.pk3` in your load order, because `gzdoom.pk3` itself doesn't define any dynamic lights.
+
+
 
 ## Dynamic arrays
 
@@ -253,6 +260,8 @@ Here you can see a few extra array methods being used:
 * `Delete` removes an element from the array. This does not destroy the actor, it simply removes a pointer to the actor from the array. In the example above we do this when a Lost Soul is killed naturally, since we don't need to keep pointers to dead actors in the array.
 * `Find` allows us to find a specific *pointer* inside an array. We're calling `Delete` with `Find` because we need to delete the specific Lost Souls that died from the array.
 
+
+
 ### Note on data types
 
 While all the examples of dynamic arrays I provided are arrays of actor pointers, arrays *can* in fact contain data of any type—because ultimately arrays are just fancy variarbles. All of these are valid:
@@ -276,6 +285,7 @@ array < Class<Actor> > classlist;
 //THIS WILL NOT WORK!
 array <Class<Actor>> classlist;
 ```
+
 
 
 ## Dynamic array methods
@@ -320,6 +330,8 @@ The full list of methods (such as `Find`, `Delete`, etc.) is described on [ZDoom
 
 * `Clear()` removes all items from the array and shrinks its size to 0. Just like `Delete`, if you have an array of actor pointers, clearing that array doesn't do anything to the objects it was pointing to: the objects don't get destroyed or otherwise modified, the array just loses pointers to them.
 
+
+
 ## Fixed-size arrays
 
 Fixed-size arrays, sometimes also called fixed arrays, are a variant of dynamic arrays that always have a fixed size. That means they always have the same number of indexes allocated, even if those indexes contain no data.
@@ -336,6 +348,10 @@ Class<Actor> traps[5];
 
 Fixed-size arrays are similar to dynamic arrays in the sense that their contents can be change dynamically. However, they don't have access to any of the dynamic array methods except `Size()`. You can't use `Pop()`, `Push()`, `Clear()` and other methods, since they all implying changing the array's size, which is obviously not an option with a fixed-size array. Instead, your only option to set and clear data is using `arrayName[index] = value`.
 
+
+
 ------
 
-🔵 [>> Next: Flow Control](Flow_Control.md)
+🟢 [<<< BACK TO START](README.md)
+
+🔵 [<< Previous: Weapons, PSprite and overlays](Weapons.md)	🔵 [>> Next: Flow Control](Flow_Control.md)

@@ -1,10 +1,16 @@
 🟢 [<<< BACK TO START](README.md)
 
-🔵 [<< Previous: Custom functions and function types](Custom_functions.md)
+🔵 [<< Previous: Custom functions and function types](Custom_functions.md)	🔵 [>> Next: Event Handlers](Event_Handlers.md)
 
 ------
 
 # Virtual functions
+
+  * [Overview](#overview)
+  * [Overriding ZScript Virtual Functions](#overriding-zscript-virtual-functions)
+  * [Common ZScript virtual functions](#common-zscript-virtual-functions)
+
+
 
 ## Overview
 
@@ -20,6 +26,7 @@ There are two primary uses for it. First, a child class can override its parent'
 class CacoSingleDad : Cacodemon 
 {
 	Actor baby;
+
 	virtual void SpawnBaby() 
 	{
 		baby = Spawn("Cacodemon",pos,NO_REPLACE);
@@ -57,6 +64,7 @@ What is done more commonly with virtual functions is that they're overridden not
 class CacoSingleDad : Cacodemon 
 {
 	Actor baby;
+
 	virtual void SpawnBaby() 
 	{
 		baby = Spawn("Cacodemon",pos,NO_REPLACE);
@@ -91,7 +99,7 @@ class SomeOtherCaco : CacoSingleDad
 
 
 
-## ZScript Virtual Functions
+## Overriding ZScript Virtual Functions
 
 While **virtual** is just a type of function, the one that you can even use yourself (as described above), much more often you'll be using (overriding) the existing virtual functions.
 
@@ -106,6 +114,7 @@ class TemporaryZombieman : Zombieman
 	{
 		renderstyle 'Translucent';
 	}
+
 	override void Tick() 
 	{
 		super.Tick();	//don't forget to call this! otherwise your actor will be frozen and won't interact with the world
@@ -125,6 +134,7 @@ class TemporaryZombieman : Zombieman
 	{
 		renderstyle 'Translucent';
 	}
+
 	override void Tick() 
 	{
 		super.Tick();
@@ -171,6 +181,7 @@ class CacoBall_AfterImage : Actor
 	{
 		+NOINTERACTION //makes this actor non-interactive (no gravity or collision)
 	}
+
 	States 
 	{
 	Spawn:
@@ -414,6 +425,10 @@ A non-comprehensive of some of the most common virtual functions you'll be overr
 
 A more detailed list can be found on the [ZDoom Wiki](https://zdoom.org/wiki/ZScript_virtual_functions#Actor).
 
+
+
 ------
 
-🔵 [>> Next: Event Handlers](Event_Handlers.md)
+🟢 [<<< BACK TO START](README.md)
+
+🔵 [<< Previous: Custom functions and function types](Custom_functions.md)	🔵 [>> Next: Event Handlers](Event_Handlers.md)
