@@ -5,30 +5,35 @@
 ------
 
 # Pointers and casting
-- [Pointers and casting](#pointers-and-casting)
+
   * [Basic pointers](#basic-pointers)
   * [Using pointers in ZScript](#using-pointers-in-zscript)
+  * [Null-checking pointers](#null-checking-pointers)
   * [Casting and custom pointers](#casting-and-custom-pointers)
   * [Type casting](#type-casting)
 
+
+
 ## Basic pointers
 
-One of the primary concepts you need to have a good grasp on to use ZScript is pointers. A **pointer** is, in essence, a type of variable that gives you *access* to something—often that's an actor.
+One of the primary concepts you need to have a good grasp on to use ZScript is pointers. A **pointer** is, in essence, a type of [variable](Variables_and_data_types.md) that gives you *access* to something—often that's an actor.
 
 DECORATE actually has pointers! But you are limited to using three of them: **master, target** and **tracer**. You’re probably familiar with them, but here’s a quick recap:
 
 - `Target` is the most common pointer and it’s automatically used by monsters and projectiles:
   - In case of **monsters** `target` is literally their current target—the actor they’ll be chasing and attacking (if there is one). Monsters acquire a target by calling `A_Look`, then chase it with `A_Chase`, and they aim at the target with `A_FaceTarget`.
-  - In case of **projectiles** `target` is (counter-intuitively) the **shooter** of the projectile. So, if it’s a player-spawned projectile, the player pawn will be its target. Why is it even tracked? Because the shooter has to get **kill credit**: it allows the game to track how many monsters the player killed, who killed whom in multiplayer, and print out obituary messages (such as "*Playername* stood in awe of Spider demon"). If for some reason the projectile loses its `target` pointer (which normally shouldn’t happen), the killer won’t get the credit. (There are other more obscure mechanics involved; for example, a projectile can’t hit its shooter as long as the shooter is the projectile’s `target`).
+  - In case of **projectiles** `target` is (counter-intuitively) the **shooter** of the projectile. So, if it’s a player-spawned projectile, the player pawn will be its target. Why is it even tracked? Because the shooter has to get **kill credit**: it allows the game to track how many monsters the player killed, who killed whom in multiplayer, and print out obituary messages (such as "*Playername* stood in awe of Spider Demon"). If for some reason the projectile loses its `target` pointer (which normally shouldn’t happen), the killer won’t get the credit. (There are other more obscure mechanics involved; for example, a projectile can’t hit its shooter as long as the shooter is the projectile’s `target`).
     - *Note*: if you’re wondering if a projectile has any pointer to its actual target, i.e. the monster that it'll hit, the answer is no. Projectiles don’t need pointers to actors they hit because they simply hit whatever they collide with. (They do get a pointer to what they hit briefly when the hit happens, but you can't access it in DECORATE; more on that later.)
 - `Tracer` pointer is normally only used by seeker projectiles, such as **RevenantTracer**. Projectiles using seeking functions such as `A_Tracer` or `A_SeekerMissile` continuously face their tracer to change their direction towards it.
 - `Master` pointer is not set by anything in vanilla Doom, but you might’ve set it yourself via `A_SpawnItemEx` which allows setting pointers manually via flags (`SXF_SETMASTER` in this case).
 
 Pointers in DECORATE can be set manually mostly with `A_SpawnItemEx` by using the function’s flags. Doing this, you get access to functions such as `A_KillMaster` or `A_RemoveChildren` and such, which allow killing/removing actors from another actor that has a pointer to them. `A_FaceTarget` is also a common example of a function that interacts with a pointer, making the actor face its target (if it has one).
 
+
+
 ## Using pointers in ZScript
 
-In ZScript pointers are much more flexible. The first difference is how you use them: you can use them as prefixes for calling functions and setting properties on a specific actor. For example, doing `alpha = 0.5;` will change the translucency of the actor that calls this code, but doing `master.alpha = 0.5;` will change the alpha of the actor’s master. 
+In ZScript pointers are much more flexible. The first difference is in how you use them: you can use them as prefixes for calling functions and setting properties on a specific actor. For example, doing `alpha = 0.5;` will change the translucency of the actor that calls this code but `master.alpha = 0.5;` will change the alpha of the actor’s `master`. 
 
 You can use the same syntax to call functions on a specific actor from another actor, like so:
 
@@ -52,11 +57,10 @@ This gracious Imp gives the target some shells when it dies (hence, if you kille
 
 *Notes on the example:*
 
-- `if (target != null)` checks if `target` exists. This is called **null-checking** (because it checks if a pointer isn't null), and you *have* to do it before trying to call anything on the `target`. 
+- `if (target != null)` checks if `target` exists. This is called **null-checking** (because it checks if a pointer isn't null), and you *have* to do it before trying to call anything on the `target`. See the next subsection for more information.
 
-  - If you don't do the null-check, and for some reason the actor doesn't exist (in this case it can happen when the target is already dead), the game will try to read data that doesn't exist. As a result it'll close with an error (this is known as a **VM abort**). A null-check tells GZDoom to first *check* if the data exists, and only do what needs to be done if the check passes.
-  - You can simplify this check to `if (target)` — it'll work the same way.
-
+  - Note that it can be simplified to `if (target)` — this does the same thing as `if (target != null)`.
+  
 - `GiveInventory` is an internal ZScript version of `A_GiveInventory` and it works basically the same way.
 
 - You might've noticed there are no curly braces after around the **target.GiveInventory** block. You can do that when there’s only **one line** after the condition. However, if there are 2 or more lines, you can’t do that:
@@ -84,10 +88,12 @@ This gracious Imp gives the target some shells when it dies (hence, if you kille
   	target.GiveInventory("Shotgun",1)
   	target.GiveInventory("Shell",20); //this will ignore the null-check
   ```
-  
+
   
 
-Now let's make something more advanced. We'll use a tracer pointer that is normally not used by monsters. But first, to make it a bit more colorful, we'll create a TRNSLATE lump and add some translations:
+
+
+Now let's make something more advanced. We'll use the `tracer` pointer that is normally not used by monsters. But first, to make it a bit more colorful, we'll create a TRNSLATE lump and add some translations:
 
 **TRNSLATE:**
 
@@ -99,9 +105,7 @@ BabyAngry = "0:255=%[0.85,0.00,0.00]:[2.00,1.96,1.39]"
 BabyCalm = "0:255=%[0.05,0.01,0.84]:[1.39,1.96,2.00]"
 ```
 
- 
-
-**ZSCRIPT:**
+ **ZSCRIPT:**
 
 ```csharp
 //This is a smaller version of Cacodemon that has x2 health and is blue:
@@ -125,19 +129,19 @@ class CacoDaddy : Cacodemon
 	{
 	Spawn:
 		//spawn Cacobaby: SXF_ISTRACER will make it CacoDaddy's tracer
-		TNT1 A 0 NoDelay A_SpawnItemEx("Cacobaby",64,flags:SXF_ISTRACER);	
+		TNT1 A 0 NoDelay A_SpawnItemEx("Cacobaby", 64, flags:SXF_ISTRACER);	
 		HEAD A 10 A_Look;
-		wait;	//loops the last frame instead of the whole state, in contrast to loop
+		wait; //loops the previous frame instead of the whole state, in contrast to 'loop'
 	Death:
 		TNT1 A 0
 		{
-			if (tracer) //null-check tracer
+			if (tracer) //check that tracer exists
 			{
-				tracer.A_StartSound("caco/active");	//play Cacodemon "wake up" sound on tracer
-				tracer.A_SetTranslation("BabyAngry");	//change translation, as defined in TRNSLATE
-				tracer.speed *= 2;	//multiply tracer's speed by 2 
-				tracer.floatspeed*= 1.5;	//multiply tracer's floatspeed by 1.5
-				tracer.bNOPAIN = true;	//set tracer's NOPAIN flag to true
+				tracer.A_StartSound("caco/active"); //play Cacodemon "wake up" sound on the tracer
+				tracer.A_SetTranslation("BabyAngry"); //change translation, as defined in TRNSLATE
+				tracer.speed *= 2; //multiply tracer's speed by 2 
+				tracer.floatspeed*= 1.5; //multiply tracer's floatspeed by 1.5
+				tracer.bNOPAIN = true; //set tracer's NOPAIN flag to true
 			}
 		}
 		goto super::Death;	//continue to default Cacodemon death
@@ -151,25 +155,64 @@ The daddy Caco spawns a baby Caco when it appears, and makes the baby its `trace
 
 We use `tracer.` as a prefix to execute functions on it and change its properties. As mentioned earlier, **it's very important to null-check all pointers you use** to avoid the risk of causing a VM abort. A simple example why it could happen here is that the daddy spawns its baby 64 units in front of itself; if the daddy Caco is initially placed facing some other actor or a wall, it won't spawn the baby at all (because `A_SpawnItemEx` checks for free space before spawning something).
 
+
+
+## Null-checking pointers
+
+Null-checking is the process of checking that specific data isn't null. This is most commonly done on pointers, and the syntax is as follows:
+
+```cs
+if (pointer != null)
+```
+
+where `pointer` is an existing pointer, such as `target`. It can also be shortened to this:
+
+```cs
+if (pointer)
+```
+
+Basically at any time when you're using a custom pointer, you need to null-check it when you're doing something with it. If you don't do the null-check and for some reason the actor doesn't exist (for example, a monster's `target` pointer will be empty if their target is already dead), the game will try to read data that doesn't exist. As a result GZDoom will close with an error, "Tried to read from address zero" (this is known as a **VM abort**). A null-check tells GZDoom to first *check* if the data exists, and only do what needs to be done if the check passes.
+
+If you need to check that a pointer *is* null, just invert the check:
+
+```cs
+if (pointer == null)
+```
+
+This can also be simplified:
+
+```cs
+if (!pointer)
+```
+
+`!` is a NOT operator in ZScript and other C-style languages; using it allows to invert the check. As you can guess, `==` means "equals to" while `!=` means "does not equal to."
+
+You can learn more about operators and operands in the [Flow Control](Flow_Control.md) chapter.
+
+
+
 ## Casting and custom pointers
 
-But casting and custom pointers is where the actual fun begins. **Casting** is creating a variable and attaching something to it (usually an instance of an actor). In other words, casing basically means creating a custom pointer. There are two main cases when you need to use casting:
+But casting and custom pointers is where the actual fun begins. **Casting** is the process of defining a variable and attaching a value to it, and if that value is an actor, the variable becomes a pointer to that actor.
 
-- To create a custom pointer that doesn't take place of `master`, `target` or `tracer`. As I mentioned earlier, you should avoid using these pointers when you can, since there's a lot of implicit behavior attached to them (for example, monsters will target their attacks at their `target` pointer).
+There are two main cases when you need to use casting:
+
+- To create a custom pointer that doesn't take place of `master`, `target` or `tracer`. As I mentioned earlier, you should avoid using these pointers when you can, since there's a lot of implicit behavior attached to them (for example, monsters will target their attacks at their `target` pointer, while projectiles track their shooters as `target`, which is important for kill credit and other things).
 - To get access to **class-specific variables**, which includes your custom variables. This concerns any custom variables you may have created as well.
 
-First, creating the pointers. Just like any variables, they can be class-wide or local. Let's modify our daddy Cacodemon slightly:
+First, creating the pointers. Just like any variables, they can be class-scope (a.k.a. fields) or local. Let's modify our daddy Cacodemon slightly:
 
 ```csharp
 class CacoDaddy : Cacodemon
 {
-	Actor baby;	//create a variable baby (notice its type is actor)
+	Actor baby;	// define a method 'baby' (notice its type is 'Actor')
+
 	States 
 	{
 	Spawn:
 		TNT1 A 0 NoDelay 
 		{
-			baby = Spawn("CacoBaby",pos);	
+			baby = Spawn("CacoBaby", pos); // Spawn CacoBaby and cast it to 'baby'
 		}
 		HEAD A 10 A_Look;
 		wait;
@@ -192,16 +235,16 @@ class CacoDaddy : Cacodemon
 
 *Notes on the example:*
 
-- `Spawn("actorname",position)` is a ZScript function that simply spawns something at the coordinates you provide. The position is a `vector3`.
+- `Spawn("actorname", coordinates)` is a ZScript function that simply spawns something at the coordinates you provide. The position is a `vector3` (see [Data types](Variables_and_data_types.md#data-types)).
 - `pos` is a vector3 expression that simply contains the actor's own coordinates. We use it as a second argument of `Spawn` to spawn CacoBaby at CacoDaddy's position.
 
-The behavior barely changes, but we're now using a custom pointer baby instead of pre-existing tracer. This frees up the tracer pointer to be used somewhere else (perhaps by one of the existing functions, who knows). 
+The behavior barely changes, but we're now using a custom pointer `baby` instead of pre-existing `tracer`. This frees up the tracer pointer to be used somewhere else (perhaps by one of the existing functions, who knows!). 
 
-What exactly happens: `baby = Spawn("CacoBaby",pos)` spawns an actor named CacoBaby at the position `pos` (CacoDaddy's position) *and* casts CacoBaby to the variable `baby`. 
+What exactly happens: `baby = Spawn("CacoBaby", pos)` spawns an actor named CacoBaby at the position `pos` (CacoDaddy's position) *and* casts CacoBaby to the variable `baby`. 
 
-You may wonder why we're not using `A_SpawnItemEx` here. That's because ZScript `Spawn` function not only spawns an actor but also tells us what actor was spawned—as a result, we can immediately cast it to the variable. `A_SpawnItemEx`, however, spawns an actor but returns two sets of data instead of one and casting with it is a little more complex. (See [Custom Functions](Custom_Functions.md) to learn more about return values.)
+You may wonder why we're not using `A_SpawnItemEx` here. That's because ZScript `Spawn` function not only spawns an actor but also tells us what actor was spawned—as a result, we can immediately cast it to the variable. `A_SpawnItemEx`, however, spawns an actor but returns two sets of data instead of one and casting with it is a little more complex. (See [Custom Functions](Custom_Functions.md) to learn more about return values.) In short, `A_SpawnItemEx` isn't really necessary when we simply want to spawn something.
 
-One minor downside is that `Spawn` uses global offsets, not relative, so we can't spawn CacoBaby 64 units in front of CacoDaddy. But that's not a problem, since we can spawn it and then immediately move it using `Warp` (a ZScript function similar to `A_Warp`):
+One minor downside is that `Spawn` uses global offsets, not relative, so we can't spawn CacoBaby 64 units in front of CacoDaddy. But that's not a problem, since we can spawn it and then immediately move it using `Warp` (a ZScript internal version of the [A_Warp](https://zdoom.org/wiki/A_Warp) function):
 
 ```csharp
 Spawn:
@@ -209,7 +252,7 @@ Spawn:
 	{
 		baby = Spawn("CacoBaby",pos);
 		if (baby)	//don't forget to immediately null-check the pointer!
-			baby.Warp(self,64,0,0);	//moves the spawned baby 64 units in front of self (CacoDaddy)
+			baby.Warp(self, 64, 0, 0);	//moves the spawned baby 64 units in front of self (CacoDaddy)
 	}
 	HEAD A 10 A_Look;
 	wait;
@@ -221,24 +264,24 @@ Spawn:
 
  
 
-Now, we can go even further with this. Instead of using two different actors, we can use only one and modify it on the fly to make it look different:
+Now, we can go even deeper. Instead of using two different actors, we can use only one and modify it on the fly to make it look different:
 
 ```csharp
-//don't try to use 'replaces Cacodemon', or they'll be spawning each other continuously:
-class CacoSingleDad : Cacodemon 
+class CacoSingleDad : Cacodemon replaces Cacodemon
 {
 	Actor baby;
+
 	States 
 	{
 	Spawn:
 		TNT1 A 0 NoDelay 
 		{
-			baby = Spawn("Cacodemon",pos);
+			baby = Spawn("Cacodemon", pos);
 			if (baby) 
 			{
-				baby.Warp(self,64,0,0);
+				baby.Warp(self, 64, 0, 0);
 				baby.A_SetHealth(800);
-				baby.A_SetSize(16,30);
+				baby.A_SetSize(16, 30);
 				baby.speed = 12;
 				baby.floatspeed = 6;
 				baby.A_SetScale(0.5);
@@ -264,59 +307,39 @@ class CacoSingleDad : Cacodemon
 }
 ```
 
-> *Note*: Some properties, such as `speed` can be set directly on an actor, but others are read-only and require a "setter" function, such as `A_SetSize`. If you try to modify something, but GZDoom tells you that "expression must be a modifiable value", this often means you can't modify that value directly, look for a setter function.
+> *Note*: Some properties, such as `speed` can be set directly on an actor, but others are read-only and require a "setter" function, such as `A_SetSize`. If you try to modify something but GZDoom tells you that "expression must be a modifiable value", this often means you can't modify that value directly, look for a setter function.
 
-By doing the above, we spawn the baby Cacodemon and immediately set all of properties: `health`, `speed`, `translation`, etc. Obviously, now you can't use this CacoSingleDad to directly replace Cacodemons, because if you do that, you'll end up with an endless cycle of CacoSingleDads spawning each other. There are several ways we could go around it. For example, we could do this in Spawn:
+By doing the above, we spawn the baby Cacodemon and immediately set all of properties: `health`, `speed`, `translation`, etc. 
 
-  ```csharp
-Spawn:
-	TNT1 A 0 NoDelay 
+You may ask at this point, is it safe to have this actor replace the vanilla Cacodemon? After all, it spawns *another* Cacodemon when it appears, won't this cause an infinite chain?
+
+Actually, no, it won't See, `Spawn` has a third argument that determines whether the spawnee can be replaced or not. The possible values for that argument are `NO_REPLACE` and `ALLOW_REPLACE`, and `NO_REPLACE` is the default one. 
+
+Obviously, you do *not* want to do anything like this:
+
+```cs
+// This will freeze the game!
+class FreezeTheGameCacodemon : Cacodemon replaces Cacodemon
+{
+	States
 	{
-		if (!master)	//the following block will only execute if the actor does NOT have a master
-        {
-			baby = Spawn("Cacodemon",pos);
-			if (baby) 
-			{
-				baby.master = self;	//we set the spawning actor as the master of the spawnee
-				baby.Warp(self,64,0,0);
-				baby.A_SetHealth(800);
-				baby.A_SetSize(16,30);
-				baby.speed = 12;
-				baby.floatspeed = 6;
-				baby.A_SetScale(0.5);
-				baby.A_SetTranslation("BabyCalm");
-			}
-		}
-	}
-	HEAD A 10 A_Look;
-	wait;
-  ```
-
- …But while this method *can* be useful in certain situations, in this case we can do it much simpler:
-
-```csharp
-Spawn:
-	TNT1 A 0 NoDelay 
-	{
-		baby = Spawn("Cacodemon",pos,NO_REPLACE);
-		if (baby) 
+	Spawn:
+		TNT1 A 0 NoDelay
 		{
-			baby.Warp(self,64,0,0);
-			baby.A_SetHealth(800);
-			baby.A_SetSize(16,30);
-			baby.speed = 12;
-			baby.floatspeed = 6;
-			baby.A_SetScale(0.5);
-			baby.A_SetTranslation("BabyCalm");
+			Spawn("Cacodemon", pos, ALLOW_REPLACE);
 		}
+		goto super::Spawn;
 	}
-	HEAD A 10 A_Look;
-	wait;
+}
 ```
 
-`NO_REPLACE` flag of the `Spawn` function spawns an actor, blocking attempts to replace it. This is what `BossBrain` in Icon of Sin uses to spawn Rocket explosions that always look the same even if a mod replaces the Rocket actor.
+because that would freeze the game with an endless cycle of Cacodemons spawning each other. But then, why would you do that, right?
 
-Actually, let's take a look at that! (Don't worry that you don't understand all of it, it's a bit advanced)
+It's important to remember that all DECORATE spawn functions (such as `A_SpawnItemEx`) *do* allow replacement by default, whereas `Spawn` doesn't.
+
+
+
+Actually, let's take a look at an internal function where `NO_REPLACE` is very important for it to function correctly. It's a function used by BossBrain, the Romero head inside the Icon of Sin (don't worry that you don't understand all of it, it's a bit advanced):
 
 ```csharp
 private static void BrainishExplosion(vector3 pos)	//defines a function for BossBrain to use
@@ -337,6 +360,8 @@ private static void BrainishExplosion(vector3 pos)	//defines a function for Boss
 
 There's a lot of stuff in this example we haven't covered yet, like creating custom functions, but now you should be able to mostly understand what's happening: the function creates a rocket, changes its explosion sound, disables rocket trail and damage and slightly randomizes its animation speed. On the whole, Icon of Sin's death effect is more complicated than that (and it only works at specific map coordinates, by the way), but you get the gist.
 
+
+
 ## Type casting
 
 There's one other case of casting that you'll need to use when working with classes that use custom variables or functions. 
@@ -344,7 +369,7 @@ There's one other case of casting that you'll need to use when working with clas
 Let's say we want to make a version of Baron of Hell that drops a big Soulsphere when it's killed: this Soulsphere should set our health to 300 instead giving 100 HP limited to 200. Of course, we could create a new Soulsphere actor, but since we now know about casting, we try do this:
 
 ```csharp
-//Doesn't actually work:
+// This doesn't actually work:
 class PrinceOfHell : BaronOfHell 
 {
 	States 
@@ -411,6 +436,7 @@ You'll need to use type casting for your own custom actors and their functions a
 class UniversalLightHalo : Actor 
 {
 	name halocolor;			//this will hold the color
+
 	Default 
 	{
 		+NOINTERACTION		//disables gravity and collision
@@ -418,12 +444,13 @@ class UniversalLightHalo : Actor
 		alpha 0.35;
 		scale 0.5;
 	}
+
 	States 
 	{
 	Spawn:
 		TNT1 A 0 NoDelay 
 		{
-		//using 'sprite' allows you to manually set which sprite t o use:
+			//using 'sprite' allows you to manually set which sprite to use:
 			if (halocolor == 'red')
 				sprite = GetSpriteIndex("HRED");
 			else if (halocolor == 'blue')
@@ -433,11 +460,11 @@ class UniversalLightHalo : Actor
 		}
 		#### A -1;		//#### means "use previous sprite"
 		stop;
-	Load: //this fake state is used to simply load sprites into memory
+	Load: //this dummy state sequence is used to simply load sprites into memory
 		HRED A 0;
 		HBLU A 0;
 		HGRN A 0;
-		stop;	//this state will never be entered, but better add stop for consistency
+		stop; //this sequence will never be entered, but better add stop for consistency
 	}
 }
 	
@@ -495,6 +522,8 @@ Notes:
 * `NOINTERACTION`, among other things, makes actors much less resource-intensive, so use it whenever possible on actors that don't need collision and gravity.
 * If you're setting `sprite` directly, the sprites you're providing via `GetSpriteIndex` need to be defined *somewhere* in order to be loaded into memory when GZDoom starts. This can be done anywhere—you can even simply define a dummy class somewhere that only has one state used to load sprites.
 * `scale` and `alpha` values in the example above are arbitrary and are provided just as an example.
+
+
 
 ------
 
