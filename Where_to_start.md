@@ -61,7 +61,7 @@ version "4.6.1"
 Note:
 
 * `zscript.zs` file must always be at the *root* of your mod folder.
-* Other zscript files can be placed *anywhere* in your mod folder, as long as you use `#inlude` with the correct path.
+* Other zscript files can be placed *anywhere* in your mod folder, as long as you use `#include` with the correct path.
 * `version` only needs to be specified *once* in your root `zscript.zs` file.
 
 ### Step #5
