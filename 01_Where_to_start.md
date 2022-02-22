@@ -6,8 +6,6 @@
 
 # Where to start
 
-
-
 ## What is ZScript?
 
 [ZScript](https://zdoom.org/wiki/ZScript) is a coding language used by the [GZDoom](https://zdoom.org/index) source port. ZScript allows to code the following aspects of the game:
@@ -16,8 +14,6 @@
 * Weapons
 * Monsters, decorations and any other objects that can be spawned in the world
 * UI elements such as game menus and heads-up display / statusbar
-
-
 
 ## How do I start coding in zscript?
 
@@ -61,7 +57,7 @@ version "4.6.1"
 Note:
 
 * `zscript.zs` file must always be at the *root* of your mod folder.
-* Other zscript files can be placed *anywhere* in your mod folder, as long as you use `#inlude` with the correct path.
+* Other zscript files can be placed *anywhere* in your mod folder, as long as you use `#include` with the correct path.
 * `version` only needs to be specified *once* in your root `zscript.zs` file.
 
 ### Step #5
@@ -81,8 +77,6 @@ Note that if you're using SLADE to edit anything in your mod folder (such as a [
 ### Step #7
 
 You're now ready to create some classes.
-
-
 
 ------
 
