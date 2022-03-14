@@ -32,6 +32,7 @@ This chapter will also cover flow control in **actor states**, which work simila
   * [fail](#fail)
   * [Fall-through (no operator)](#Fall-through-(no-operator))
   * [State jumps](#State-jumps)
+  * [Checking current state sequence](#checking-current-state-sequence)
 
 # Operators and operands
 
@@ -487,88 +488,87 @@ Another common example of a bit field is player input: whenever player presses a
   
   ```csharp
   Class Imp1 : DoomImp { }
-  
-  
   ```
 
-    //in some other place in the code:
-    actor a = Spawn("Imp1",pos);
-    if (a is "DoomImp")
-    {
-        //this check will return true because the spawned Imp1 inherits from DoomImp
-    }
-    ```
-    
-    A restrictive alternative to this operator is `GetClassName()` function which returns true only if the operand is the specific class provided:
-    
-    ```csharp
-    Class Imp1 : DoomImp { }
-    
-    
-    //in some other place in the code:
-    actor a = Spawn("Imp1",pos);
-    if (a.GetClassName() == "DoomImp")
-    {
-        //this will return false because Imp1 and DoomImp are different class names
-    }
-    ```
+```
+  //in some other place in the code:
+  actor a = Spawn("Imp1",pos);
+  if (a is "DoomImp")
+  {
+      //this check will return true because the spawned Imp1 inherits from DoomImp
+  }
+```
+
+  A restrictive alternative to this operator is `GetClassName()` function which returns true only if the operand is the specific class provided:
+
+```csharp
+Class Imp1 : DoomImp { }
+
+
+//in some other place in the code:
+actor a = Spawn("Imp1",pos);
+if (a.GetClassName() == "DoomImp")
+{
+    //this will return false because Imp1 and DoomImp are different class names
+}
+```
 
 * `?` — **ternary operator**, functions as a shorter version of an if/else block. Doesn't affect performance and is only used for convenience. 
   
-    The syntax for using a ternary operator is as follows:
-  
-  ```csharp
-  booleanvalue = condition ? valueiftrue : valueiffalse
-  ```
-  
+  The syntax for using a ternary operator is as follows:
+
+```csharp
+booleanvalue = condition ? valueiftrue : valueiffalse
+```
+
     Examples:
-  
-  ```csharp
-  //regular if/else block:
-  int i;
-  if (bNOGRAVITY)
-  {
-      i = 10;    //sets the value to 10 if the calling actor has +NOGRAVITY flag
-  }
-  else
-  {
-      i = 5;    //otherwise sets the value to 5
-  }
-  
-  //ternary operator:
-  int i = bNOGRAVITY ? 10 : 5;
-  ```
-  
+
+```csharp
+//regular if/else block:
+int i;
+if (bNOGRAVITY)
+{
+    i = 10;    //sets the value to 10 if the calling actor has +NOGRAVITY flag
+}
+else
+{
+    i = 5;    //otherwise sets the value to 5
+}
+
+//ternary operator:
+int i = bNOGRAVITY ? 10 : 5;
+```
+
     Among other things, using it can be convenient in function arguments:
-  
-  ```csharp
-  //all three variants below will set the calling actor's mass to 1000 if they have +BOSS flag, otherwise the mass will be set to 100
-  
-  //basic if/else:
-  if (bBOSS)
-  {
-      A_SetMass(1000);
-  }
-  else
-  {
-      A_SetMass(100);
-  }
-  
-  //a more versatile but longer version:
-  int i;
-  if (bBOSS)
-  {
-      i = 1000;
-  }
-  else
-  {
-      i = 100;
-  }
-  A_SetMass(i);
-  
-  //ternary operator:
-  A_SetMass(bBOSS ? 1000 : 100);
-  ```
+
+```csharp
+//all three variants below will set the calling actor's mass to 1000 if they have +BOSS flag, otherwise the mass will be set to 100
+
+//basic if/else:
+if (bBOSS)
+{
+    A_SetMass(1000);
+}
+else
+{
+    A_SetMass(100);
+}
+
+//a more versatile but longer version:
+int i;
+if (bBOSS)
+{
+    i = 1000;
+}
+else
+{
+    i = 100;
+}
+A_SetMass(i);
+
+//ternary operator:
+A_SetMass(bBOSS ? 1000 : 100);
+```
 
 # Statements
 
@@ -1431,7 +1431,7 @@ To have more control over state jumps, you can find and returns the desired stat
 There are two functions that can find a state by checking for a specific state label:
 
 - `FindState("State label")` looks for the specified state label and returns the first state of that state sequence.
-- `ResolveState("State label")` works similarly but is also context-aware. This basically means that it can be safely called from weapon or CustomInventory states, and ZScript will properly look for the state within said weapon/CustomInventory, not being confused about whether it should look for a state label on the player pawn holding it. Calling `return FindState(...)` from a Weapon/CustomInventory will result in an "ambiguous context" error and GZDoom will abort.
+- `ResolveState("State label")` works similarly but is also context-aware. This basically means that it can be safely called from weapon or CustomInventory states, and ZScript will properly look for the state within said weapon/CustomInventory, not being confused about whether it should look for a state label on the player pawn holding it. Calling `FindState` in from a Weapon/CustomInventory will try to find the state in the player pawn that is the owner of the weapon/item, rather than in the weapon/item itself, creating ambiguous context and potentially aborting GZDoom.
   - It will also work on regular actors, so most of the time it's safe to use `ResolveState()` in any context.
 - If you have a conditional state return anywhere within the function, you have to put `return null` at the end of that function to explicitly tell it that if the first jump doesn't happen, it has to go to the next state.
   - In weapons you have to use `return ResolveState(null)` instead. (See [Weapons, overlays and PSprite](Weapons.md) for more details.)
@@ -1505,6 +1505,64 @@ Dismemberment:
 ```
 
 In this example there are several variations of the death animation for the monster. (Note, when a monster is killed, their health may become negative, so the above code is valid.) If the monster's health was pushed far below zero, it shows a gibbing animation, but if it's only under -15, it jumps to a new Dismemberment sequence. If neither condition is meant (the monster is dead but its health is between 0 and -15), it displays its parent's Death sequence.
+
+## Checking current state sequence
+
+[`InStateSequence(<current state>, <state sequence>)`](https://zdoom.org/wiki/InStateSequence) is a static boolean function that returns true if the specified state is currently inside the specified state sequence. Normally it's used to check which state sequence the actor is currently in. To do that, the first argument should contain a pointer to the current state (`curstate` for actors), while the second argument should be a pointer to a state sequence (obtained via `FindState` or `ResolveState`). For example:
+
+```csharp
+if (InStateSequence(curstate, ResolveState("Missile")))
+{
+    // Executed when the calling actor is in its
+    // "Missile" state sequence.
+}
+```
+
+The function can be used on any actor that the caller has a pointer to:
+
+```csharp
+if (target && InStateSequence(target.curstate, target.ResolveState("Missile")))
+{
+    // Executed when the calling actor has a target
+    // and that target is in its "Missile" state 
+    // sequence.
+}
+```
+
+Note, since this is a static function, the caller is irrelevant. In the example above you can call `target.InStateSequence` instead of `InStateSequence`, but it'll work exactly in the same way. The arguments will still need a `target` prefix because their values are taken from the actor who calls the code block.
+
+When called from a Weapon or a CustomInventory, the state has to be obtained from the PSprite, since it's the PSprite that handles the sprite drawing for those classes (see the [Weapons, Ovelays and PSprite](12_Weapons_Overlays_PSprite.md) chapter for details). For example:
+
+```csharp
+// This pistol will give 1 HP to its owner every second:
+class HealingPistol : Pistol
+{
+    override void DoEffect()
+    {
+        super.DoEffect(); 
+        // Double-check the owner exists and is a player:
+        if (!owner || !owner.player)
+            return;
+        // Do nothing if the currently selected weapon
+        // is not this one:
+        if (owner.player.readyweapon != self)
+            return;
+        // This effect should happen only once a second,
+        // so we do nothing if this modulo expression
+        // isn't equal to 0:
+        if (levle.time % 35 != 0)
+            return;
+        // Get a pointer to the main sprite layer:
+        let psp = owner.player.FindPSprite(PSP_Weapon);
+        // Null-check the pointer, then check its curstate
+        // is in this weapon's Ready sequence
+        if (psp && InStateSequence(psp.curstate, ResolveState("Ready")))
+            owner.GiveBody(1); //heal 1 HP
+    }
+}
+```
+
+This pistol will heal 1 HP to the player every second while it's selected and is also in its Ready sequence.
 
 ------
 
