@@ -1,17 +1,16 @@
 🟢 [<<< BACK TO START](README.md)
 
-🔵 [<< Previous: Pointers and casting](08_Pointers_and_casting.md)		🔵 [>> Next: Virtual Functions](10_Virtual_functions.md)
+🔵 [<< Previous: Pointers and casting](08_Pointers_and_casting.md)        🔵 [>> Next: Virtual Functions](10_Virtual_functions.md)
 
 ------
 
 # Custom functions and function types
+
 * [Defining custom functions](#defining-custom-functions)
   + [Non-void functions and return values](#non-void-functions-and-return-values)
 * [Action functions](#action-functions)
 * [Static functions](#static-functions)
 * [Virtual functions](#virtual-functions)
-
-
 
 ## Defining custom functions
 
@@ -21,7 +20,7 @@ Sometimes you need to perform a bunch of similar actions in multiple places and/
 //pseudocode:
 type name (arguments) 
 {
-	//what the function does
+    //what the function does
 }
 ```
 
@@ -34,45 +33,45 @@ Let's revisit our **CacoSingleDad** for an actual example:
 ```csharp
 class CacoSingleDad : Cacodemon replaces Cacodemon 
 {
-	Actor baby;
+    Actor baby;
 
-	void SpawnBaby()		//defines a function that can be used by CacoSingleDad
+    void SpawnBaby()        //defines a function that can be used by CacoSingleDad
     {
-		baby = Spawn("Cacodemon",pos,NO_REPLACE);
-		if (baby) 
-		{
-			baby.Warp(self,64,0,0);
-			baby.A_SetHealth(800);
-			baby.A_SetSize(16,30);
-			baby.speed = 12;
-			baby.floatspeed = 6;
-			baby.A_SetScale(0.5);
-			baby.A_SetTranslation("BabyCalm");
-		}
-	}
+        baby = Spawn("Cacodemon",pos,NO_REPLACE);
+        if (baby) 
+        {
+            baby.Warp(self,64,0,0);
+            baby.A_SetHealth(800);
+            baby.A_SetSize(16,30);
+            baby.speed = 12;
+            baby.floatspeed = 6;
+            baby.A_SetScale(0.5);
+            baby.A_SetTranslation("BabyCalm");
+        }
+    }
 
-	void AngerBaby() 
-	{
-		if (baby) 
-		{
-			baby.A_StartSound("caco/active");
-			baby.A_SetTranslation("BabyAngry");
-			baby.speed *= 2; 
-			baby.floatspeed*= 1.5;
-			baby.bNOPAIN = true;
-		}
-	}
-	
-	States 
-	{
-	Spawn:
-		TNT1 A 0 NoDelay SpawnBaby();
-		HEAD A 10 A_Look;
-		wait;
-	Death:
-		TNT1 A 0 AngerBaby();
-		goto super::Death;
-	}
+    void AngerBaby() 
+    {
+        if (baby) 
+        {
+            baby.A_StartSound("caco/active");
+            baby.A_SetTranslation("BabyAngry");
+            baby.speed *= 2; 
+            baby.floatspeed*= 1.5;
+            baby.bNOPAIN = true;
+        }
+    }
+
+    States 
+    {
+    Spawn:
+        TNT1 A 0 NoDelay SpawnBaby();
+        HEAD A 10 A_Look;
+        wait;
+    Death:
+        TNT1 A 0 AngerBaby();
+        goto super::Death;
+    }
 }
 ```
 
@@ -90,17 +89,17 @@ For example, let's say we want to create a universal "baby-spawning function" th
 
 ```csharp
 //defining the function:
-void SpawnBabyExtended(Class<Actor>	spawnclass, int babyhealth = 100, int babyspeed = 10, double babyscale = 0.5) 
+void SpawnBabyExtended(Class<Actor>    spawnclass, int babyhealth = 100, int babyspeed = 10, double babyscale = 0.5) 
 {
-	baby = Spawn(spawnclass,pos,NO_REPLACE);
-	if (baby) 
-	{
-		baby.Warp(self,64,0,0);
-		baby.A_SetHealth(babyhealth);
-		baby.speed = babyspeed;
-		baby.A_SetScale(babyscale);
-		baby.A_SetTranslation("BabyCalm");
-	}
+    baby = Spawn(spawnclass,pos,NO_REPLACE);
+    if (baby) 
+    {
+        baby.Warp(self,64,0,0);
+        baby.A_SetHealth(babyhealth);
+        baby.speed = babyspeed;
+        baby.A_SetScale(babyscale);
+        baby.A_SetTranslation("BabyCalm");
+    }
 }
 
 //using the function:
@@ -119,25 +118,23 @@ At the same time, `spawnclass` is not an optional argument: when using the funct
 
 The arguments you defined can be used within a function as shown in the example, e.g. `baby.A_SetHealth(babyhealth);` will make the spawned actor's health equal to the number you provide when calling the function (in the example it's 800). We also provided a default value of 100 for the argument.
 
- 
-
 We could make this function a bit more universal by improving how it treats the default values:
 
 ```csharp
 void SpawnBabyUniversal(Class<Actor> spawnclass, int babyhealth = 0, int babyspeed = 0, double babyscale = 0) 
 {
-	baby = Spawn(spawnclass,pos,NO_REPLACE);
-	if (baby) 
-	{
-		baby.Warp(self,64,0,0);
-		if (babyhealth != 0)			//executes if 'babyhealth' is not equal to 0
-			baby.A_SetHealth(babyhealth);
-		if (babyspeed != 0)				//executes if 'babyspeed' is not equal to 0
-			baby.speed = babyspeed;
-		if (babyscale != 0)				//executes if 'babyscale' is not equal to 0
-			baby.A_SetScale(babyscale);
-		baby.A_SetTranslation("BabyCalm");
-	}
+    baby = Spawn(spawnclass,pos,NO_REPLACE);
+    if (baby) 
+    {
+        baby.Warp(self,64,0,0);
+        if (babyhealth != 0)            //executes if 'babyhealth' is not equal to 0
+            baby.A_SetHealth(babyhealth);
+        if (babyspeed != 0)                //executes if 'babyspeed' is not equal to 0
+            baby.speed = babyspeed;
+        if (babyscale != 0)                //executes if 'babyscale' is not equal to 0
+            baby.A_SetScale(babyscale);
+        baby.A_SetTranslation("BabyCalm");
+    }
 }
 ```
 
@@ -146,8 +143,6 @@ In this version of the function the default values are 0 and they're treated as 
 It's up to you which arguments to make optional and which to leave compulsory (in `SpawnBabyUniversal()` above the only non-optional argument is `spawnclass`—the name of the actor to spawn); the only rule to remember is that non-optional arguments should be defined *first*—you can't have non-optional arguments defined after optional ones.
 
 You can notice that this function doesn't actually cover everything we used in CacoSingleDad originally (such as modifying the baby's `floatspeed`), but you can easily expand it. It will also only work on actors that actually have a `baby` variable defined—so, if you want to create multiple custom functions, it may be a good idea to put them all inside your own version of the base Actor class and have your classes inherit from it.
-
- 
 
 A note on **function names**: you can give your functions any names you like, but in general it's a good idea to not use DECORATE's naming convention (which would be `A_FunctionName`) simply to avoid confusing yourself: this way you'll be able to tell at a glance that it's not a DECORATE function. However, it *can* be a good idea to use some sort of a custom prefix, such as your mod's initials.
 
@@ -158,10 +153,10 @@ Void functions are the functions that do stuff and don't return any data. But th
 ```csharp
 int GetTargetHealth() 
 {
-	if (target)
-		return target.health;
-	else
-		return 0; //we have to return something, so let's use 0 as default
+    if (target)
+        return target.health;
+    else
+        return 0; //we have to return something, so let's use 0 as default
 }
 ```
 
@@ -174,61 +169,59 @@ It can also be slightly simplified:
 ```csharp
 int GetTargetHealth() 
 {
-	if (target)
-		return target.health;
-	return 0;
+    if (target)
+        return target.health;
+    return 0;
 }
 ```
 
 We don't need to use `else` here because the function cuts off at the point where you use `return;` so, if the target exists, the function will return its health and immediately stop doing anything else.
-
- 
 
 Function types are the same as variable types: they can hold numeric values, pointers, coordinates, etc. Here's an example of a custom version of `A_MonsterRefire` that is a `state` function:
 
 ```csharp
 class ChaingunGuyWithAMagazine : ChaingunGuy 
 {
-	int monstermag;	//this variable holds the number of "ammo" in monster's magazine
-	Property monstermag : monstermag;
+    int monstermag;    //this variable holds the number of "ammo" in monster's magazine
+    Property monstermag : monstermag;
 
-	Default 
-	{
+    Default 
+    {
         ChaingunGuyWithAMagazine.monstermag 40;
     }
 
-	state CustomMonsterRefire(int ChanceToEnd = 0, statelabel endstate = "See") 
-	{ 
-		if (monstermag <= 0)			      //check how much "ammo" is left
-			return ResolveState("Reload");	  //if 0, goto Reload state
-		else if (ChanceToEnd > random(0,100))  //otherwise check ChanceToEnd against a random value
-			return ResolveState(endstate);	  //if true, go to end state
-		return null;					     //otherwise don't do anything
-	}
+    state CustomMonsterRefire(int ChanceToEnd = 0, statelabel endstate = "See") 
+    { 
+        if (monstermag <= 0)                  //check how much "ammo" is left
+            return ResolveState("Reload");      //if 0, goto Reload state
+        else if (ChanceToEnd > random(0,100))  //otherwise check ChanceToEnd against a random value
+            return ResolveState(endstate);      //if true, go to end state
+        return null;                         //otherwise don't do anything
+    }
 
-	States 
-	{
-	Missile:
-		CPAS F 2 
-		{
-            	A_CPosAttack();
-            	monstermag--;
-		}
-		CPAS E 2 A_FaceTarget;
-		CPAS F 2 A_CPosAttack;
-		CPAS E 2 A_FaceTarget();
-		TNT1 A 0 CustomMonsterRefire(5,"AttackEnd");
-		loop;
-	AttackEnd:
-		CPAS A 20;
-		goto See;
-	Reload:
-		CPAS A 40 
-		{
-			monstermag = 40;
-		}
-		goto See;
-	}
+    States 
+    {
+    Missile:
+        CPAS F 2 
+        {
+                A_CPosAttack();
+                monstermag--;
+        }
+        CPAS E 2 A_FaceTarget;
+        CPAS F 2 A_CPosAttack;
+        CPAS E 2 A_FaceTarget();
+        TNT1 A 0 CustomMonsterRefire(5,"AttackEnd");
+        loop;
+    AttackEnd:
+        CPAS A 20;
+        goto See;
+    Reload:
+        CPAS A 40 
+        {
+            monstermag = 40;
+        }
+        goto See;
+    }
 }
 ```
 
@@ -242,8 +235,6 @@ This function works as a state jump, such as `A_Jump`: when the function is call
 - Finally, if none of the checks go through, the function returns nothing. `ResolveState()` is the correct way to return states in ZScript (you can't directly put in a state name). `ResolveState` will be covered in more detail in [Flow Control](#_Flow_Control_1).
   - In this case, if the function returns null, the state machine will continue going through the state. In the example above it'll show frame `CPAS E` for 1 tic and then it'll hit `loop` and go back to the beginning of the state.
 
-
-
 ## Action functions
 
 Action functions are functions that have the keyword `action` added in front of the function type. For example:
@@ -251,23 +242,25 @@ Action functions are functions that have the keyword `action` added in front of 
 ```csharp
 action void MyFunction()
 {
-	[...] //function contents
+    [...] //function contents
 }
 ```
 
 The concept of an action function is specific to ZDoom and can be confusing to explain. On the technical side, when a function is defined as an action function, it gains access to a special struct `FStateParamInfo`, which allows the function to know exactly which [state](A1_Flow_Control.md#state-control) it's called from and what called it. Regular actors have no reason to be confused about it, but there's one special case: classes that can draw stuff on player's screen. Currently only two classes can do that: `Weapon` and `CustomInventory`.
 
-Both of those classes don't use their own states directly; instead a separate internal class `PSprite` handles drawing on-screen sprites. Because of that certain weapon functions are called by the weapon itself, while others are called by `PSprite`. For that reason weapon states and `action` functions have access to `self` and `invoker` pointers that they use to differentiate between these two contexts. All of this will be covered in more detail in the [Weapons, overlays and PSprite](12_Weapons_Overlays_PSprite.md) chapter.
+Both of those classes don't use their own states directly; instead a separate internal class `PSprite` handles drawing on-screen sprites. What's more, a weapon has to interact with both data defined in the weapon (such as its flags, ammotypes, etc.) and the data defined on its owner (such as checking the PlayerPawn's inventory for remaining ammo, getting its position, angle and pitch to determine the direction of the shooting, and so on).
 
-When it comes to creating functions for non-weapon actors (like we explored earlier in this chapter), for all intents and purposes it *doesn't matter if they're action functions* or not. It won't affect how they should be coded or what they can do. However, action functions can't be [virtual](10_Virtual_functions.md) or static, since the `action`, `virtual` and `static` keywords are incompatible.
+To be able to interact with that data properly, weapons interact with two pointers: `self` — which is *not* the weapon, but the PlayerPawn owner — and `invoker` — which refers to the weapon itself. When a function is defined as `action`, it gains the ability to utilize and differentiate between `self` and `invoker`. Non-action functions, on the other hand, don't recognize the `invoker` pointer at all.
+
+The use of these pointers and action functions will be covered in more detail in the [Weapons, overlays and PSprite](12_Weapons_Overlays_PSprite.md) chapter.
+
+As for creating functions for regular actors (the ones that are *not* based on either Weapon or CustomInventory), for all intents and purposes it doesn't matter if those functions are action or not. If a monster's function is defined as an action function, it will still recognize `invoker`, but it'll be the same thing as `self` (which is not at all how it works for weapons). Other than that, defining an actor function as an action function doesn't change what it can do. However, action functions can't be [virtual](10_Virtual_functions.md) or static, since the `action`, `virtual` and `static` keywords are incompatible, so normally defining actor functions as action isn't useful.
 
 In short, keep the following points in mind:
 
-* If you're defining a weapon function that is meant to be called from a weapon state, usually it has to be an `action` function.
+* If you're defining a weapon function that is meant to be called from a weapon state, it will almost always have to be defined as an `action` function.
 * If you're defining a custom function used in a non-weapon actor, it doesn't matter if it's an action function.
 * Action functions can't be **virtual** or **static** (see below).
-
-
 
 ## Static functions
 
@@ -276,7 +269,7 @@ Static functions are functions that can be called from anywhere, by any class. T
 ```csharp
 static void MyFunction()
 {
-	[...] //function contents
+    [...] //function contents
 }
 ```
 
@@ -285,39 +278,39 @@ Static functions are *not* **methods**, since they're not bound to the class the
 ```csharp
 class FunctionContainer : Actor
 {
-	static void MyFunction()
-	{
-		[...] //function contents
-	}
+    static void MyFunction()
+    {
+        [...] //function contents
+    }
 }
 
 class SomeOtherClass : Actor
 {
-	States
-	{
-	Spawn:
-		TNT1 A 0 NoDelay
-		{
-			FunctionContainer.MyFunction();
-		}
-	[...] //the rest of the actor's code
+    States
+    {
+    Spawn:
+        TNT1 A 0 NoDelay
+        {
+            FunctionContainer.MyFunction();
+        }
+    [...] //the rest of the actor's code
     }
 }
 ```
 
-Static functions are designed specifically to be available to all classes. However, that also means that static functions don't have the concept of `self`: the class where they're defined in (`FunctionContainer` in the example above) can't be `self` because it serves simply as a container for the function; whereas the class that ends up actually calling the function (`SomeOtherClass` in the example above) is ignored, since the defined function can't magically guess which class will be calling it.
+Static functions are designed specifically to be available to all classes. However, that also means that static functions don't have the concept of `self`: the class where they're defined in (`FunctionContainer` in the example above) can't be `self` because it serves simply as a container for the function, it isn't actually placed in the game when the function is called; whereas the class that ends up actually calling the function (`SomeOtherClass` in the example above) is ignored, since the defined function can't magically guess which class will be calling it.
 
 Static functions are usually used to get some data. For example, here's a simple sign function that returns -1 or 1 based on whether the number given to it is positive or negative:
 
 ```csharp
 class MathContainer : Actor
 {
-	int Sign (double i) 
-	{
-		if (i >= 0)
-			return 1;
-		return -1;
-	}
+    int Sign (double i) 
+    {
+        if (i >= 0)
+            return 1;
+        return -1;
+    }
 }
 ```
 
@@ -330,10 +323,10 @@ Many existing ZScript functions are static. For example, the [`InStateSequence`]
 ```csharp
 override void Tick()
 {
-	super.Tick();
-	if (InStateSequence(curstate,FindState("Spawn"))
-	{
-		Spawn("RocketTrail",pos);
+    super.Tick();
+    if (InStateSequence(curstate,FindState("Spawn"))
+    {
+        Spawn("RocketTrail",pos);
     }
 }
 ```
@@ -343,14 +336,14 @@ This override will make the actor spawn a rocket trail behind itself but only wh
 ```csharp
 class FearfulCacodemon : Cacodemon
 {
-	override void Tick() 
-	{
-		super.Tick();
-		if (target && InStateSequence(target.curstate, target.FindState("Missile")))
-			bFRIGHTENED = true;
-		else
-			bFRIGHTENED = false;
-	}
+    override void Tick() 
+    {
+        super.Tick();
+        if (target && InStateSequence(target.curstate, target.FindState("Missile")))
+            bFRIGHTENED = true;
+        else
+            bFRIGHTENED = false;
+    }
 }
 ```
 
@@ -363,15 +356,13 @@ Note: the example above can be shortened as follows:
 ```csharp
 class FearfulCacodemon : Cacodemon
 {
-	override void Tick() 
-	{
-		super.Tick();
-		bFRIGHTENED = (target && InStateSequence(target.curstate,target.FindState("Missile"));
-	}
+    override void Tick() 
+    {
+        super.Tick();
+        bFRIGHTENED = (target && InStateSequence(target.curstate,target.FindState("Missile"));
+    }
 }
 ```
-
-
 
 ## Virtual functions
 
@@ -383,4 +374,6 @@ Virtual functions is a pretty big topic, so they're covered in more detail in th
 
 🟢 [<<< BACK TO START](README.md)
 
-🔵 [<< Previous: Pointers and casting](08_Pointers_and_casting.md)		🔵 [>> Next: Virtual Functions](10_Virtual_functions.md)
+🔵 [<< Previous: Pointers and casting](08_Pointers_and_casting.md)        🔵 [>> Next: Virtual Functions](10_Virtual_functions.md)
+
+
