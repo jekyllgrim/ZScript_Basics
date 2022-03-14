@@ -27,6 +27,8 @@ The main terms related to arrays are:
 
 ## Static constant arrays
 
+> *Note:* I'm starting with a static constant array not because it's the most commonly used type but because it's arguably the simplest one to explain. In practice you'll be using dynamic arrays most of the time, described further in this chapter.
+
 A static constant array is basically a simple list of values. They're defined as follows:
 
 ```csharp
@@ -108,6 +110,12 @@ Class RandomTallTorchWithALight : RedTorch
 
 [`A_AttachLightDef`](https://zdoom.org/wiki/A_AttachLightDef) is a function that allows attaching light definitions as defined in GLDEFS or DOOMDEFS lump. As such, remember that the code above will only work if you have `lights.pk3` in your load order, because `gzdoom.pk3` itself doesn't define any dynamic lights.
 
+### Data access
+
+Note that static arrays are static—meaning, they're available everywhere in the code, at all times. You can use the name of the class they're defined in as a prefix in order to read their values. In the example above `RandomTallTorchWithALight.torchSprite` will be readable from everywhere.
+
+This is only true for static arrays.
+
 ## Dynamic arrays
 
 Dynamic arrays are arguably the most frequently used type of arrays. A dynamic array is an array that gets filled with data at runtime (i.e. during the game). You can dynamically add or remove its elements—hence it's "dynamic." In contrast to a static array, when a dynamic array is defined it's always empty and has to be filled with data at runtime.
@@ -124,7 +132,7 @@ array <Actor> traps;
 
 One very common application of dynamic arrays is storing [pointers](08_Pointers_and_casting.md) to multiple actors. 
 
-Let's say we want to make a stationary turret that continuously fires at us, but once we destroy it we want all of the projectiles it fired to disappear. We *could* just make the projectiles die when `if (target.health <=0 )` is true (since, as we remember, when it comes to projectiles, their `target` field is whoever or whatever shot them, in this case our turret). But there are cases when it may not work for us. What if we don't want or can't modify the projectiles? What if we're making it use existing vanilla projectiles, or projectiles from another mod, or something else? What if we just want to make the code shorter?
+Let's say we want to make a stationary turret that continuously fires at us, but once we destroy it we want all of the projectiles it fired to disappear. We *could* just make the projectiles die when `if (target.health <= 0)` is true (since, as we remember, when it comes to projectiles, their `target` field is whoever or whatever shot them, in this case our turret). But there are cases when it may not work for us. What if we don't want or can't modify the projectiles? What if we're making it use existing vanilla projectiles, or projectiles from another mod, or something else? What if we just want to make the code shorter?
 
 Here's how this can be achieved:
 
@@ -280,7 +288,7 @@ array <Class<Actor>> classlist;
 
 The full list of methods (such as `Find`, `Delete`, etc.) is described on [ZDoom Wiki](https://zdoom.org/wiki/Dynamic_arrays). I'll only briefly cover the most basic ones and add some notes to them.
 
-**Note:** All array methods are called with `arrayname.Method()`.
+>  *Note:* All array methods are called with `arrayname.Method()`.
 
 * `arrayName[index]` allows you to do something with the data inside the array. For example, `lostsouls[0]` in the example above gives us access to the very first element (i.e. a pointer to the oldest Lost Soul in the map) in the `lostsouls` array. By calling `lostsouls[0].Destroy()` we destroy the actor with that pointer.
   
