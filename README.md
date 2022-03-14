@@ -8,7 +8,7 @@ This guide is a beginner-friendly introduction to ZScript, a primary coding lang
 
 1. This document was written by a person who learned to use ZScript without any prior programming experience. I strive to use the correct terminology and not dumb things down but I may also purposefully overexplain certain things or initially present them in a simplified manner for the sake of beginner-friendliness.
 2. While most code examples in the guide are made to be runnable, it's *not* recommended to use them as is: many of them are purposefully inefficient, and the guide tends to iterate over them, improving various aspects while explaining new techniques. Examples are meant to be just that: examples—not ready-made solutions.
-3. This document is a guide, not a wiki. As such, it's designed to be read from beginning to end. Chapters are not self-contained and often rely on information explained earlier in the guide, so it's not recommended to skip anything. The only exception to this is the **appendix** chapters that can be found at the end 
+3. This document is a guide, not a wiki. As such, it's designed to be read from beginning to end. Chapters are not self-contained and often rely on information explained earlier in the guide, so it's not recommended to skip anything. The only exception to this is the **appendix** chapters that can be found at the end—they contain additional information that may be referenced throughout the guide, so you may familiarize yourself with the contents of those chapters as needed.
 
 ## 🔶 CHOOSE  YOUR PATH 🔶
 
@@ -44,9 +44,11 @@ This guide is a beginner-friendly introduction to ZScript, a primary coding lang
 
 13. [Arrays](13_Arrays.md)
 
-14. Constants and enums (TBA)
+14. [Constants](14_Constants.md)
 
-15. Using items to add behavior to actors (TBA)
+15. Inventory (TBA)
+
+16. HUD (TBA)
 * [Appendix 1: Flow Control](A1_Flow_Control.md)
 
 * [Appendix 2: Best Practices and Rules of Thumb](A2_Best_Practices.md)
