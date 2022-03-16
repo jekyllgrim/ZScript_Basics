@@ -387,21 +387,22 @@ In this subsection we'll be taking a look at both approaches in parallel.
 In order to explain in detail all PSprite interactions and manipulations, among other things I'll also be using a new weapon class as an example. In contrast to most other examples in this guide, this one will use an original set of sprites, not found in Doom. Here they are:
 
 PGUNA0
-![Graph](pistolAngled\PGUNA0.png)
+![Graph](pistolAngled/PGUNA0.png)
 
 PGUNB0
-![Graph](pistolAngled\PGUNB0.png)
+![Graph](pistolAngled/PGUNB0.png)
 
 PGUNC0
-![Graph](pistolAngled\PGUNC0.png)
+![Graph](pistolAngled/PGUNC0.png)
 
 PGUND0
-![Graph](pistolAngled\PGUND0.png)
+![Graph](pistolAngled/PGUND0.png)
+
 PGUFA0
-![Graph](pistolAngled\PGUFA0.png)
+![Graph](pistolAngled/PGUFA0.png)
 
 PGUFZ0
-![Graph](pistolAngled\PGUFZ0.png)
+![Graph](pistolAngled/PGUFZ0.png)
 
 The sprites can be found in the `pistolAngled` folder accompanying this guide. As you can see, there are 4 sprites here showing the movement of the slide (PGUNA–PGUND), one sprite with muzzle highlights (PGUFA) designed to be overlayed on top of PGUNA, and one sprite with the muzzle flash (PGUFZ). I will be referring to these sprites specifically in the example code for `PistolAngled` and `PistolAngledDual` below.
 
