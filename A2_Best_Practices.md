@@ -10,12 +10,11 @@ Even in our day and age there are lot of important best practices that are eithe
 
 ## Table of Contents
 
-- [Best Practices and Rules of Thumb](#best-practices-and-rules-of-thumb)
-  * [Using a consistent indentation style](#using-a-consistent-indentation-style)
-  * [Using #include](#using--include)
-  * [PK3 instead of WAD and folders instead of archives](#pk3-instead-of-wad-and-folders-instead-of-archives)
-  * [Using a consistent naming convention for your classes](#using-a-consistent-naming-convention-for-your-classes)
-  * [Using GitHub](#using-github)
+* [Using a consistent indentation style](#using-a-consistent-indentation-style)
+* [Using #include](#using--include)
+* [PK3 instead of WAD and folders instead of archives](#pk3-instead-of-wad-and-folders-instead-of-archives)
+* [Using a consistent naming convention for your classes](#using-a-consistent-naming-convention-for-your-classes)
+* [Using GitHub](#using-github)
 
 ## Using a consistent indentation style
 
@@ -166,3 +165,7 @@ A good number of well-known mods use GitHub because of the obvious benefits:
 - You can easily track changes for *every* file in your project: GitHub will highlight the changes of the contents, inform you about any deletion/addition, and you'll be able to roll back any of those changes at any point.
 - You can easily release your work using GitHub's release feature. Once you're ready to make a release, GitHub will automatically compile your folder in an archive. That archive will be playable in GZDoom as is.
 - You can easily collaborate with other people—this is, in fact, one of the primary purposes of GitHub. People can be added as contributors to your repository, or they can make pull requests (user-made updates to your work) which you can accept to decline.
+
+---
+
+🟢 [<<< BACK TO START](README.md)
