@@ -52,3 +52,5 @@ This guide is a beginner-friendly introduction to ZScript, a primary coding lang
 * [Appendix 1: Flow Control](A1_Flow_Control.md)
 
 * [Appendix 2: Best Practices and Rules of Thumb](A2_Best_Practices.md)
+
+* [Appendix 3: Glossary](A3_Glossary.md)
