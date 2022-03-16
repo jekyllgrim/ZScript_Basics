@@ -8,6 +8,8 @@
 
 # Weapons, overlays and PSprite
 
+## Table of Contents
+
 * [Overview](#overview)
 * [Handling data from weapons](#handling-data-from-weapons)
   + [Accessing data from weapon states](#accessing-data-from-weapon-states)

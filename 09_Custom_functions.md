@@ -89,7 +89,7 @@ For example, let's say we want to create a universal "baby-spawning function" th
 
 ```csharp
 //defining the function:
-void SpawnBabyExtended(Class<Actor>    spawnclass, int babyhealth = 100, int babyspeed = 10, double babyscale = 0.5) 
+void SpawnBabyExtended(Class<Actor> spawnclass, int babyhealth = 100, int babyspeed = 10, double babyscale = 0.5) 
 {
     baby = Spawn(spawnclass,pos,NO_REPLACE);
     if (baby) 
@@ -375,5 +375,3 @@ Virtual functions is a pretty big topic, so they're covered in more detail in th
 🟢 [<<< BACK TO START](README.md)
 
 🔵 [<< Previous: Pointers and casting](08_Pointers_and_casting.md)        🔵 [>> Next: Virtual Functions](10_Virtual_functions.md)
-
-
