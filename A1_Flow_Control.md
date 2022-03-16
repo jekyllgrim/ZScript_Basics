@@ -4,7 +4,7 @@
 
 ------
 
-# Flow Control
+# Appendix 1: Flow Control
 
 When you call functions, change values and do other things within a code block (an anonymous function, a virtual function override, etc.), these changes are executed in a certain order, following the specified conditions. To control this flow, you need to know how to use **statements** and **operators**.
 
@@ -1567,5 +1567,3 @@ This pistol will heal 1 HP to the player every second while it's selected and is
 ------
 
 🟢 [<<< BACK TO START](README.md)
-
-🔵 [<< Previous: Arrays](Arrays.md)    🔵 [<< Next: Best Practices and Rules of Thumb](Best_Practices.md)
