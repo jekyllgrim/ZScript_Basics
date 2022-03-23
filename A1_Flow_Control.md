@@ -1,7 +1,5 @@
 🟢 [<<< BACK TO START](README.md)
 
-🔵 [<< Previous: Arrays](Arrays.md)    🔵 [<< Next: Best Practices and Rules of Thumb](Best_Practices.md)
-
 ------
 
 # Appendix 1: Flow Control
@@ -14,7 +12,7 @@ This chapter will also cover flow control in **actor states**, which work simila
 
 - [Operators and operands](#operators-and-operands)
   * [Arithmetic operators](#arithmetic-operators)
-    + [Note on placement of increment/decrement operators](#Note-on-placement-of-increment/decrement-operators)
+    + [Note on placement of increment/decrement operators](#note-on-placement-of-increment/decrement-operators)
   * [Assignment operators](#assignment-operators)
   * [Relational operators](#relational-operators)
   * [Logical operators](#logical-operators)
@@ -30,8 +28,8 @@ This chapter will also cover flow control in **actor states**, which work simila
   * [wait](#wait)
   * [goto](#goto)
   * [fail](#fail)
-  * [Fall-through (no operator)](#Fall-through-(no-operator))
-  * [State jumps](#State-jumps)
+  * [Fall-through (no operator)](#fall-through-(no-operator))
+  * [State jumps](#state-jumps)
   * [Checking current state sequence](#checking-current-state-sequence)
 
 # Operators and operands
