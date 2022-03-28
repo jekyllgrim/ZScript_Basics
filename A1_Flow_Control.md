@@ -52,42 +52,58 @@ Basic arithmetic operations like addition, subtraction, multiplication, division
 - `+` — **addition**:
   
   ```csharp
-  int i = health + 100; //defines an integer variable i equal to the actor's current health value plus 100
+  // Ddefine an integer variable 'i' equal to
+  // the actor's current health value plus 100:
+  
+  int i = health + 100;
   ```
   
   ```csharp
-  A_SetHealth(health + target.health); //sets the actor's health to its current value plus the actor's target's current health value
+  // Set the actor's health to its current value
+  // plus the actor's target's current health value:
+  
+  A_SetHealth(health + target.health);
   ```
 
 - `-`  — **subtraction**:
   
   ```csharp
-  SetZ(ceilingz - 1); //moves the actor vertically and places it 1 unit below the height of the current sector's ceiling
+  // Move the actor vertically and place it 1 unit 
+  // below the height of the current sector's ceiling:
+  
+  SetZ(ceilingz - 1); 
   ```
   
   ```csharp
-  int i = pos.z - target.pos.z; //defines an integer variable i that is the difference between the absolute vertical positions of this actor and this actor's target
+  // Defines an integer variable 'i' that is the difference
+  // between the absolute vertical positions of this actor
+  // and this actor's target:
+  
+  int i = pos.z - target.pos.z;
   ```
 
 - `*` — **multiplication**:
   
   ```csharp
-  scale = scale * 0.5; //changes the actor's current scale so that it's reduced by 50%
+  scale = scale * 0.5; // reduce the actor's current scale by 50%
   ```
   
   ```csharp
-  A_SetHealth(health * 0.8); //change's the actor's health value so that it's reduced by 20%
+  A_SetHealth(health * 0.8); // set the actor's current health to 80% 
   ```
 
 - `/` — **division**:
   
   ```csharp
-  double projvel = Distance3D(target) / 35; //defines a double value 'projvel' that is equal to the distance to target divided by 35 
+  // Define a double value 'projvel' that is equal 
+  // to the distance to target divided by 35:
+  
+  double projvel = Distance3D(target) / 35; 
   ```
   
     (If a projectile is then fired at the `target` with velocity `projvel`, it'll reach the goal within 35 tics, i.e. a second)
   
-    **IMPORTANT NOTE:** In many programming languages there are two separate division operators: one for integer division and one for float-point (or double) division. In ZScript there's only one, which means that if both numbers are integers, the result will be an integer as well, and the part of the number after the point will be automatically truncated (removed). So, for example, `5 / 2` in ZScript equals `2`, not `2.5`.
+  **IMPORTANT NOTE:** In many programming languages there are two separate division operators: one for integer division and one for float-point (or double) division. In ZScript there's only one, which means that if both numbers are integers, the result will be an integer as well, and the part of the number after the point will be automatically truncated (removed). So, for example, `5 / 2` in ZScript equals `2`, not `2.5`.
   
     This can be avoided by making sure that one or both operands are doubles, by doing one of the following:
   
@@ -100,17 +116,20 @@ Basic arithmetic operations like addition, subtraction, multiplication, division
 - `%`  — **modulus operation** returns the remainder after dividing the first operand by the second operand:
   
   ```csharp
+  // This check will return true every time the 
+  // current level.time can be divided by 35 
+  // without a remainder, i.e. every 35 tics (1 second):
+  
   if (level.time % 35 == 0) 
-  //this check will return true every time the current level.time can be divided by 35 without a remainder, i.e. every 35 tics (1 second)
   ```
 
 - `++` — **increments** the value (adds 1 to it):
   
   ```csharp
-  int steps;    //defines an integer variable 'steps'
-  if (steps < 10)
-  {    //checks if the value of 'steps' is under 10
-      steps++;    //if true, adds 1 to the current value of 'steps'
+  int steps; //define an integer variable 'steps'
+  if (steps < 10) //check if it's below 10
+  {
+      steps++; //if true, add 1 to the current value of 'steps'
   }
   ```
   
@@ -119,10 +138,10 @@ Basic arithmetic operations like addition, subtraction, multiplication, division
 - `--` — **decrements** the value (decreases it by 1):
   
   ```csharp
-  int steps;    //defines an integer variable 'steps'
-  if (steps > 0)
-  {    //checks if the value of 'steps' is over 0
-      steps--;    //if true, subtracts 1 from the current value of 'steps'
+  int steps; //define an integer variable 'steps'
+  if (steps > 0) //check if it's above 0
+  {
+      steps--; //if true, subtract 1 from the current value of 'steps'
   }
   ```
   
@@ -157,31 +176,45 @@ Assignment operators are used to *set* a value. They don't check or compare, the
 * `=` — **assigns** a certain value to the operand:
   
   ```csharp
-  int i = 10; //defines integer variable i and sets its value to 10
+  // Ddefines integer variable 'i'
+  // and sets its value to 10:
+  
+  int i = 10; 
   ```
   
   ```csharp
-  gravity = 0.4; //sets the calling actor's gravity to 0.4
+  // Set the calling actor's gravity to 0.4:
+  
+  gravity = 0.4;
   ```
   
   ```csharp
-  mass = health; //sets the calling actor's mass to be equal to their current health value
+  // Sets the calling actor's mass to be equal
+  // to their current health value:
+  
+  mass = health; 
   ```
 
 * `+=` — **adds** a value to the current value of the operand:
   
   ```csharp
-  mass += 1000; //adds 1000 to the current mass value of the calling actor
+  // Add 1000 to the current mass value
+  // of the calling actor:
+  
+  mass += 1000; 
   ```
   
   ```csharp
-  vel.z += frandom(1,4); //increases the calling actor's current vertical velocity by a random double value betweem 1.0 and 4.0
+  // Increase the calling actor's current vertical velocity
+  // by a random double value betweem 1.0 and 4.0:
+  
+  vel.z += frandom(1,4);
   ```
   
     `a += b`is a shorter version `a = a + b`:
   
   ```csharp
-  //These do the same thing:
+  // These do the same thing:
   
   gravity += 0.5;
   gravity = gravity + 0.5;
@@ -190,21 +223,29 @@ Assignment operators are used to *set* a value. They don't check or compare, the
 * `-=` — **subtracts** a value from the current value of the operand:
   
   ```csharp
-  angle -= 45; //decreases the calling actor's angle by 45, which will turn the actor 45 degrees to the left
+  // Decrease the calling actor's angle by 45,
+  // which will turn the actor 45 degrees to the left:
+  
+  angle -= 45;
   ```
 
 * `*=` — **multiplies** the current value of the operand by the given value:
   
   ```csharp
-  scale *= 0.99; //decreases the calling actor's scale (sprite size) by 1%
+  // Decrease the calling actor's scale (sprite size) by 1%:
+  
+  scale *= 0.99; 
   ```
 
 * `/=` — **divides** the current value of the operand by the given value:
   
   ```csharp
-  alpha /= 2; //reduces the calling actor's alpha (translucency) by 50%
+  // Reduce the calling actor's alpha (translucency) 
+  // by 50%:
   
-  //same as doing this:
+  alpha /= 2;
+  
+  // This does the same:
   alpha *= 0.5;
   ```
   
@@ -215,13 +256,17 @@ Assignment operators are used to *set* a value. They don't check or compare, the
   ```csharp
   int i = 10;
   i %= 2; 
-  //i will be equal to 0, because 10 equals 2 * 5 without remainder
+  
+  // Result: 'i' is equal to 0, because 10 equals
+  // 2 * 5 without a remainder
   ```
   
   ```csharp
   int i = 10;
   i %= 3;
-  //i will be equal to 1, because 10 equals 3 * 3 plus 1 as remainder
+  
+  // Result: 'i' is equal to 1, because 10 equals 
+  // 3 * 3 plus 1 as remainder
   ```
 
 ## Relational operators
@@ -234,42 +279,54 @@ Used to *check* whether two values are equal, or whether one is greater than, le
     
     ```csharp
     if (health == 100) 
-    //returns true if health value is exactly equal to 100
+    {
+        // True if health is exactly equal to 100
+    }
     ```
     
     With **boolean** values this operator can be used to check if they're `true` or `false`:
     
     ```csharp
     if (target.bISMONSTER == true)
-    // Returns true if the calling actor's target has ISMONSTER flag
-    ```
-    
-    ```csharp
-    bool mybool;
-    if (mybool == false)
     {
-      mybool = true;
+        // True if the calling actor's target 
+        // has the ISMONSTER flag
     }
     ```
     
     Note that true/false checks can be shortened as follows:
     
     ```csharp
-    if (target.bISMONSTER) //this is the same as if (target.bISMONSTER == true)
+    // These do the same thing:
+    
+    if (target.bISMONSTER)
+    {...}
+    
+    if (target.bISMONSTER == true)
+    {...}
     ```
     
     This operator can also be used with [pointers](Pointers_and_casting.md) to check if they're the pointers to the same actor:
     
     ```csharp
     if (victim == target)
-    // This check is used in SpecialMissileHit overrides to check if 'victim' (the actor hit by the projectile) is the same as projectiles 'target' (the actor who shot it). It makes sure projectiles can never hit their shooters.
+    {
+        // Is true if 'victim' and 'target' pointers point to the same actor.
+    
+        // This check is used in SpecialMissileHit overrides 
+        // to check if 'victim' (the actor hit by the projectile) 
+        // is the same as projectile's 'target' (the actor who shot it).
+        // It makes sure projectiles can never hit their shooters.
+    }
     ```
     
     Checking pointers against `null` allows to check if that pointer is empty (you already know this as null-checking):
     
     ```csharp
     if (target == null)
-    // Will return true if the calling actor doesn't have a target
+    {
+        // True if the calling actor doesn't have a target
+    }
     ```
     
     Note: make sure you do NOT confuse `==` with with `=` — an operator used to actually *change* values. (See Assignment Operators above.)
@@ -278,35 +335,46 @@ Used to *check* whether two values are equal, or whether one is greater than, le
   
   ```csharp
   if (mass != 0)
-  // Will return true when the mass of the calling actor isn't equal to 0
+  {
+      // True when the mass of the calling actor isn't equal to 0
+  }
   ```
   
   ```csharp
   if (master != target.master)
-  // Will return true if the calling actor's master is not the same 
+  {
+      // True if the calling actor's master is not the same
+      // as its target's master.
+  }
   ```
   
     This operator is often used in null-checks:
   
   ```csharp
-  if (target != null) {
-      //this block will be executed if the calling actor has a target
+  if (target != null) 
+  {
+      // This block will be executed if the calling actor has a target
+  }
   ```
   
     Note that null-checks can be shortened, just like boolean checks, as follows:
   
   ```csharp
   if (target)    //this is the same as if (taget != null)
+  
   if (!target)    //this is the same as if (target == null)
   ```
   
-    `!` is actually separate operator that is covered below, under Logical operators.
+    `!` is actually a separate operator that is covered below, under Logical operators.
 
 * `~==` — checks if the first operand is ***approximately* equal to** the second one: this is the same check as `==` but it can be used with doubles to add a very small margin of error to the check. It's very often used with velocity checks (as you remember, `vel` is a vector3 that consists of 3 doubles):
   
   ```csharp
   if (vel ~== (0,0,0))
-  // Will return true if the calling actor's velocity is approximately equal to zero
+  {
+      // True if the calling actor's velocity 
+      // is approximately equal to zero
+  }
   ```
   
     For all intents and purposes this check is pretty much the same as `if (vel == (0,0,0))`, but edge cases are possible, so for doubles it's recommended. It's slightly less performance efficient than `==`, but most of the time the difference is negligible.
@@ -331,21 +399,26 @@ Used to *check* whether two values are equal, or whether one is greater than, le
   int i = pos.z - target.pos.z;
   if (i >= 0)
   {
-      //execute this block if the calling actor's vertical position is above or equal to the target's position
+      // Execute this block if the calling actor's 
+      // vertical position is above or equal to 
+      // the target's position.
   }
   else
   {
-      //otherwise execute this block
+      // Otherwise execute this block
   }
   ```
 
 * `<=` — checks if the first operand is **less than or equal to** the second:
   
   ```csharp
-  if (pos.z <= 0) {
-      destroy();
+  // Destroy the calling actor if their position is
+  // at or under the current sector's floor:
+  
+  if (pos.z <= floorz)
+  {
+      Destroy();
   }
-  // This will destroy the calling actor if their position is at or under the current sector's floor
   ```
 
 ## Logical operators
@@ -356,12 +429,21 @@ These operators are used to combine multiple checks.
   
   ```csharp
   if (target && target.health > 0)
-  // Returns true if the calling actor has a target and that target's health is above 0
+  {
+      // True if the calling actor has a target 
+      // and that target's health is above 0
+  }
   ```
   
   ```csharp
+  // Define a random number between -1000
+  // and 1000:
+  
+  int i = random(-1000, 1000);
   if (i > 0 && i <= 100)
-  // Returns true if the (previously defined) variable i is above zero and under or equal to 100
+  {
+      // True if 'i' is above zero and under or equal to 100
+  }
   ```
 
 Note, in case there are multiple checks, the game won't proceed to the next check unless the previous one is true. So, for example in this case:
@@ -385,15 +467,22 @@ What it means, always put the most important and the simplest check first, becau
   
   ```csharp
   if (target is "PlayerPawn" || target.bISMONSTER)
-  // This check will return true both if the target of the calling actor is a player pawn (a player-controlled actor) or if it has a ISMONSTER flag (i.e. is likely a monster)
+  {
+      // True if the target of the calling actor 
+      // is a player pawn (a player-controlled actor)
+      // or if it has a ISMONSTER flag (i.e. is likely a monster)
+  }
   ```
   
   ```csharp
   if (vel ~== (0,0,0) || pos.z <= floorz)
-  // Returns true if the calling actor is not moving or if it's on the floor (or, for some reason, below it)
+  {
+      // True if the calling actor is not moving or
+      // if it's on the floor (or, for some reason, below it)
+  }
   ```
   
-    OR checks work the same way as AND checks, just inverted. Which means, if the first condition is true, it won't proceed to the second condition.
+  OR checks work the same way as AND checks, just inverted. Which means, if the first condition is true, it won't proceed to the second condition.
 
 * `!` — logical NOT. This operator allows to **invert** *any* check or even a whole statement. For example:
   
@@ -414,13 +503,19 @@ What it means, always put the most important and the simplest check first, becau
 All logical operators can be combined with the help of parentheses:
 
 ```csharp
+// This check will pass if target exists, AND target isn't killed 
+// (doesn't have KILLED flag), AND it's either a PlayerPawn OR a monster:
+
 if (target && !target.bKILLED && (target is "PlayerPawn" || target.bISMONSTER))
-// This check will pass if target exists, AND target isn't killed (doesn't have KILLED flag), AND it's either a PlayerPawn OR a monster
 ```
 
 ```csharp
+// This will pass if the calling actor has a target
+// and that target is PlayerPawn, OR if the calling actor
+// has a master, that master has a target, and
+// the master's target is PlayerPawn:
+
 if ((target && target is "PlayerPawn") || (master && master.target && master.target is "PlayerPawn"))
-// This will pass if the calling actor has a target and that target is PlayerPawn, OR if the calling actor has a master, that master has a target, and the master's target is PlayerPawn.
 ```
 
 ## Bitwise operators
@@ -436,32 +531,45 @@ Another common example of a bit field is player input: whenever player presses a
 * `|` — **bitwise OR**. Most commonly used to combine flags together, for example:
   
   ```csharp
-  A_WeaponReady(WRF_NOSECONDARY|WRF_NOSWITCH); //this will make the weapon ready for fire but won't let you either fire the secondary attack or switch the weapon
+  // This will make the weapon ready for fire but
+  // won't let you either fire the secondary attack
+  // or switch the weapon:
+  
+  A_WeaponReady(WRF_NOSECONDARY|WRF_NOSWITCH); 
   ```
 
 * `|=` — a combination of OR and a setter, it's primarily used to set flags. It functions by appending flags to the bit field, so that you can set multiple flags this way without clearing the field:
   
   ```csharp
+  // Define a flag field that contains
+  // the DMG_THRUSTLESS flag in it:
   int fflags = DMG_THRUSTLESS;
+  // Do the following with a 30% chance:
   if (random(1,3) == 3)
   {
+      // Add the DMG_NO_PAIN flag to fflags:
       fflags |= DMG_NO_PAIN;
   }
+  // Call DamageMobj on the target with the
+  // defined flags:
   target.DamageMobj(self,self,10,'normal',flags:fflags);
   ```
   
-    This block first defines a flag field `fflags` that already contains `DMG_THRUSTLESS` flag (a flag of `DamageMobj` function that makes it not push the actor when damaging them). After that with a randomized chance it'll *add* `DMG_NOPAIN` flag (the damaged actor won't enter its Pain state sequence) to the same field, and then call `DamageMobj` on the `target`. As a result, this block will always deal damage without any thrust, but will only sometimes also not cause pain.
+  Result: this block will always deal damage without any thrust but will only *sometimes* also not cause pain.
 
 * `&` — **bitwise AND**. Most commonly used to check if a value is present in the bit field. For example:
   
   ```csharp
   if (player.cmd.buttons & BT_FIRE)
-  //will return true if the player is currently pressing the Fire key, among others
+  {
+      // True if the player is currently
+      // pressing the Fire key, among others
+  }
   ```
   
-    As mentioned above, `==` won't work here because the `cmd.buttons` field contains all currently pressed keys. By using `&` you check if the player is pressing anything *as well as* the key you're checking for.
+  As mentioned above, `==` won't work here because the `cmd.buttons` field contains all currently pressed keys. By using `&` you check if the player is pressing anything *as well as* the key you're checking for.
 
-* `&=` — a combination of **bitwise AND** and assignment operator `=`. It's most common application is to unset flags in combination with `~` (see below).
+* `&=` — a combination of **bitwise AND** and the assignment operator `=`. Its most common application is to unset flags in combination with `~` (see below).
 
 * `~`  — **bitwise NOT**. It's most commonly used in combination with `&=` to unset flags as follows:
   
@@ -469,14 +577,19 @@ Another common example of a bit field is player input: whenever player presses a
   myflags &= ~FLAGNAME; //This will remove `FLAGNAME` flag from the myFlags field
   ```
   
-    Below is an inverted way to define the same block used in the example above, except here the flag field already contains both flags, and with a randomized chance we remove one of them before calling `DamageMobj()`:
+  Below is an inverted way to define the same block used in the example above, except here the flag field already contains both flags, and with a randomized chance we remove one of them before calling `DamageMobj()`:
   
   ```csharp
+  // Define a flag field that contains
+  // two flags:
   int fflags = DMG_THRUSTLESS|DMG_NO_PAIN;
+  // With a 60% chance:
   if (random(1,3) > 1)
   {
+      // remove one of the flags:
       fflags &= ~DMG_NO_PAIN;
   }
+  // Call DamageMobj with the resulting flags:
   target.DamageMobj(self,self,10,'normal',flags:fflags);
   ```
 
@@ -485,64 +598,70 @@ Another common example of a bit field is player input: whenever player presses a
 * `is` — checks whether the operand is a specific class *or* is a class that inherits from the given class:
   
   ```csharp
-  Class Imp1 : DoomImp { }
-  ```
-
-```
-  //in some other place in the code:
+  class Imp1 : DoomImp 
+  {}
+  
+  // In some other place in the code:
   actor a = Spawn("Imp1",pos);
   if (a is "DoomImp")
   {
-      //this check will return true because the spawned Imp1 inherits from DoomImp
+      // This will be called because
+      // the spawned Imp1 inherits from DoomImp
   }
-```
-
-  A restrictive alternative to this operator is `GetClassName()` function which returns true only if the operand is the specific class provided:
-
-```csharp
-Class Imp1 : DoomImp { }
-
-
-//in some other place in the code:
-actor a = Spawn("Imp1",pos);
-if (a.GetClassName() == "DoomImp")
-{
-    //this will return false because Imp1 and DoomImp are different class names
-}
-```
+  ```
+  
+  A restrictive alternative to this operator is `GetClass()` function which returns true only if the operand is the specific class provided:
+  
+  ```csharp
+  class Imp1 : DoomImp 
+  {}
+  
+  // In some other place in the code:
+  actor a = Spawn("Imp1",pos);
+  if (a.GetClass() == "DoomImp")
+  {
+      // This will not be called because the spawned 
+      // Imp1 inherits from DoomImp but is NOT DoomImp
+  }```
+  ```
 
 * `?` — **ternary operator**, functions as a shorter version of an if/else block. Doesn't affect performance and is only used for convenience. 
   
   The syntax for using a ternary operator is as follows:
 
-```csharp
-booleanvalue = condition ? valueiftrue : valueiffalse
+```c
+<boolean value> = <condition> ? <value if true> : <value if false>
 ```
 
-    Examples:
+Examples:
 
 ```csharp
-//regular if/else block:
+// Regular if/else block:
+
 int i;
+// Check if the calling actor has
+// the NOGRAVITY flag:
 if (bNOGRAVITY)
 {
-    i = 10;    //sets the value to 10 if the calling actor has +NOGRAVITY flag
+    i = 10;    // if so, set i to 10
 }
 else
 {
-    i = 5;    //otherwise sets the value to 5
+    i = 5;    // otherwise set i to 5
 }
 
-//ternary operator:
+// Same thing with a ternary operator:
 int i = bNOGRAVITY ? 10 : 5;
 ```
 
-    Among other things, using it can be convenient in function arguments:
+Among other things, using it can be convenient in function arguments:
 
 ```csharp
-//all three variants below will set the calling actor's mass to 1000 if they have +BOSS flag, otherwise the mass will be set to 100
+// All three variants below will set the calling actor's
+// mass to 1000 if they have +BOSS flag, otherwise the
+// mass will be set to 100.
 
-//basic if/else:
+// Basic if/else:
 if (bBOSS)
 {
     A_SetMass(1000);
@@ -552,7 +671,7 @@ else
     A_SetMass(100);
 }
 
-//a more versatile but longer version:
+// Aa more versatile but longer version:
 int i;
 if (bBOSS)
 {
@@ -564,7 +683,7 @@ else
 }
 A_SetMass(i);
 
-//ternary operator:
+// A ternary operator:
 A_SetMass(bBOSS ? 1000 : 100);
 ```
 
@@ -635,7 +754,7 @@ Note that in the example above `random` automatically creates an integer value, 
 `else` is a statement that is meant to follow `if` and defines another block that will be executed if the original condition isn't met:
 
 ```csharp
-//pseudocode:
+// pseudocode:
 if (condition == true)
 {
     DoThis();
@@ -781,7 +900,8 @@ You can define various types of loops within ZScript code, and there are special
 while (condition == true)
 {
     DoStuff();
-    //if the 'condition' becomes false in the process, the loop will end
+    // If the 'condition' becomes false
+    // in the process, the loop will end.
 }
 ```
 
@@ -816,7 +936,7 @@ You can also set up an **endless** loop by doing `while (true)` (since, well, `t
 
 `for` is a more robust loop-starting statement that can be used similarly to `while`:
 
-```csharp
+```c
 //psuedocode:
 for (<counter value>; <condition>; <change>)
 ```
@@ -828,7 +948,7 @@ A typical `for` loop looks like this:
 ```csharp
 for (int i = 10; i > 0; i--)
 {
-    //this block will be repeated 10 times
+    // This block will be repeated 10 times
 }
 ```
 
@@ -839,7 +959,7 @@ You can invert the values, it won't make any difference:
 ```csharp
 for (int i = 0; i < 10; i++)
 {
-    //this block will be repeated 10 times
+    // This block will be repeated 10 times
 }
 ```
 
@@ -854,7 +974,7 @@ Note that a `for` loop will first execute everything in it, and *after* that it'
 There are multiple convenient applications for `for` loops. The simplest one is to use them as a shorter version of `while` loops:
 
 ```csharp
-//this will repeat 10 times:
+// This will repeat 10 times:
 int i = 10;
 while (i > 0)
 {
@@ -862,7 +982,7 @@ while (i > 0)
     i--;
 }
 
-//this will also repeat 10 times:
+// This will also repeat 10 times:
 for (int i = 10; i > 0; i--)
 {
     A_SpawnItemEx("RandomDebris",xvel:frandom(-5,5),yvel:frandom(-5,5),zvel:frandom(3,5));
@@ -872,7 +992,7 @@ for (int i = 10; i > 0; i--)
 Note that you can make the initial value randomized if you want a random number of repetitions. For example, if you want to spawn some sort of debris/particles and you want to spawn a random number of them each time:
 
 ```csharp
-//this loop will execute between 8-12 times:
+// This loop will execute between 8-12 times:
 for (int i = random(8,12); i > 0; i--)
 {
     A_SpawnItemEx("RandomDebris",xvel:frandom(-5,5),yvel:frandom(-5,5),zvel:frandom(3,5));
@@ -882,7 +1002,8 @@ for (int i = random(8,12); i > 0; i--)
 Note that normally **you should only randomize the counter value**, not the condition value, because, as described above, the condition is checked with every iteration of the loop. Which means, if you randomize the condition, it'll actually check against a random number every time:
 
 ```csharp
-/*    This will check i against a random value between 8-12 with every iteration of the loop.
+/*  
+    This will check 'i' against a random value between 8-12 with every iteration of the loop.
     Normally this is not a good idea, since it offers you less control over how many
     repetitions you'll actually have. It'll also be slightly less peformance-efficient
     since a random value will need to be defined with every iteration, and that requires
@@ -899,8 +1020,10 @@ The counter value `i` is a variable that exists within the loop itself and can b
 ```csharp
 for (int i = 0; i < 5; i++)
 {
-    /*    Spawnheight of the spawned projectile is defined as i * 8, which means
-        that 5 imp orbs will be fired, each spawned 8 units above the previous one:
+    /*    
+        Spawnheight of the spawned projectile is defined as i * 8, 
+        which means that 5 imp orbs will be fired, each spawned 
+        8 units above the previous one:
     */
     A_SpawnProjectile("DoomImpBall", i * 8);
 }
@@ -909,7 +1032,9 @@ for (int i = 0; i < 5; i++)
 While usually the change is defined as incrementing `i` by 1, it's also perfectly possible to use a different value. For example, in this block `i` is increased by 30 with every iteration, and the loop is repeated until it reaches 360:
 
 ```csharp
-// This will fire imp fireballs in a circle, a new fireball every 30 degrees (i.e. 12 fireballs in total):
+// This will fire imp fireballs in a circle, a new fireball 
+// every 30 degrees (i.e. 12 fireballs in total):
+
 for (int i = 0; i < 360; i += 30)
 {
     A_SpawnProjectile("DoomImpBall", angle: i);
