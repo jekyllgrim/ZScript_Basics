@@ -262,15 +262,17 @@ Here you can see a few extra array methods being used:
 
 ### Note on data types
 
-While all the examples of dynamic arrays I provided are arrays of actor pointers, arrays *can* in fact contain data of any type—because ultimately arrays are just fancy variarbles. All of these are valid:
+While all the examples of dynamic arrays I provided are arrays of actor pointers, arrays *can* in fact contain data of almost any type—because ultimately arrays are just fancy variarbles. All of these are valid:
 
 ```csharp
 array <int> numberlist; //an array of numbers
 array <Class<Actor> > classlist; //this doesn't contain pointers, instead it contains class names. Note the space.
-array <vector3> coordinatelist; //an array of vector3 coordinates
+array <SpriteID> spriteList; //an array of sprite IDs
 
 //and so on...
 ```
+
+The only exception to this is vectors. Unfortunately, ZScript arrays currently don't support `vector2` or `vector3` types.
 
 **Note:** when you're making a an array of class names, you need a space between `<` and `>`:
 
