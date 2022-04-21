@@ -1,6 +1,6 @@
 🟢 [<<< BACK TO START](README.md)
 
-🔵 [<< Previous: Event Handlers](11_Event_Handlers.md)        🔵 [>> Next: Arrays](13_Arrays.md)
+🔵 [<< Previous: Player, PlayerInfo and PlayerPawn](12.0_Player.md) 🔵 [>> Next: Arrays](13_Arrays.md)
 
 ------
 
@@ -1877,4 +1877,4 @@ Basically this is the inverse of the earlier method.
 
 🟢 [<<< BACK TO START](README.md)
 
-🔵 [<< Previous: Event Handlers](11_Event_Handlers.md)        🔵 [>> Next: Arrays](13_Arrays.md)
+🔵 [<< Previous: Player, PlayerInfo and PlayerPawn](12.0_Player.md)        🔵 [>> Next: Arrays](13_Arrays.md)

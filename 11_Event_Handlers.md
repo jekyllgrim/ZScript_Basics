@@ -1,6 +1,6 @@
 🟢 [<<< BACK TO START](README.md)
 
-🔵 [<< Previous: Virtual Functions](10_Virtual_functions.md)        🔵 [>> Next: Weapons, PSprite and overlays](12_Weapons_Overlays_PSprite.md)
+🔵 [<< Previous: Virtual Functions](10_Virtual_functions.md)        🔵 [>> Next: Player, PlayerInfo and PlayerPawn](12.0_Player.md)
 
 ------
 
@@ -532,4 +532,4 @@ Some notes of the functions used in this script:
 
 🟢 [<<< BACK TO START](README.md)
 
-🔵 [<< Previous: Virtual Functions](10_Virtual_functions.md)        🔵 [>> Next: Weapons, PSprite and overlays](12_Weapons_Overlays_PSprite.md)
+🔵 [<< Previous: Virtual Functions](10_Virtual_functions.md)        🔵 [>> Next: Player, PlayerInfo and PlayerPawn](12.0_Player.md)
