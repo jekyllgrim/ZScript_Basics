@@ -1,7 +1,5 @@
 # ZScript Basics: A Guide for Non-Programmers (from a non-programmer)
 
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/D1D27F686)
-
 This guide is a beginner-friendly introduction to ZScript, a primary coding language used to code gameplay, UI and menus in GZDoom source port.
 
 ## Important notes
@@ -40,15 +38,17 @@ This guide is a beginner-friendly introduction to ZScript, a primary coding lang
 
 11. [Event Handlers](11_Event_Handlers.md)
 
-12. [Weapons, PSprite and overlays](12_Weapons_Overlays_PSprite.md) (WIP)
+12. [Player, PlayerInfo and PlayerPawn](12.0_Player.md)
 
-13. [Arrays](13_Arrays.md)
+13. [Weapons, PSprite and overlays](12_Weapons_Overlays_PSprite.md) (WIP)
 
-14. [Constants](14_Constants.md)
+14. [Arrays](13_Arrays.md)
 
-15. Inventory (TBA)
+15. [Constants](14_Constants.md)
 
-16. HUD (TBA)
+16. Inventory (TBA)
+
+17. HUD (TBA)
 * [Appendix 1: Flow Control](A1_Flow_Control.md)
 
 * [Appendix 2: Best Practices and Rules of Thumb](A2_Best_Practices.md)
