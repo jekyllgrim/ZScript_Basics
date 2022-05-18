@@ -331,9 +331,11 @@ As mentioned, the difference between action and non-action functions is how they
 
 * `self` — the owner, cast as Actor
 
-* `player` (or `self.player`) — the PlayerInfo struct attached to the owner (as long as the owner is a player)
+* `player` (or `self.player`) — the [PlayerInfo struct](12.0_Player.md) attached to the owner (as long as the owner is a player)
 
 * `player.mo` (or `self.player.mo`) — the owner, cast as PlayerPawn
+
+* `invoker.owner` — same thing as `self`, so using this is not really necessary
 
 **Regular function:**
 
@@ -341,9 +343,9 @@ As mentioned, the difference between action and non-action functions is how they
 
 * `owner` — the owner, cast as Actor
 
-* `owner.player` (or `self.player`) — the PlayerInfo struct attached to the owner (as long as the owner is a player)
+* `owner.player` (or `self.owner.player`) — the [PlayerInfo struct](12.0_Player.md) attached to the owner (as long as the owner is a player)
 
-* `owner.player.mo` — the owner, cast as PlayerPawn
+* `owner.player.mo` (or `self.owner.player.mo`) — the owner, cast as PlayerPawn
 
 * ~~`invoker`~~ — this pointer isn't recognized
 
@@ -454,6 +456,8 @@ class PistolAngled : Pistol
 ```
 
 > *Note:* It's important to remember that the [vanilla weapon illumination functions](https://zdoom.org/wiki/A_Light0), such as as `A_Light1` and `A_Light2`, actually illuminate *the whole level*, and if you don't call `A_Light0` after them, the map's light level will remain permanently raised. While using them is typical in vanilla weapons, it's not a requirement; you may opt for something GZDoom-specific, like a dynamic light.
+> 
+> Instead of calling `A_Light0` you can also call `goto LightDone`: LightDone is a state sequence defined in the base `Weapon` class that simply calls `A_Light0` and `stop` to destroy the layer.
 
 The third argument of `A_Overlay` is a boolean value by default set to `false`. If it's set to `true`, the overlay will not be created if that layer is already occupied by a PSprite. If `false`, the overlay will be created unconditionally, and if any animation was already active on that layer, it'll be destroyed first. 
 
@@ -586,7 +590,7 @@ There are two functions that can do that:
 
 * `FindPSprite(<layer number>)` — checks if the specified sprite layer exists; if it does, returns a pointer to it. Otherwise returns null.
 
-* `GetPSprite(<layer number>)` — checks if the specified sprite layer exists; if it doesn't, creates it and then returns a pointer to it.
+* `GetPSprite(<layer number>)` — checks if the specified sprite layer exists; if it doesn't, *creates it* and then returns a pointer to it.
 
 Just like `SetPSprite`, these will need a `player` prefix if used in a state. In other contexts you'll also need a pointer to the player pawn first, so, for example, from a weapon's virtual function the prefix will be `owner.player`.
 
@@ -700,7 +704,7 @@ class PistolAngledFist : Pistol
 }
 ```
 
-So, this allows us to perform a punch while the main layer is in the Ready sequence. But what if we want to let the player *always* perform a punch, regardless of what the pistol is doing? Let's say we won't to be able to punch while firing (don't do this at home).
+So, this allows us to perform a punch while the main layer is in the Ready sequence. But what if we want to let the player *always* perform a punch, regardless of what the pistol is doing? Let's say we want to be able to punch while firing (don't do this at home).
 
 It's simple: we just move the `player.cmd.buttons` check to `DoEffect()`, which, as we remember, is called every tick the weapon is in inventory. We also have to utilize ZScript functions and use the correct pointers, as explained above:
 
@@ -813,7 +817,7 @@ if (psp)
 let psp = player.FindPSprite(PSP_Flash);
 if (psp)
 {
-    player.SetPSprite(PSP_Flash, "Null");
+    psp.Destroy();
 }
 
 ```
@@ -853,6 +857,8 @@ Note that `A_OverlayFlags` doesn't use the real flag names, rather it uses their
 
 * `PSPF_AddWeapon` (internally `bAddWeapon`) — this flag is used by *overlays* (i.e. all PSprite layers that are *not* PSP_WEAPON) and it makes the overlay follow the main layer's offset ([PSprite offsets](#psprite-offsets) below will cover that in detail). This flag is **true** by default. If you want to move an overlay around separately from the main layer, you need to set it to false.
 
+> *Note:* The sprite layer offsets should not be confused with the sprite offsets. Sprite offsets need to be applied via SLADE, either directly to the sprite or through a TEXTURES lump. The layer offsets, on the other hand, are dynamic values that can be used to move the sprite around the screen. If you want to align your muzzle flash to your gun, for example, you still need to align their sprite offsets first so that they're at the same place; `bAddWeapon` only makes sure that they're *moved* dynamically in sync, nothing more.
+
 * `PSPF_RenderStyle` — allows changing the sprite layer's renderstyle, just like it can be done on actors. After setting it to true, you can use [`A_OverlayRenderstyle`](https://zdoom.org/wiki/A_OverlayRenderstyle) to change the layer's style. **This flag can't be modified directly** through a pointer, and neither can the renderstyle itself; renderstyle manipulation can only be done from the C++ part of the engine via functions. This is true for actors as well, which require `SetRenderstyle()` to change their renderstyle dynamically.
 
 * `PSPF_Alpha` and `PSPF_ForceAlpha` — these two flags enable modifying the alpha (i.e. translucency) of the sprite layer. The difference between the two is that some renderstyles (set via `A_OverlayRenderstyle`) force alpha to a specific value and block changes to it, which `PSPF_Alpha` can't override while `PSPF_ForceAlpha` can. In practice it means that `PSPF_Alpha` can basically be ignored, and you can always use `PSPF_ForceAlpha` instead if you need to make sure the overlay's alpha will be set to the value you want. Similarly to `PSPF_RenderStyle`, these two **can't be modified directly**, only  via `A_OverlayFlags`.
@@ -881,7 +887,7 @@ class RightHandFist : Fist
 
 This is an extremely simple modification of the Doom's Fist weapon to make it right-handed. Note, we use both `PSPF_Flip` and `PSPF_Mirror`, so that both the sprites visuals *and* position are flipped. We call the function in the first Select state, so that it's applied immediately.
 
-As for modifying the flags directly, in general it's not =really more useful than using `A_OverlayFlags`, since the code will be longer. However, it's still useful to know how it works. Here's the same right-hand fist done via ZScript pointers:
+As for modifying the flags directly, in general it's not really more useful than using `A_OverlayFlags`, since the code will be longer. However, it's still useful to know how it works. Here's the same right-hand fist done via ZScript pointers:
 
 ```csharp
 class RightHandFist : Fist
@@ -919,7 +925,7 @@ There are a few functions that can modify PSprite properties. Most of them will 
 
 * `A_OverlayAlpha(<layer>, <value>)` sets the specified layer's alpha (translucency) to the specified double value. For this to work, the renderstyle has to support alpha modification. The fastest way to allow this is to set the `PSPF_ForceAlpha` flag to true, since this forcibly allows alpha manipulation with any renderstyle.
 
-* `A_OverlayTranslation(<layer> , <translation name>)` — modifies the translation of the specified layer, setting it to a translation as defined in the [TRNSLATE](https://zdoom.org/wiki/TRNSLATE) lump.
+* `A_OverlayTranslation(<layer>, <translation name>)` — modifies the translation of the specified layer, setting it to a translation as defined in the [TRNSLATE](https://zdoom.org/wiki/TRNSLATE) lump.
 
 * `A_WeaponOffset` and `A_OverlayOffset` allow moving the main sprite layer and the overlay layers around; covered in detail below.
 
