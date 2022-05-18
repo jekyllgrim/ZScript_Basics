@@ -56,9 +56,9 @@ A class-scope [variable](#variable) (a variable that is defined at the top of th
 
 ### Flag
 
-1. In an Actor: A type of a boolean Actor property that can be set or unset by using `+<FLAGNAME>` or `-<FLAGNAME>` in the actor's Default block. Flags are internally defined as a bit field.
+1. In an Actor: A type of a boolean Actor property that can be set or unset by using `+<FLAGNAME>` or `-<FLAGNAME>` in the actor's Default block or by setting `bFLAGNAME` to true or false on an actor pointer. Flags are internally defined as a bit field.
 
-2. In a function: A bitfield that functions as an argument of a function so that it can combine multiple values. The flags are integer numbers that normally receive "nice names" by being defined as constants.
+2. In a function: A bitfield that functions as an argument of a function so that it can combine multiple values. The flags are integer numbers that normally receive "nice names" by being defined as constants. Flags can be set, unset and combined with bitwise operators. See: [Flow Control](A1_Flow_Control.md).
 
 ### Function
 
