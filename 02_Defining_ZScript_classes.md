@@ -319,19 +319,19 @@ class PistolWithReload : Pistol //it's based on the existing Pistol, so it inher
     // is already full:
     action void A_WeaponReadyReload(int flags = 0)
     {
-		// Check that ammo1 (magazine) is lower than maxamount
+        // Check that ammo1 (magazine) is lower than maxamount
         // and ammo2 (reserve ammo) is above ammouse1 (the amount
         // of magazine ammo used for firing):
-		if (invoker.ammo1.amount < invoker.ammo1.maxamount && invoker.ammo2.amount > invoker.ammouse1)
-		{
-			// If true, add WRF_ALLOWRELOAD to the flags, 
+        if (invoker.ammo1.amount < invoker.ammo1.maxamount && invoker.ammo2.amount > invoker.ammouse1)
+        {
+            // If true, add WRF_ALLOWRELOAD to the flags, 
             // which is a A_WeaponReady() flag that allows 
             // using the Reload state sequence:
-			flags |= WRF_ALLOWRELOAD;
-		}
-		// Pass the resulting value to A_WeaponReady 
-		// (which will be either 0 or WRF_ALLOWRELOAD):
-		A_WeaponReady(flags);
+            flags |= WRF_ALLOWRELOAD;
+        }
+        // Pass the resulting value to A_WeaponReady 
+        // (which will be either 0 or WRF_ALLOWRELOAD):
+        A_WeaponReady(flags);
     }
 
     // This defines a custom function that in a loop takes
