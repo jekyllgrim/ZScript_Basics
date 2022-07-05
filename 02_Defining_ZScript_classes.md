@@ -309,6 +309,8 @@ class PistolWithReload : Pistol //it's based on the existing Pistol, so it inher
     {
         +WEAPON.AMMO_OPTIONAL //without this flag the weapon will be deselected as soon as the magazine is empty
         Weapon.AmmoType "PistolMagazine"; //a special "magazine" ammo type 
+        Weapon.AmmoUse 1;
+        Weapon.AmmoGive 0; //We don't want weapon pickups to refill the magazine
         Weapon.AmmoType2 "Clip"; //Clip is still used as reserve ammo
         Weapon.AmmoGive2 20; //the weapon will give some reserve ammo when picked up
     }
@@ -320,9 +322,9 @@ class PistolWithReload : Pistol //it's based on the existing Pistol, so it inher
     action void A_WeaponReadyReload(int flags = 0)
     {
         // Check that ammo1 (magazine) is lower than maxamount
-        // and ammo2 (reserve ammo) is above ammouse1 (the amount
-        // of magazine ammo used for firing):
-        if (invoker.ammo1.amount < invoker.ammo1.maxamount && invoker.ammo2.amount > invoker.ammouse1)
+        // and ammo2 (reserve ammo) is at least the same as ammouse1 
+        // (the amount of magazine ammo required for firing):
+        if (invoker.ammo1.amount < invoker.ammo1.maxamount && invoker.ammo2.amount >= invoker.ammouse1)
         {
             // If true, add WRF_ALLOWRELOAD to the flags, 
             // which is a A_WeaponReady() flag that allows 
