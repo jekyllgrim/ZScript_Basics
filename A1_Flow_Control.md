@@ -524,9 +524,9 @@ Bitwise operators are used to deal with [**bit fields**](https://en.wikipedia.or
 
 Bit fields are a specific type of data structure. In GZDoom their primary application is function flags. For example, `A_WeaponReady` supports various flags, such as `WRF_NOPRIMARY`, `WRF_NOSECONDARY`, `WRF_NOSWITCH`. The flags argument is special, because it's a single argument that can have multiple values combined in any order and number. It's possible because the flags argument is actually an integer value that functions as a **bit field**: what it means is that internally each flag is a number, those numbers are added to each when you define the flags, and the final number tells the game which combination of flags to use. The flag names, such as "WRF_NOPRIMARY", are just aliases for the actual numeric values.
 
-It's important to know that, because as a result you can't use operators such as `==` with flags; instead they need special **bitwise operators** that can interact with the bit field that contains the flags.
+It's important to know that, because as a result you can't use operators such as `==` or `||` with flags; instead they need special **bitwise operators** that can interact with the bit field that contains the flags.
 
-Another common example of a bit field is player input: whenever player presses a button, the bit field that contains the inputs is changed. Obviously, multiple buttons can be pressed at the same time, so the field dynamically stores those values. You can get access to the player's input bit field either by using `GetPlayerInput()` function or just by accessing the `cmd.buttons` field when you have a pointer to the player (so, for example, from a weapon state it'll be `player.cmd.buttons`).
+Another common example of a bit field is player input: whenever player presses a button, the bit field that contains the inputs (`player.cmd.buttons`) is changed. Obviously, multiple buttons can be pressed at the same time, so the field dynamically stores those values. You can get access to the player's input bit field either by using `GetPlayerInput()` function or just by accessing the `cmd.buttons` field when you have a pointer to the player (so, for example, from a weapon state it'll be `player.cmd.buttons`).
 
 * `|` — **bitwise OR**. Most commonly used to combine flags together, for example:
   
@@ -777,9 +777,9 @@ if (condition)
 else {} //don't do this if you don't have any code here, it's pointless!
 ```
 
-### if else
+### else if
 
-`if else` is a combined statement that also follows an `if` block and is called when the original condition is false, but it also defines an extra condition:
+`else if` is a combined statement that also follows an `if` block and is called when the original condition is false, but it also defines an extra condition:
 
 ```csharp
 if (condition1 == true)
@@ -794,7 +794,7 @@ else if (condition2 == true)
 
 In the above example `DoThat()` will only be called if `condition` is false AND `condition2` is true.
 
-`if else` can be followed by an `else` block:
+`else if` can be followed by an `else` block:
 
 ```csharp
 if (condition1 == true)
