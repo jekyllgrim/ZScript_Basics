@@ -127,7 +127,7 @@ class CacoDaddy : Cacodemon
     Death:
         TNT1 A 0
         {
-            if (tracer) //check that tracer exists
+            if (tracer && tracer.health > 0) //check that tracer exists and is alive
             {
                 tracer.A_StartSound("caco/active"); //play Cacodemon "wake up" sound on the tracer
                 tracer.A_SetTranslation("BabyAngry"); //change translation, as defined in TRNSLATE
@@ -143,7 +143,7 @@ class CacoDaddy : Cacodemon
 
 > *Note*: Don't forget that you have to use **NoDelay** if you want to do something in the very first frame of the Spawn state. Otherwise Doom skips that function.
 
-The daddy Caco spawns a baby Caco when it appears, and makes the baby its `tracer`. When the daddy dies, it checks if its `tracer` still exists, and if so, does a bunch of stuff **on the** **tracer**: plays a sound, changes its `translation` and `speed`, and removes its ability to enter Pain state. The baby is out for blood.
+The daddy Caco spawns a baby Caco when it appears, and makes the baby its `tracer`. When the daddy dies, it checks if its `tracer` still exists and is still alive, and if so, does a bunch of stuff **on the** **tracer**: plays a sound, changes its `translation` and `speed`, and removes its ability to enter Pain state. The baby is out for blood.
 
 We use `tracer.` as a prefix to execute functions on it and change its properties. As mentioned earlier, **it's very important to null-check all pointers you use** to avoid the risk of causing a VM abort. A simple example why it could happen here is that the daddy spawns its baby 64 units in front of itself; if the daddy Caco is initially placed facing some other actor or a wall, it won't spawn the baby at all (because `A_SpawnItemEx` checks for free space before spawning something).
 
@@ -193,7 +193,7 @@ First, creating the pointers. Just like any variables, they can be class-scope (
 ```csharp
 class CacoDaddy : Cacodemon
 {
-    Actor baby;    // define a method 'baby' (notice its type is 'Actor')
+    Actor baby;    // define a field 'baby' (notice its type is 'Actor')
 
     States 
     {
@@ -207,7 +207,7 @@ class CacoDaddy : Cacodemon
     Death:
         TNT1 A 0 
         {
-            if (baby) 
+            if (baby && baby.health > 0) 
             {
                 baby.A_StartSound("caco/active");
                 baby.A_SetTranslation("BabyAngry");
@@ -248,7 +248,7 @@ Spawn:
 
 > *Note*: For this simple example, we're not checking the position here at all, so if CacoDaddy was in front of a wall, the baby can end up inside a wall.
 
-`Self`, as you probably already guessed, is a pointer to the current actor; since we're calling this from CacoDaddy, `self` is CacoDaddy. The full syntax for `Warp` is **Warp(pointer, xoffsets, yoffsets, zoffsets)**, and the offsets are relative, just like with `A_Warp`, so we move the spawned baby 64 units in front of `self` (CacoDaddy).  (`Self` is an existing pointer, you don't need to define or cast it.)
+`Self`, as you probably already guessed, is a pointer to the current actor; since we're calling this from CacoDaddy, `self` is CacoDaddy. The full syntax for `Warp` is `Warp(pointer, xoffsets, yoffsets, zoffsets)`, and the offsets are relative, just like with `A_Warp`, so we move the spawned baby 64 units in front of `self` (CacoDaddy).  (`Self` is an existing pointer, you don't need to define or cast it.)
 
 Now, we can go even deeper. Instead of using two different actors, we can use only one and modify it on the fly to make it look different:
 
@@ -279,7 +279,7 @@ class CacoSingleDad : Cacodemon replaces Cacodemon
     Death:
         TNT1 A 0 
         {
-            if (baby) 
+            if (baby && baby.health > 0) 
             {
                 baby.A_StartSound("caco/active");
                 baby.A_SetTranslation("BabyAngry");

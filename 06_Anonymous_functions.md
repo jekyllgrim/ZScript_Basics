@@ -1,19 +1,17 @@
 🟢 [<<< BACK TO START](README.md)
 
-🔵[<< Previous: How to see your classes in the game](05_How_to_see_your_classes.md)	🔵 [>> Next: Variables and data types](07_Variables_and_data_types.md)
+🔵[<< Previous: How to see your classes in the game](05_How_to_see_your_classes.md)    🔵 [>> Next: Variables and data types](07_Variables_and_data_types.md)
 
 ------
 
 # Anonymous functions
 
-  * [Overview](#overview)
-  * [Features of anonymous functions](#features-of-anonymous-functions)
-    + [Using parentheses](#using-parentheses)
-    + [Variables and conditions inside anonymous functions](#variables-and-conditions-inside-anonymous-functions)
-    + [Jumps in anonymous functions](#jumps-in-anonymous-functions)
-  * [Flow control](#flow-control)
-
-
+* [Overview](#overview)
+* [Features of anonymous functions](#features-of-anonymous-functions)
+  + [Using parentheses](#using-parentheses)
+  + [Variables and conditions inside anonymous functions](#variables-and-conditions-inside-anonymous-functions)
+  + [Jumps in anonymous functions](#jumps-in-anonymous-functions)
+* [Flow control](#flow-control)
 
 ## Overview
 
@@ -35,10 +33,10 @@ TNT1 A 0 A_FireBullets(5,5,1,8);
 ```csharp
 TNT1 A 0 
 {
-	A_GunFlash();
-	A_Recoil(2);
-	A_SpawnItemEx("EmptyCasing");
-	A_FireBullets(5,5,1,8);
+    A_GunFlash();
+    A_Recoil(2);
+    A_SpawnItemEx("EmptyCasing");
+    A_FireBullets(5,5,1,8);
 }
 ```
 
@@ -46,13 +44,9 @@ This way you're basically creating a custom function that calls `A_GunFlash`, `A
 
 And that’s much cleaner and more convenient for multiple purposes. 
 
-
-
 ## Features of anonymous functions
 
 Here I'll briefly cover some of the points you need to be aware of when using anonymous functions. Please note, most of these will be covered in more detail later on in the guide, so don't worry if you can't immediately fully understand something. This section is mostly an outline what we'll be talking about later.
-
-
 
 ### Using parentheses
 
@@ -61,10 +55,10 @@ Let's take a look at the example above again:
 ```cs
 TNT1 A 0 
 {
-	A_GunFlash();
-	A_Recoil(2);
-	A_SpawnItemEx("EmptyCasing");
-	A_FireBullets(5,5,1,8);
+    A_GunFlash();
+    A_Recoil(2);
+    A_SpawnItemEx("EmptyCasing");
+    A_FireBullets(5,5,1,8);
 }
 ```
 
@@ -86,19 +80,17 @@ However, inside an anonymous function it's *not* optional:
 // This is valid:
 TNT1 A 0
 {
-	A_GunFlash();
+    A_GunFlash();
 }
 
 // This is NOT valid and will not work!
 TNT1 A 0
 {
-	A_GunFlash;
+    A_GunFlash;
 }
 ```
 
 For simplicity's sake, you can simply use parentheses in all contexts, then you'll never make a mistake.
-
-
 
 ### Variables and conditions inside anonymous functions
 
@@ -107,17 +99,17 @@ Anonymous functions are independent code blocks. That means you can define varia
 ```cs
 TNT1 A 0 
 {
-	A_GunFlash();
-	A_Recoil(2);
-	A_SpawnItemEx("EmptyCasing");
-	if (FindInventory("PowerStrength"))
-	{
-		A_FireBullets(5,5,1,80);
-	}
-	else
-	{
-		A_FireBullets(5,5,1,8);
-	}
+    A_GunFlash();
+    A_Recoil(2);
+    A_SpawnItemEx("EmptyCasing");
+    if (FindInventory("PowerStrength"))
+    {
+        A_FireBullets(5,5,1,80);
+    }
+    else
+    {
+        A_FireBullets(5,5,1,8);
+    }
 }
 ```
 
@@ -130,21 +122,19 @@ You can also simplify the code above by using a variable:
 ```cs
 TNT1 A 0 
 {
-	A_GunFlash();
-	A_Recoil(2);
-	A_SpawnItemEx("EmptyCasing");
-	int dmg = 8; //define an integer variable 'dmg' equal to 8
-	if (FindInventory("PowerStrength"))
-	{
-		dmg *= 10; //if PowerStrength is in inventory, multiply dmg by 10
-	}
-	A_FireBullets(5,5,1,dmg); //pass 'dmg' as the damage value to the attack function
+    A_GunFlash();
+    A_Recoil(2);
+    A_SpawnItemEx("EmptyCasing");
+    int dmg = 8; //define an integer variable 'dmg' equal to 8
+    if (FindInventory("PowerStrength"))
+    {
+        dmg *= 10; //if PowerStrength is in inventory, multiply dmg by 10
+    }
+    A_FireBullets(5,5,1,dmg); //pass 'dmg' as the damage value to the attack function
 }
 ```
 
 If you're not familiar with variables, don't worry, they will be covered in the [Variables and Data Types](07_Variables_and_data_types.md) chapter and in other parts of the guide, so keep reading!
-
-
 
 ### Jumps in anonymous functions
 
@@ -155,22 +145,22 @@ Let's say you have a monster with two separate attacks and you want it to random
 ```cs
 class ZombiemanWithTwoAttacks : Zombieman
 {
-	States
-	{
-	Missile:
-		POSS E 10 
-		{
-			A_FaceTarget();
-			A_Jump(128, "Missile2"); //But this doesn't seem to work...
-		}
-		POSS F 8 A_PosAttack;
-		POSS E 8;
-		goto see;
-	Missile2:
-		POSS F 8 A_Spawnprojectile("PlasmaBall");
-		POSS E 8;
-		goto see;
-	}
+    States
+    {
+    Missile:
+        POSS E 10 
+        {
+            A_FaceTarget();
+            A_Jump(128, "Missile2"); //But this doesn't seem to work...
+        }
+        POSS F 8 A_PosAttack;
+        POSS E 8;
+        goto see;
+    Missile2:
+        POSS F 8 A_Spawnprojectile("PlasmaBall");
+        POSS E 8;
+        goto see;
+    }
 }
 ```
 
@@ -181,30 +171,28 @@ To make jump functions work in anonymous functions, they need a `return` keyword
 ```cs
 class ZombiemanWithTwoAttacks : Zombieman
 {
-	States
-	{
-	Missile:
-		POSS E 10 
-		{
-			A_FaceTarget();
-			return A_Jump(128, "Missile2"); //Jumps to Missile2 with 50% chance
-		}
-		POSS F 8 A_Spawnprojectile("PlasmaBall");
-		POSS E 8;
-		goto see;
-	Missile2:
-		POSS F 8 A_PosAttack;
-		POSS E 8;
-		goto see;
-	}
+    States
+    {
+    Missile:
+        POSS E 10 
+        {
+            A_FaceTarget();
+            return A_Jump(128, "Missile2"); //Jumps to Missile2 with 50% chance
+        }
+        POSS F 8 A_Spawnprojectile("PlasmaBall");
+        POSS E 8;
+        goto see;
+    Missile2:
+        POSS F 8 A_PosAttack;
+        POSS E 8;
+        goto see;
+    }
 }
 ```
 
 The reason for this is that anonymous functions are, well, functions, and they need to have a return value. That value is the next state they need to go to (which by default is simply the next state, i.e. the next frame in the state sequence). If that explanation made no sense, then for now you have to just remember that any sort of jump functions require a `return` keyword if they're used in an anonymous function.
 
 It's also important to know that with anonymous functions using `A_Jump*` and other DECORATE methods is not actually the best approach. Instead of you can use `return ResolveState("Statename")`, which allows creating multiple conditional jumps. That, however, is explained in more detail in the [State Control section of the Flow Control chapter](A1_Flow_Control.md#State-control).
-
-
 
 ## Flow control
 
@@ -214,4 +202,4 @@ The way conditional blocks are define and executed is referred to as "flow contr
 
 🟢 [<<< BACK TO START](README.md)
 
-🔵[<< Previous: How to see your classes in the game](05_How_to_see_your_classes.md)	🔵 [>> Next: Variables and data types](07_Variables_and_data_types.md)
+🔵[<< Previous: How to see your classes in the game](05_How_to_see_your_classes.md)    🔵 [>> Next: Variables and data types](07_Variables_and_data_types.md)

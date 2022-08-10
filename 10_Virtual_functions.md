@@ -1,16 +1,14 @@
 🟢 [<<< BACK TO START](README.md)
 
-🔵 [<< Previous: Custom functions and function types](09_Custom_functions.md)	🔵 [>> Next: Event Handlers](11_Event_Handlers.md)
+🔵 [<< Previous: Custom functions and function types](09_Custom_functions.md)    🔵 [>> Next: Event Handlers](11_Event_Handlers.md)
 
 ------
 
 # Virtual functions
 
-  * [Overview](#overview)
-  * [Overriding ZScript Virtual Functions](#overriding-zscript-virtual-functions)
-  * [Common ZScript virtual functions](#common-zscript-virtual-functions)
-
-
+* [Overview](#overview)
+* [Overriding ZScript Virtual Functions](#overriding-zscript-virtual-functions)
+* [Common ZScript virtual functions](#common-zscript-virtual-functions)
 
 ## Overview
 
@@ -25,32 +23,32 @@ There are two primary uses for it. First, a child class can override its parent'
 ```csharp
 class CacoSingleDad : Cacodemon 
 {
-	Actor baby;
+    Actor baby;
 
-	virtual void SpawnBaby() 
-	{
-		baby = Spawn("Cacodemon",pos,NO_REPLACE);
-		if (baby) 
-		{
-			baby.Warp(self,64,0,0);
-			baby.A_SetHealth(800);
-			baby.A_SetSize(16,30);
-			baby.speed = 12;
-			baby.floatspeed = 6;
-			baby.A_SetScale(0.5);
-			baby.A_SetTranslation("BabyCalm");
-		}
-	}
+    virtual void SpawnBaby() 
+    {
+        baby = Spawn("Cacodemon",pos,NO_REPLACE);
+        if (baby) 
+        {
+            baby.Warp(self,64,0,0);
+            baby.A_SetHealth(800);
+            baby.A_SetSize(16,30);
+            baby.speed = 12;
+            baby.floatspeed = 6;
+            baby.A_SetScale(0.5);
+            baby.A_SetTranslation("BabyCalm");
+        }
+    }
 }
 
 class SomeOtherCaco : CacoSingleDad 
 {
-	override void SpawnBaby() 
-	{
-		actor a = Spawn("Cacodemon",pos,NO_REPLACE);
-		if (a)
-			a.master = self;
-	}
+    override void SpawnBaby() 
+    {
+        actor a = Spawn("Cacodemon",pos,NO_REPLACE);
+        if (a)
+            a.master = self;
+    }
 }
 ```
 
@@ -63,41 +61,39 @@ What is done more commonly with virtual functions is that they're overridden not
 ```csharp
 class CacoSingleDad : Cacodemon 
 {
-	Actor baby;
+    Actor baby;
 
-	virtual void SpawnBaby() 
-	{
-		baby = Spawn("Cacodemon",pos,NO_REPLACE);
-		if (baby) 
-		{
-			baby.Warp(self,64,0,0);
-			baby.A_SetHealth(800);
-			baby.A_SetSize(16,30);
-			baby.speed = 12;
-			baby.floatspeed = 6;
-			baby.A_SetScale(0.5);
-			baby.A_SetTranslation("BabyCalm");
-		}
-	}
+    virtual void SpawnBaby() 
+    {
+        baby = Spawn("Cacodemon",pos,NO_REPLACE);
+        if (baby) 
+        {
+            baby.Warp(self,64,0,0);
+            baby.A_SetHealth(800);
+            baby.A_SetSize(16,30);
+            baby.speed = 12;
+            baby.floatspeed = 6;
+            baby.A_SetScale(0.5);
+            baby.A_SetTranslation("BabyCalm");
+        }
+    }
 }
 
 class SomeOtherCaco : CacoSingleDad 
 {
-	override void SpawnBaby() 
-	{
-		super.SpawnBaby();			//calls the original SpawnBaby() first
-		if (baby) 
-		{
-			baby.A_SetScale(0.4);
-			baby.master = self;
-		}
-	}
+    override void SpawnBaby() 
+    {
+        super.SpawnBaby();            //calls the original SpawnBaby() first
+        if (baby) 
+        {
+            baby.A_SetScale(0.4);
+            baby.master = self;
+        }
+    }
 }
 ```
 
 `Super` is a pointer to the parent class, and using it like that makes it call the parent's version of the function. As a result, in the example above SomeOtherCaco *first* does everything the original `SpawnBaby()` function does, and after that it adds some changes: it modifies the spawned baby's `scale` and sets itself as the baby's `master`.
-
-
 
 ## Overriding ZScript Virtual Functions
 
@@ -110,16 +106,16 @@ One of the most common virtuals you'll be using this way is `Tick()`: a virtual 
 ```csharp
 class TemporaryZombieman : Zombieman 
 {
-	Default 
-	{
-		renderstyle 'Translucent';
-	}
+    Default 
+    {
+        renderstyle 'Translucent';
+    }
 
-	override void Tick() 
-	{
-		super.Tick();	//don't forget to call this! otherwise your actor will be frozen and won't interact with the world
-		A_FadeOut(0.01);
-	}
+    override void Tick() 
+    {
+        super.Tick();    //don't forget to call this! otherwise your actor will be frozen and won't interact with the world
+        A_FadeOut(0.01);
+    }
 }
 ```
 
@@ -130,17 +126,17 @@ Remember that `Tick()` is called even when the actor is frozen, so normally you 
 ```csharp
 class TemporaryZombieman : Zombieman 
 {
-	Default 
-	{
-		renderstyle 'Translucent';
-	}
+    Default 
+    {
+        renderstyle 'Translucent';
+    }
 
-	override void Tick() 
-	{
-		super.Tick();
-		if (!isFrozen())
-			A_FadeOut(0.01);
-	}
+    override void Tick() 
+    {
+        super.Tick();
+        if (!isFrozen())
+            A_FadeOut(0.01);
+    }
 }
 ```
 
@@ -150,48 +146,46 @@ Notes:
   - "freeze" cheat has been entered in the console;
   - the player has a PowerTimeFreezer powerup and the actor in question does *not* have a NOTIMEFREEZE flag;
   - any other custom scripts that for whatever reason freeze actors.
--  Boolean checks such as `if (bool == true)` can be shortened to `if (bool)`. And `!` means "not" and cab be used to invert any check. `if (!isFrozen())` is the same as `if (IsFrozen() == false)`. See [Flow Control, Statements](A1_Flow_Control.md#statements) for more information.
-
-
+- Boolean checks such as `if (bool == true)` can be shortened to `if (bool)`. And `!` means "not" and cab be used to invert any check. `if (!isFrozen())` is the same as `if (IsFrozen() == false)`. See [Flow Control, Statements](A1_Flow_Control.md#statements) for more information.
 
 There's a ton of things you can do this way. A common example when using Tick() is convenient is when your actor needs to continuously spawn some sort special effect every tick (such as a trail or an after-image). Here's a handy example of doing an after-image this way:
 
 ```csharp
 class BlurryCacoBall : CacoDemonBall 
 {
-	override void Tick() 
-	{
-		super.Tick();
-		if (isFrozen())		//check if the actor is frozen
-			return;			//if so, we stop here and don't do anything else
-		actor img = Spawn("CacoBall_AfterImage",pos);	//spawn after-image and cast it
-	//transfer current actor's alpha, renderstyle and sprite frame to the spawned after-image
+    override void Tick() 
+    {
+        super.Tick();
+        if (isFrozen())        //check if the actor is frozen
+            return;            //if so, we stop here and don't do anything else
+        actor img = Spawn("CacoBall_AfterImage",pos);    //spawn after-image and cast it
+    //transfer current actor's alpha, renderstyle and sprite frame to the spawned after-image
         if (img) 
-		{
-			img.A_SetRenderstyle(alpha,GetRenderstyle());
-			img.sprite = sprite;	//sprite is the current sprite, such as "BAL2"
-			img.frame = frame;		//frame is a frame letter, such as A, B, C
+        {
+            img.A_SetRenderstyle(alpha,GetRenderstyle());
+            img.sprite = sprite;    //sprite is the current sprite, such as "BAL2"
+            img.frame = frame;        //frame is a frame letter, such as A, B, C
         }
-	}
+    }
 }
 
 class CacoBall_AfterImage : Actor 
 {
-	Default 
-	{
-		+NOINTERACTION //makes this actor non-interactive (no gravity or collision)
-	}
+    Default 
+    {
+        +NOINTERACTION //makes this actor non-interactive (no gravity or collision)
+    }
 
-	States 
-	{
-	Spawn:
-		#### # 1	//#### # means "use previous sprite & frame" (as set by BlurryCacoBall earlier)
-		{
-			A_FadeOut(0.05);
-			scale *= 0.95;
-		}
-		loop;
-	}
+    States 
+    {
+    Spawn:
+        #### # 1    //#### # means "use previous sprite & frame" (as set by BlurryCacoBall earlier)
+        {
+            A_FadeOut(0.05);
+            scale *= 0.95;
+        }
+        loop;
+    }
 }
 ```
 
@@ -203,51 +197,47 @@ This principle applies to most virtual functions. Here's another example with `P
 //pseudocode:
 class MyActor : Actor 
 {
-	int myvalue;
-	override void PostBeginPlay() 
-	{
-		super.PostBeginPlay();
-		myvalue = 10;
-	}
+    int myvalue;
+    override void PostBeginPlay() 
+    {
+        super.PostBeginPlay();
+        myvalue = 10;
+    }
 }
 ```
 
 As explained earlier, when you declare class-scope variables, like `myvalue` above, you can't immediately give them a value. You either have to turn it into a property, or set that value somewhere. `PostBeginPlay()` is a good place to do that. Notice, that `PostBeginPlay()` is not like `Tick()`: it's called only once, so there's no need to check if the actor is frozen. If your actor has some sort of an attached "companion" actor (for example, a fireball that spawns an actor-based light flare around itself), it's also a good place to spawn them.
-
-
 
 There are many, many other virtual functions that you will need to override. And remember: you won't always need to call **super** on them; sometimes you'll need to completely fill in what the function does, without calling its original version. Let's take a quick look at `ModifyDamage()` — an **Inventory** function used by protective items such as PowerProtection (a power-up that reduces incoming damage). This function gets the damage that is supposed to be dealt to the owner of the item, and then uses `newdamage` argument to tell the game how much damage to actually deal:
 
 ```csharp
 class CustomProtection : Inventory 
 {
-	Default 
-	{
-		inventory.maxamount 1;
-	}
-	
-	override void ModifyDamage (int damage, Name damageType, out int newdamage, bool passive, Actor inflictor, Actor source, int flags) 
-	{
+    Default 
+    {
+        inventory.maxamount 1;
+    }
+
+    override void ModifyDamage (int damage, Name damageType, out int newdamage, bool passive, Actor inflictor, Actor source, int flags) 
+    {
         // check if the inflictor exists and has a MISSILE flag:
-		if (inflictor && inflictor.bMISSILE) 
-		{
-			newdamage = damage * 0.5;
-		}
-		// otherwise check if the damage was dealt by the monster directly (i.e. it's a melee attack)
-		// if so, check if the monster is alive and is hostile to the owner of this item:
-		else if (inflictor.bISMONSTER && inflictor.isHostile(owner) && inflictor.health > 0) 
-		{
-			newdamage = damage * 0.1;
-		}
-	}
+        if (inflictor && inflictor.bMISSILE) 
+        {
+            newdamage = damage * 0.5;
+        }
+        // otherwise check if the damage was dealt by the monster directly (i.e. it's a melee attack)
+        // if so, check if the monster is alive and is hostile to the owner of this item:
+        else if (inflictor.bISMONSTER && inflictor.isHostile(owner) && inflictor.health > 0) 
+        {
+            newdamage = damage * 0.1;
+        }
+    }
 }
 ```
 
 The overridden `ModifyDamage()` above first checks what dealt the damage: whether it a missile or a monster itself (i.e. a monster's melee attack). For missiles the damage will be cut in half, while for monsters (melee attacks) it'll be reduced by 90%.
 
 `ModifyDamage()` gets a bunch of pointers, and we use them to decide what to do. Inflictor is an actor pointer to the object that dealt the damage directly (projectile, puff or a monster in case of a melee attack).
-
-
 
 Notice that both `Tick()` and `PostBeginPlay()` are **void** functions (they have no return value) and they have no arguments.` ModifyDamage()` has arguments but it's also a void function. But that's not true for all virtual functions. 
 
@@ -264,12 +254,12 @@ This function is used in Hexen by MageStaffFX2—a homing projectile fired by Bl
 
 override int SpecialMissileHit (Actor victim)
 {
-	if (victim != target && !victim.player && !victim.bBoss)
-	{
-		victim.DamageMobj (self, target, 10, 'Fire');
-		return 1;	// Keep going
-	}
-	return -1;
+    if (victim != target && !victim.player && !victim.bBoss)
+    {
+        victim.DamageMobj (self, target, 10, 'Fire');
+        return 1;    // Keep going
+    }
+    return -1;
 }
 ```
 
@@ -281,8 +271,6 @@ In the example above the projectile does the following:
    1. *If you wonder why you need to check if the projectile didn't hit the shooter—it's because when spawned, projectiles basically spawn inside the actor that shot them, and they *will* collide with them, unless this check is added.
 2. If all checks pass, it deals damage to the victim by calling `DamageMobj()` function (see below) and keeps going.
 3. Otherwise (i.e. If the victim is the shooter, *or* a player, *or* a boss), the projectile explodes.
-
-
 
 As you can see, virtual functions are already attached to actors, and you can mix your own stuff into them to add various effects. However, you can also *call* them just like you call regular actor functions. A common example of a function that you may often need to both override and call is `DamageMobj()`:
 
@@ -310,12 +298,12 @@ Here's an example of how this override is used:
 ```csharp
 class ZombieTroopman : Zombieman 
 {
-	override int DamageMobj(Actor inflictor, Actor source, int damage, Name mod, int flags, double angle) 
-	{
-		if (source && source is "Zombieman")
-			return 0;
-		return super.DamageMobj(inflictor, source, Damage, mod, flags, angle);		
-	}
+    override int DamageMobj(Actor inflictor, Actor source, int damage, Name mod, int flags, double angle) 
+    {
+        if (source && source is "Zombieman")
+            return 0;
+        return super.DamageMobj(inflictor, source, Damage, mod, flags, angle);        
+    }
 }
 ```
 
@@ -326,38 +314,34 @@ Here's another example of a neat use of `DamageMobj`: you can handle headshot da
 ```csharp
 class HeadshottableZombieman : Zombieman 
 {
-	override int DamageMobj (Actor inflictor, Actor source, int damage, Name mod, int flags, double angle)
-	{
-		if (inflictor && (inflictor.pos.z - floorz) >= (height * 0.75))
-		{
-			damage *= 2.0;
-		}
-		return super.DamageMobj(inflictor, source, damage, mod, flags, angle);
-	}
+    override int DamageMobj (Actor inflictor, Actor source, int damage, Name mod, int flags, double angle)
+    {
+        if (inflictor && (inflictor.pos.z - floorz) >= (height * 0.75))
+        {
+            damage *= 2.0;
+        }
+        return super.DamageMobj(inflictor, source, damage, mod, flags, angle);
+    }
 }
 ```
 
 In this example if the inflictor's position is in the top 25% range of the monster's height, the damage will be doubled!
-
-
 
 As mentioned above, you can also *call* `DamageMobj` to—you guessed it—damage an actor. You can even do it from a `DamageMobj` override:
 
 ```csharp
 class RetaliatingZombieman : Zombieman 
 {
-	override int DamageMobj(Actor inflictor, Actor source, int damage, Name mod, int flags, double angle) 
-	{
-		if (source)
-			source.DamageMobj(self,self,damage,'normal'); //deals damage to whatever damaged it
-		return super.DamageMobj(inflictor, source, Damage, mod, flags, angle);		
-	}	
+    override int DamageMobj(Actor inflictor, Actor source, int damage, Name mod, int flags, double angle) 
+    {
+        if (source)
+            source.DamageMobj(self,self,damage,'normal'); //deals damage to whatever damaged it
+        return super.DamageMobj(inflictor, source, Damage, mod, flags, angle);        
+    }    
 }
 ```
 
 This annoying Zombieman calls `DamageMobj` on the actor that dealt damage to them (such as the player), and deals exactly the same amount of damage. Notice that, since there are no projectiles involved, both `inflictor` and `source` in this call are `self`, i.e. the Zombieman itself.
-
-
 
 `DamageMobj` can be called from anywhere; in fact, it's actually probably the most common basic function used to deal damage.
 
@@ -366,43 +350,41 @@ Let's say you want to create a projectile that can pierce enemies and damage the
 ```csharp
 class PenetratingBullet : FastProjectile 
 {
-	actor hitvictim; //this custom pointer will store the last actor hit by the projectile
-	Default 
-	{
-		speed 85;	
-		damage 0; //we need this to be 0 since we'll be dealing damage manually
-		radius 2;
-		height 2;
-		scale 0.2;
-		obituary "%o was shot down.";
-	}	
+    actor hitvictim; //this custom pointer will store the last actor hit by the projectile
+    Default 
+    {
+        speed 85;    
+        damage 0; //we need this to be 0 since we'll be dealing damage manually
+        radius 2;
+        height 2;
+        scale 0.2;
+        obituary "%o was shot down.";
+    }    
     override int SpecialMissileHit(actor victim) 
-	{
-		//check that the victim (the actor hit) is NOT the same as hitvictim (last actor hit):
+    {
+        //check that the victim (the actor hit) is NOT the same as hitvictim (last actor hit):
         if (victim && target && victim != target && victim != hitvictim) 
-		{	
-			victim.DamageMobj(self,target,10,'normal'); //deal exactly 10 damage to victim
-			hitvictim = victim;			//store the vicitm we just damaged as 'hitvictim'
-		}
-		return 1;						//keep flying
-	}
-	States			//we're just reusing Rocket sprites
-	{
-	Spawn:
-		MISL A 1;
-		loop;
-	Death:
-		TNT1 A 1;
-		stop;
-	}
+        {    
+            victim.DamageMobj(self,target,10,'normal'); //deal exactly 10 damage to victim
+            hitvictim = victim;            //store the vicitm we just damaged as 'hitvictim'
+        }
+        return 1;                        //keep flying
+    }
+    States            //we're just reusing Rocket sprites
+    {
+    Spawn:
+        MISL A 1;
+        loop;
+    Death:
+        TNT1 A 1;
+        stop;
+    }
 }
 ```
 
 Thanks to `SpecialMissileHit` we don't even need RIPPER. Instead of `10` you can, of course, supply any random expression you like as damage, for example `5*random(1,8)` will make it behave similarly to Doom, where projectiles deal randomized damage multiplied between 1 and 8.
 
 Notice, that the `inflictor` in this case is `self` (the projectile itself), while the `source` is `target`— that is the projectile's `target`, which, as we remember is whoever shot the projectile.
-
-
 
 ## Common ZScript virtual functions
 
@@ -425,10 +407,8 @@ A non-comprehensive of some of the most common virtual functions you'll be overr
 
 A more detailed list can be found on the [ZDoom Wiki](https://zdoom.org/wiki/ZScript_virtual_functions#Actor).
 
-
-
 ------
 
 🟢 [<<< BACK TO START](README.md)
 
-🔵 [<< Previous: Custom functions and function types](09_Custom_functions.md)	🔵 [>> Next: Event Handlers](11_Event_Handlers.md)
+🔵 [<< Previous: Custom functions and function types](09_Custom_functions.md)    🔵 [>> Next: Event Handlers](11_Event_Handlers.md)
