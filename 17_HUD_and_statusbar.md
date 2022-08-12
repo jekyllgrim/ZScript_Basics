@@ -13,8 +13,8 @@
   * [Creating a HUD](#creating-a-hud)
     + [Add the HUD in MAPINFO](#add-the-hud-in-mapinfo)
     + [Initialization](#initialization)
-    + [Structuring Draw()](#structuring-draw--)
-      - [1. Super.Draw()](#1-superdraw--)
+    + [Structuring Draw()](#structuring-draw)
+      - [1. Super.Draw()](#1-superdraw)
       - [2. Check HUD state](#2-check-hud-state)
       - [3. Begin the HUD](#3-begin-the-hud)
       - [4. Start drawing](#4-start-drawing)
@@ -27,9 +27,10 @@
       - [HUD aspect ratio](#hud-aspect-ratio)
     + [Drawing in the HUD](#drawing-in-the-hud-1)
       - [Setting up a font](#setting-up-a-font)
-      - [DrawImage()](#drawimage--)
-      - [DrawTexture()](#drawtexture--)
-      - [DrawInventoryIcon()](#drawinventoryicon--)
+      - [DrawImage()](#drawimage())
+      - [DrawTexture()](#drawtexture())
+      - [DrawString()](#drawstring())
+      - [DrawInventoryIcon()](#drawinventoryicon())
       - [Information functions](#information-functions)
       - [Force 1:1 aspect ratio without disabling UI scaling](#force-1-1-aspect-ratio-without-disabling-ui-scaling)
 
@@ -471,6 +472,8 @@ void DrawTexture(TextureID texture, Vector2 pos, int flags = 0, double Alpha = 1
 This function is largely identical to `DrawImage()`, with the exception of the first argument: instead of taking the name of a graphic as a `string`, it takes a `TextureID`-type argument. `TextureID` is a special [data type](07_Variables_and_data_types.md) that contains a reference to a texture, but not the actual texture name.
 
 You likely won't need this texture often.
+
+#### DrawString()
 
 ```csharp
 void DrawString(HUDFont font, String string, Vector2 pos, int flags = 0, int translation = Font.CR_UNTRANSLATED, double Alpha = 1., int wrapwidth = -1, int linespacing = 4, Vector2 scale = (1, 1))
