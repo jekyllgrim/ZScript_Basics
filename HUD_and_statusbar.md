@@ -1,25 +1,37 @@
-*This chapter is work-in-progress and is incomplete*
+🟢 [<<< BACK TO START](README.md)
+
+🔵 [Constants](14_Constants.md)
+
+------
+
+*This chapter is a work-in-progress. To be revised/completed.*
 
 # HUD and statusbar
 
-* [Overview](#overview)
-* [Creating a HUD](#creating-a-hud)
-  + [Add the HUD in MAPINFO](#add-the-hud-in-mapinfo)
-  + [Initialization](#initialization)
-  + [Structuring Draw()](#structuring-draw--)
-    - [1. Super.Draw()](#1-superdraw--)
-    - [2. Check HUD state](#2-check-hud-state)
-    - [3. Begin the HUD](#3-begin-the-hud)
-    - [4. Start drawing](#4-start-drawing)
-* [Drawing in the HUD](#drawing-in-the-hud)
-  + [HUD element offsets](#hud-element-offsets)
-    - [Statusbar offsets](#statusbar-offsets)
-    - [Fullscreen offsets](#fullscreen-offsets)
-      * [Text offsets](#text-offsets)
-    - [HUD scaling](#hud-scaling)
-    - [HUD aspect ratio](#hud-aspect-ratio)
-  + [Drawing in the HUD](#drawing-in-the-hud-1)
-  + [Force 1:1 aspect ratio without disabling UI scaling](#force-1-1-aspect-ratio-without-disabling-ui-scaling)
+- [HUD and statusbar](#hud-and-statusbar)
+  * [Overview](#overview)
+  * [Creating a HUD](#creating-a-hud)
+    + [Add the HUD in MAPINFO](#add-the-hud-in-mapinfo)
+    + [Initialization](#initialization)
+    + [Structuring Draw()](#structuring-draw--)
+      - [1. Super.Draw()](#1-superdraw--)
+      - [2. Check HUD state](#2-check-hud-state)
+      - [3. Begin the HUD](#3-begin-the-hud)
+      - [4. Start drawing](#4-start-drawing)
+  * [Drawing in the HUD](#drawing-in-the-hud)
+    + [HUD element offsets](#hud-element-offsets)
+      - [Statusbar offsets](#statusbar-offsets)
+      - [Fullscreen offsets](#fullscreen-offsets)
+        * [Text offsets](#text-offsets)
+      - [HUD scaling](#hud-scaling)
+      - [HUD aspect ratio](#hud-aspect-ratio)
+    + [Drawing in the HUD](#drawing-in-the-hud-1)
+      - [Setting up a font](#setting-up-a-font)
+      - [DrawImage()](#drawimage--)
+      - [DrawTexture()](#drawtexture--)
+      - [DrawInventoryIcon()](#drawinventoryicon--)
+      - [Information functions](#information-functions)
+      - [Force 1:1 aspect ratio without disabling UI scaling](#force-1-1-aspect-ratio-without-disabling-ui-scaling)
 
 ## Overview
 
@@ -82,7 +94,7 @@ class MyCustomHUD : BaseStatusBar
 }
 ```
 
-`Init()`, `Draw()` and `Tick()` are, of course, not all `BaseStatusBar`'s functions—you can find the full list and descriptions of the functions [on ZDoom wiki](https://zdoom.org/wiki/ZScript_virtual_functions#BaseStatusBar). But for now let's keep it simple. Most things happen `Draw()`, so let's look into it in more detail.
+`Init()`, `Draw()` and `Tick()` are, of course, not all `BaseStatusBar`'s functions—you can find the full list and descriptions of the functions [on ZDoom wiki](https://zdoom.org/wiki/ZScript_virtual_functions#BaseStatusBar). Most important things will happen in `Draw()`, however.
 
 ### Add the HUD in MAPINFO
 
@@ -137,7 +149,7 @@ override void Draw(int state, double TicFrac)
 }
 ```
 
-    If you don't add this exception, the player won't be able to disable the HUD, it'll still be drawn even if they keep pressing +. There's no good     reason to block this feature, so I don't recommend that.
+If you don't add this exception, the player won't be able to disable the HUD, it'll still be drawn even if they keep pressing +. There's no good reason to block this feature, so I don't recommend doing that.
 
 * `HUD_StatusBar` — the player is using the minimal version of the HUD, aka the statusbar. In classic Doom this was the only existing HUD. In GZDoom statusbar is explicitly defined to only occupy the bottom part of the screen, 32 pixels tall (so, it's 200x32 by default). However, this state doesn't enforce any limitations by itself; it's up to you to decide what to do with it. You can draw a proper, classic-style statusbar, separate from the fullscreen HUD. You can also draw the same things for fullscreen and statusbar states, essentially merging them into one HUD. You can also just make two separate HUDs, or make them similar but make the "statusbar" one into a minimal version. 
 
@@ -153,7 +165,7 @@ After getting the `state` (or maybe even before it) you'll need to actually star
 void BeginStatusBar(bool forceScaled = false, int resW = -1, int resH = -1, int rel = -1)
 ```
 
-`BeginStatusBar()` is used by the vanilla statusbar. This function defines a box area of specific size and places that box at the bottom center of the screen. The size of the box will adjust to screen size by default but it won't change its aspect ratio (e.g. a 320x200 box will always be 4:3, so with a wider screen you'll see a textured border at the sides). After this function you'll normally need
+`BeginStatusBar()` is used by the vanilla statusbar. This function defines a box area of specific size and places that box at the bottom center of the screen. The size of the box will adjust to screen size by default but it won't change its aspect ratio (e.g. a 320x200 box will always be 4:3, so with a wider screen you'll see a textured border at the sides).
 
 What's also important is that `BeginStatusBar()` will move up the viewport: meaning, the whole image of what you can see in the game will be moved up to make space for the statusbar.
 
@@ -161,9 +173,9 @@ The arguments work as follows:
 
 * `bool forceScaled` — if you pass `true`, the HUD will always be drawn at the same size, ignoring all scaling options (meaning, the player won't be able to scale the HUD using the "User interface scale" menu option). False by default.
 
-* `int resW` — the width of the HUD. The default value is `-1` which is interpreted as 320.
+* `int resW` — the width of the statusbar HUD box. The default value is `-1` which is interpreted as 320.
 
-* `int resH` —the height of the HUD. The default value is `-1` which is interpreted as 200.
+* `int resH` —the height of the statusbar HUD box. The default value is `-1` which is interpreted as 200.
 
 * `int rel` — currently unused and shouldn't be modified (defaults to `-1`).
 
@@ -179,7 +191,9 @@ The arguments are:
 
 * `bool forcescaled` — works the same way as with `BeginStatusBar()`: draws the HUD at a fixed resolution and disablesthe ability to scale it.
 
-* `int resW` and `int resH` work the same way as with `BeginStatusBar()`: they define the width and height in pixels, and their default values of `-1` are interpreted as 320 and 200 by default.
+* `int resW` — the virtual width of the fullscreen HUD. The default value is `-1` which is interpreted as 320. Note, the HUD will still scale to match screen resolution and aspect ratio.
+
+* `int resH` — the virtual height of the fullscreen HUD. The default value is `-1` which is interpreted as 200. Note, the HUD will still scale to match screen resolution and aspect ratio.
 
 Which one you need is a matter of design. The vanilla Doom HUD uses both, calling `BeginStatusBar()` if the state is `HUD_StatusBar`, and `BeginHUD()` for `HUD_Fullscreen`:
 
@@ -249,7 +263,7 @@ Once your HUD class and `Draw()` are set up correctly, you can actually start dr
 
 ### HUD element offsets
 
-First, let's talk about how elements (such as images, strings, etc.) are placed on the HUD. Note, for the examples we'll be using DrawImage()`, which is the simplest `BaseStatusBar` function that is designed to draw images.
+First, let's talk about how elements (such as images, strings, etc.) are placed on the HUD. Note, for the examples we'll be using `DrawImage()`, which is the simplest `BaseStatusBar` function that is designed to draw images.
 
 **All drawing functions have offsets that define where the element will be drawn.** For example, `DrawImage()`'s second argument is the offsets (as a `vector2` value):
 
@@ -257,7 +271,7 @@ First, let's talk about how elements (such as images, strings, etc.) are placed 
 DrawImage("MEDIA0", (0, 0));
 ```
 
-This will draw a medikit sprite at the top left corner of the HUD area. The starting point of the offsets aka `(0, 0)`, is by default the top left corner. Positive X values will shift the point to the right, positive Y values shift it downwards — this is always true, regardless of the type of HUD and the use of special offset-related flags.
+This will draw a medikit sprite at the top left corner of the HUD area. The starting point of the offsets aka `(0, 0)`, is by default the top left corner. Positive X values will shift the point to the right, positive Y values shift it downwards — this is always true, regardless of the type of HUD and the use of offset-related flags.
 
 As noted before, statusbar and fullscreen HUDs treat offsets differently. 
 
@@ -331,7 +345,7 @@ DrawImage("MEDIA", (-2,-2), DI_SCREEN_RIGHT_BOTTOM|DI_ITEM_RIGHT_BOTTOM);
 
 <img src="HUDguides/medi_rightbottom_offset.png" title="" alt="Right bottom with 2-pixel offset" data-align="center">
 
-Note that `DrawImage()` and most of the other drawing functions support their own scaling, sepate from the HUD size. For examplle, you can have a 320x200 HUD but draw the Medikit twice as large:
+Note that `DrawImage()` and most of the other drawing functions support their own scaling, sepate from the HUD size. For example, you can have a 320x200 HUD but draw the Medikit twice as large:
 
 ```csharp
 DrawImage("MEDIA", (-2,-2), DI_SCREEN_RIGHT_BOTTOM|DI_ITEM_RIGHT_BOTTOM, scale: (2, 2));
@@ -341,7 +355,7 @@ DrawImage("MEDIA", (-2,-2), DI_SCREEN_RIGHT_BOTTOM|DI_ITEM_RIGHT_BOTTOM, scale: 
 
 As long as the flags are set up correctly, the image will remain at the same place but will change its size.
 
-Note, scaling of a specific HUD element is unrelated to the HUD's own scale, which can be controlled by the user: see next section.
+Note, scaling of a specific HUD element is unrelated to the HUD's own scale, which can be controlled by the user (explained below).
 
 ##### Text offsets
 
@@ -393,7 +407,7 @@ It is also possible to disable the option to scale the HUD completely by setting
 
 #### HUD aspect ratio
 
-As you probably know, [all of Doom graphics is vertically stretched by the factor of 1.2](https://doomwiki.org/wiki/Aspect_ratio). HUDs are not an exception: HUD graphics are also vertically stretched by default. At the moment of writing this, the only way to disable that is to set the `forceScaled` argument of the `BeginHUD()` and/or `BeginStatusBar()` to `true`, however that also disables the ability for the user to change the size of the HUD, which is usually undesirable.
+As you probably know, [all of Doom graphics is vertically stretched by the factor of 1.2](https://zdoom.org/wiki/Aspect_ratio_correction). HUDs are not an exception: HUD graphics are also vertically stretched by default. At the moment of writing this, the only way to disable that behavior for HUDs is to set the `forceScaled` argument of the `BeginHUD()` and/or `BeginStatusBar()` to `true`, however that also disables the ability for the user to change the size of the HUD, which is usually undesirable.
 
 HUD aspect ratio is controlled by the `hud_aspectscale` console command: when set to true (default), the HUD graphics will be stretched.
 
@@ -403,7 +417,32 @@ Most of the time you don't need to worry about, unles your HUD features circular
 
 Finally, let's talk about how to draw things!
 
-Most of the time you'll be using `DrawImage()` and`DrawString()`. 
+#### Setting up a font
+
+If you're planning to draw text or numbers anywhere in the HUD, you'll first need to set up a HUD font. Fonts used by the HUD have to be cached to a field of the `HUDFont` type and created with the `HUDFont.Create()` function. But before that they also need to be obtained and cast to a `Font`-type variable.
+
+This is normally done only once, in `Init()`:
+
+```csharp
+class MyHUD : BaseStatusBar
+{
+    // This will contain a reference to the font:
+    HUDFont mIndexFont;
+
+    override void Init()
+    {
+        super.Init();
+        Font fnt = "MYHUDFNT"; //obtain the font named "MYHUDFNT"
+        mIndexFont = HUDFont.Create(fnt); //cache the font
+    }
+}    
+```
+
+After this point you'll be able to use `mIndexFont` in functions like `DrawString()`. Note, the variable name, as usual, can be anything; I'm using `mIndexFont` as an example, since this is what is used in `DoomStatusBar`.
+
+I should note that `HUDFont` is a whole separate class, whose purpose is to handle HUD fonts, and `Create()` is its only method. Among other things, `Create()` allows specifying monospaced fonts or defining custom spacing. You can find the documentation for this class [on ZDoom Wiki](https://zdoom.org/wiki/Classes:HUDFont).
+
+#### DrawImage()
 
 ```csharp
 native void DrawImage(String texture, Vector2 pos, int flags = 0, double Alpha = 1., Vector2 box = (-1, -1), Vector2 scale = (1, 1));
@@ -411,7 +450,7 @@ native void DrawImage(String texture, Vector2 pos, int flags = 0, double Alpha =
 
 As you can see by the `native` keyword, this function is defined in C++. The arguments work as follows:
 
-* `string texture` — the name of the texture. Despite being defined as a `string`, all graphic names are case-insensitive. Despite the word "texture", you can use any image here: textures, flats, graphics or sprites.
+* `string texture` — the name of the texture. Despite being defined as a `string`, all graphic names are case-insensitive. Although the word "texture" is used, you can actually use any image here: textures, flats, graphics or sprites.
 
 * `vector2 pos` — the position where the element will be drawn. See notes on the offsets above to learn how the position works with various offsets. Note that the graphic's offsets set via SLADE are ignored and do not affect its placement.
 
@@ -421,9 +460,71 @@ As you can see by the `native` keyword, this function is defined in C++. The arg
 
 * `vector2 box` — allows defining a fixed area within which the element is drawn. This can be used to crop images, for example: e.g. if you use a 48x32 image but define the box argument as `(12, 12)`, the image will be cropped to a 12x12 square. The default value is `(-1, -1)`, which means the box's size will be equal to the size of the element.
 
-* `vector2 scale` — the scale of the element; works pretty much like, for example, actor scale. Note, this is relative scale, e.g. at `(2, 2)` the element will appear x2 larger than it normally would; after that the general HUD scale / screen size scale / aspect ratio will be applied.
+* `vector2 scale` — the individual scale of the element (independent from the general HUD scale); works pretty much like, for example, actor scale. Note, this is relative scale, e.g. at `(2, 2)` the element will appear x2 larger than it normally would.
 
-### Force 1:1 aspect ratio without disabling UI scaling
+#### DrawTexture()
+
+```csharp
+void DrawTexture(TextureID texture, Vector2 pos, int flags = 0, double Alpha = 1., Vector2 box = (-1, -1), Vector2 scale = (1, 1))
+```
+
+This function is largely identical to `DrawImage()`, with the exception of the first argument: instead of taking the name of a graphic as a `string`, it takes a `TextureID`-type argument. `TextureID` is a special [data type](07_Variables_and_data_types.md) that contains a reference to a texture, but not the actual texture name.
+
+You likely won't need this texture often.
+
+```csharp
+void DrawString(HUDFont font, String string, Vector2 pos, int flags = 0, int translation = Font.CR_UNTRANSLATED, double Alpha = 1., int wrapwidth = -1, int linespacing = 4, Vector2 scale = (1, 1))
+```
+
+This function draws a string of text. Note, it needs a HUDFont font to be set up before it can be used. The argumenst are:
+
+* `HUDFont font` — the name of the field that contains the font.
+
+* `String string` — the actual text to be displayed. Instead of writing the text literally, if you're using the [LANGUAGE lump](https://zdoom.org/wiki/LANGUAGE), you can pass `StringTable.Localize("$LANGUAGECODE")` to display the correct string as defined in LANGUAGE.
+
+* `Vector2 pos` — the position of the text element, just like in `DrawImage()`.
+
+* `int flags` — a bit field for flags, such as `DI_TEXT_ALIGN_LEFT`, `DI_TEXT_ALIGN_RIGHT` and `DI_TEXT_ALIGN_CENTER` (determine how the text will be aligned relative to the specified position), as well as the DI_SCREEN* flags mentioned earlier.
+
+* `int translation` — the color translation applied to the font. Note, fonts are always translated via IDs that can be found [on GZDoom GitHub](https://github.com/ZDoom/gzdoom/blob/6489f5ebf0a1d05355eebc8718c5adf0709790c3/src/common/fonts/v_font.h#L47), for example `Font.CR_Red`, `Font.CR_White`, etc. The default value, `Font.CR_UNTRANSLATED`, means the color of the font graphics will be used as is.
+
+* `double alpha` — the translucency of the element, from 0.0 to 1.0.
+
+* `int wrapwidth` — defines the length of the string in pixels at which it should wrap and start a new line ***(further testing needed)***. The default value is `-1` whip disables wrapping.
+
+* `int linespacing` — defines the spacing between lines if the text is wrapped.
+
+* `vector2 scale` — the individual scale of the element (independent from the general HUD scale). Can be used to make the text appear larger or smaller relative to the size of its glyphs.
+
+#### DrawInventoryIcon()
+
+```csharp
+void DrawInventoryIcon(Inventory item, Vector2 pos, int flags = 0, double alpha = 1.0, Vector2 boxsize = (-1, -1), Vector2 scale = (1.,1.))
+```
+
+This function is largely similar to `DrawImage()` but instead it draws the inventory icon defined in a specific `Inventory` class (retrieving it from the item's `Inventory.Icon` property). You need to pass a pointer to an inventory item to make it work, e.g.:
+
+```csharp
+let armor = CPlayer.mo.FindInventory("BasicArmor"); //a pointer to the class that handles armor
+if (it)
+    DrawInventoryIcon(it, (0, 0), DI_SCREEN_RIGHT_BOTTOM|DI_ITEM_RIGHT_BOTTOM);
+```
+
+#### Information functions
+
+`BaseStatusBar` defines many functions that can be used to retrieve various information. Some of them are:
+
+* `int GetArmorAmount()` — returns the current amount of armor the player has.
+
+* `int GetArmorSavePercent()` — returns the armor's `savepercent` value (damage absorption).
+
+* `String GetWeaponTag()` — returns the select weapon's `Tag` property as a string (usually contains the weapon's name).
+
+* `bool isInvulnerable()` — returns `true` if the player is currently invulnerable due to power-ups or other effects.
+
+These are just some of the examples, but many more can be found on [ZDoom Wiki](https://zdoom.org/wiki/Classes:BaseStatusBar).
+
+#### Force 1:1 aspect ratio without disabling UI scaling
 
 If you're determined to create a HUD that supports UI scaling, yet looks identical regardless of aspect ratio, it's actually possible. You will have to check the valuie of the `hud_aspectscale` CCMD and then multiply Y position and size of all elements by 0.8333... in order to counter aspect ratio changes. This can be achieved with a wrapper function. For example, for `DrawImage()` it'd look like this:
 
@@ -464,3 +565,9 @@ void NoAspectDrawImage(String texture, Vector2 pos, int flags = 0, double Alpha 
     DrawImage(texture, pos, flags, Alpha, box, scale);
 }
 ```
+
+------
+
+🟢 [<<< BACK TO START](README.md)
+
+🔵 [Constants](14_Constants.md)
