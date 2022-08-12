@@ -819,7 +819,6 @@ if (psp)
 {
     psp.Destroy();
 }
-
 ```
 
 ### PSprite flags
