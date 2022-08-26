@@ -136,7 +136,33 @@ Do the following:
 
 Now place a thing on your map, right-click it, and if you scroll down the list of available thing categories, at the bottom you'll see "User-defined". There you will find your custom actors.
 
-If you're planning a big project with multiple classes and you want them to have custom categories, you will need to create a custom UDB config.
+If you're planning a big project with multiple classes and you want them to have custom categories, you can either create a custom UDB config, or you can use **editor keys** in the definitions of your classes: these are special comments that can be added to a class, so that UDB can parse them and apply the values. For example:
+
+```csharp
+class BigZombieman : Zombieman
+{
+    // These comments will be ignored by GZDoom,
+    // but UDB is specifically designed to parse them
+    // and get information from them:
+
+    //$Title "Big Zombieman"
+    //$Angled
+    //$Category "Monsters"
+
+    Default
+    {
+        health 1000;
+        scale 1.5;
+        radius 30;
+        height 56;
+        speed 6;
+    }
+}
+```
+
+This will make your custom monster appear in UDB in the "Monsters" category, with an arrow key showing its angle (so you can easily determine where it'll be facing upon spawning) and it'll also be named "Big Zombieman" rather than just use the class name.
+
+Editor keys are covered in more detail on [ZDoom Wiki](https://zdoom.org/wiki/Editor_keys).
 
 ------
 
