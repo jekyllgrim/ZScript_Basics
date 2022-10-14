@@ -21,7 +21,7 @@ The answer depends on the exact goal.
 If you just want to see your class in the game to test how it works, all you need to do is spawn it. For that you can use the `summon` console command. Open the console using the tilda (~) key and type:
 
 ```
-summon classname
+summon <classname>
 ```
 
 where `classname` is the actual name of your class. For example, `summon zombieman` will summon a Zombieman.
@@ -62,6 +62,14 @@ class MyCustomCacodemon : Cacodemon replaces Cacodemon
 }
 ```
 
+For clarity, the syntax here is:
+
+```csharp
+class <NewClass> : <ParentClass> replaces <ClassToReplace>
+```
+
+This should explain why `Cacodemon` comes twice in this example: the first time is the parent class to inherit from, while the second time points to which actors it should replace in the map when they spawn.
+
 There are two downsides to this method:
 
 1. If your mod is run with another mod or a map that includes replacements for the same monster, they may conflict. In fact, the last replacement always takes precedence. So, for example, if you have a custom version of a Cacodemon in your mod, and your mod is played with a mapset that *also* comes with its own custom Cacodemon, the monster from the file that comes last in the load order will be used. For example, if you're running GZDoom from command line or a .bat file:
@@ -79,6 +87,16 @@ There are two downsides to this method:
 2. This method only allows 1:1 replacements; if for some reason you want one class to replace several classes from the vanilla game, you'll have to create copies of it just for the sake of replacement. This is undesirable, since this leads to needlessly messy code and potential issues.
 
 A more robust way is to use an event handler. This method is described in the [event handlers chapter](11_Event_Handlers.md#actor-replacement-via-event-handlers); however, being able to use it requires knowing about virtual functions and event handlers, so I recommend that you continue reading the guide first.
+
+#### What exactly does replacement do?
+
+It's important to be clear about one thing: "replacing" doesn't mean actual replacement. The original class *doesn't stop existing*. It's still in the code.
+
+What the `replaces` keyword (or the `CheckReplacement()` event handler function) does, is only one thing: it tells the engine which actor to *spawn* instead of which actor. This affects the actors pre-placed on a map, for example: they will be replaced with your actors if you use one of these methods. This also affects many dynamic spawning methods: e.g. it can replace projectiles (for example, if you create an actor that `replaces Rocket`, it'll replace rockets fired by the Doom Rocket Launcher, as well as by Cyberdemon, since those are the same).
+
+It's not possible to completely delete classes from the game, because classes exist in a static context (which means they're defined in the code, and they are compiled when GZDoom is started). Spawning, on the other hand, happens dynamically (by the engine, when it's already running), so it can be overridden to spawn another actor instead.
+
+There are also some special cases where spawning is forced, i.e. it disables replacement. One notable example of it is Doom 2's `BossBrain` (Romero's brain) actor, which, when killed, spawns a bunch of rocket explosions across the Icon of Sin's face: those rocket explosions can't be replaced even if you replace the `Rocket` actor, because they're spawned by a method that disables replacement. This is, however, a special case, which you normally won't run into when coding a mod.
 
 ## Placing your classes in a custom map
 

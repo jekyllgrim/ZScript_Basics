@@ -6,14 +6,21 @@
 
 # Defining ZScript classes
 
-* [About classes](#about-classes)
-* [ZDoom Wiki and ZScript vs DECORATE](#zdoom-wiki-and-zscript-vs-decorate)
-* [Creating actors](#creating-actors)
-* [Actor states](#actor-states)
-* [Coding a basic object](#coding-a-basic-object)
-* [Coding a basic monster](#coding-a-basic-monster)
-* [Coding a basic weapon](#coding-a-basic-weapon)
-* [Creating a weapon with a reload mechanic](#creating-a-weapon-with-a-reload-mechanic)
+- [ZDoom Wiki and ZScript vs DECORATE](#zdoom-wiki-and-zscript-vs-decorate)
+  * [References:](#references-)
+- [Creating actors](#creating-actors)
+- [Actor properties](#actor-properties)
+- [Actor states](#actor-states)
+  + [State keywords](#state-keywords)
+  + [Invisible and 0-tic states](#invisible-and-0-tic-states)
+  + [Custom and preexisting state sequences](#custom-and-preexisting-state-sequences)
+    * [References:](#references--1)
+- [Using inheritance](#using-inheritance)
+- [Coding a basic object](#coding-a-basic-object)
+- [Coding a basic monster](#coding-a-basic-monster)
+- [Weapons](#weapons)
+  * [Coding a basic weapon](#coding-a-basic-weapon)
+  * [Creating a weapon with a reload mechanic](#creating-a-weapon-with-a-reload-mechanic)
 
 ## About classes
 
@@ -76,9 +83,49 @@ The basic rules for defining your classes are:
 * Don't use the same names as the existing classes (for example, don't try to code a custom actor named `Zombieman`, give it a different name)
 * To make the actors appear in the game, you either need to create a custom map and place them there manually, or they need to replace existing actors. The [How to see your classes in the game](05_How_to_see_your_classes.md) chapter explains how this works.
 
+## Actor properties
+
+[Actor properties](https://zdoom.org/wiki/Actor_properties) are a list of properties that an actor has by default. There are hundreds of properties and flags that can be used on actors, such as `health`, `scale`, `speed` and others. Properties are defined in a `Default` block:
+
+```csharp
+class MyActor : Actor
+{
+    Default
+    {
+        health 100;
+    }
+}
+```
+
+This will create an actor that has 100 health. Note, this doesn't make it solid, or shootable, or add any animations to it.
+
+Apart from properties, there are also flags that are added using `+`:
+
+```csharp
+class MyActor : Actor
+{
+    Default
+    {
+        +SOLID
+        +SHOOTABLE
+        radius 32;
+        height 56;
+        health 100;
+    }
+}
+```
+
+This actor is solid (you can't pass through it by walking), shootable (can be damaged by attacks), and has a 32x56 hitbox in map units.
+
+Note that flags don't require a `;` after them, in contrast to properties, but you can add them if you want, it doesn't mater.
+
+If you want to *unset* a flag, it has to be preceded with `-`. However, note that all flags are *false by default*. You may need to unset flags if your class is based on another actor, rather than the base `Actor` (this is called inheritance, briefly covered further in this chapter).
+
 ## Actor states
 
-The `States` keyword defines a states block of the actor where you can use predefined [actor states](https://zdoom.org/wiki/Actor_states) as well as add your own states. States are used by a state machine that displays specific frames and executes attached functions at runtime.
+The `States` keyword defines a states block of the actor where you can use predefined [actor states](https://zdoom.org/wiki/Actor_states) as well as add your own states. States are used by a state machine that displays specific frames and executes attached functions at runtime. Adding custom state sequences is also possible.
+
+> Note: states only exists for actors, i.e. classes based on the `Actor` class directly or through inheritance. Other classes, such as menus, HUD, event handlers or anything else not based on `Actor` do not support state animations (even though many of them can draw images on the player's scree, such as varios UI classes).
 
 To control the states you need to read about state flow control, which is described on the wiki, as well as in this guide: see [Flow Control: State Control](A1_Flow_Control.md#state-control). **Don't worry if some of this is confusing at first**; if you're not familiar with states, you'll likely need to keep that page open and check it frequently while coding until you get used to it.
 
@@ -95,7 +142,119 @@ StateLabel:
 }
 ```
 
-In this example `SPRT` is the sprite name, `A` is a frame letter, and numbers (1, 2 and 5) are the sprites duration in tics (a tic in GZDoom is 1/35th of a second). **Sprites** have to be named in a specific format described [here](https://zdoom.org/wiki/Sprite) in order to work properly.
+In this example `SPRT` is the sprite name, `A` is a frame letter, and numbers (1, 2 and 5) are the sprites duration in tics (a tic in GZDoom is 1/35th of a second). **Sprites** have to be named in a specific format described [on the wiki](https://zdoom.org/wiki/Sprite) in order to work properly.
+
+The `stop` command at the end stops the sequence and *destroys the actor*. There are many other commands (also described in [Flow Control: State Control](A1_Flow_Control.md#state-control)). One the most common ones are `stop` (stop animation and destroy the calling actor), `loop` (loop the current state sequence) and `goto <StateLabel>` which moves the actor to a new state sequence titled `StateLabel`.
+
+By default actors spawned in the world will enter `Spawn` state sequence. There are many ways to move from one state animation to another, including `goto <StateLabel>` and various functions, including conditional jumps in the middle of one state sequence into another.
+
+Every separate sprite equals a separate state in a state sequence. You can define states with a sprite and duration to display a specific animation frame, and you can also attach functions for them to make something happen at that moment in the animation. When a function is attached to a state, it's executed at the *start* of the state, so the duration of that state isn't relevant for the function's execution. In the example above, the `A_Function()` call will happen 1 tic after the actor was spawned, as soon as the `SPRT A 1` state ends and at the same time as `SPRT B 2` is shown.
+
+Since all sprites contain a base name and a frame letter, it's possible to string multiple letters together:
+
+```csharp
+Spawn:
+    SPRT ABCDE 5;
+    loop;
+```
+
+The sequence above will display SPRTA, SPRTB, SPRTC, SPRTD and SPRTE sprites, each for 5 tics, before looping and displaying them all from the beginning.
+
+If you attach a function to a line with multiple frames, this function will be executed *for every frame*:
+
+```csharp
+Spawn:
+    SPRT ABCDE 5 A_Explode();
+    loop;
+```
+
+This piece of code will show 5 frames of animation and also call `A_Explode()` (the basic explosion function) every time, 5 tics between each calls.
+
+#### State keywords
+
+States can also have special [keywords](https://zdoom.org/wiki/Actor_states#State_keywords) attached to them that add some extra behaviors. The keywords are placed between the duration and the function call:
+
+```csharp
+Spawn:
+    SPRT ABCDE 5 bright A_Explode();
+    loop;
+```
+
+This code will make the calling actor fullbright (not affected by map sector light level) during those 5 frames, while also calling `A_Explode()`.
+
+If a function is attached to the very first state in an actor's `Spawn` sequence, that function will not be executed immediately upon actor spawning, but it'll work later if the state sequence is looped. So, in the example above when SPRTA is show, `A_Explode()` will not be called; it'll only be called starting with SPRTB, and then every 5 tics. 
+
+It's important to keep this in mind, because if you do something like this:
+
+```csharp
+Spawn:
+    SPRT A 5 A_Explode();
+    stop;
+```
+
+...there will be no explosion at all: the actor has only one state, that state is the first one in the Spawn sequence, and then the actor is destroyed because `stop` is called.
+
+This behavior can be circumvented by using the `Nodelay` keyword:
+
+```csharp
+Spawn:
+    SPRT A 5 Nodelay A_Explode();
+    stop;
+```
+
+This keyword forces the function to execute immediately as the actor is spawned. Note, it only works on the first state of Spawn and is irrelevant in any other states.
+
+#### Invisible and 0-tic states
+
+If you want to make an actor invisible, use `TNT1` for the sprite name (you can use any frame letter with it, it doesn't matter). This name has special handling: it completely disables the rendering of the actor for the duration of the state. Note, you don't need to (and shouldn't!) add an actual empty image into your project and use that, you can just use `TNT1`.
+
+```csharp
+class BlinkingActor : Actor
+{
+    Default
+    {
+        +NOINTERACTION
+    }
+
+    States
+    {
+    Spawn:
+        SPRT A 5;
+        TNT1 A 10;
+        loop;
+    }
+}
+```
+
+The actor above is completely non-interactive (thanks to the `NOINTERACTION` [flag](https://zdoom.org/wiki/Actor_flags)) and will show SPRTA for 5 tics, then become invisible for 10 tics, and loop the animation.
+
+A state's duration can also be 0. This can be useful if you want something to happen before another thing. Since 0-tic states are never drawn due to having no duration, it's considered best practice to use `TNT1` for those states as well:
+
+```csharp
+Spawn:
+    SPRT ABC 5;
+    TNT1 A 0 A_Jump(128, "Null");
+    TNT1 A 0 A_Explode();
+    SPRT CDEF 4;
+    stop;
+```
+
+The actor above shows SPRTA, SPRTB, and SPRTC in sequence, 5 tics for each state, then uses [`A_Jump`](https://zdoom.org/wiki/A_Jump) function with a 128/256 (50%) chance of jumping to the "Null" state sequence ("Null" is a special pre-existing state sequence that destroys the calling actor after 1 tic). If the jump doesn't happen, the actor calls `A_Explode()`  to deal area damage, shows some more animation, and calls `stop` to disappear.
+
+There's one important rule to remember: **never loop state sequences with 0 total duration**. If you try to do this, you'll get a classic infinite loop, where the engine will try to call the same state over and over within the same tic, which will result in an infinite number of calls and an inevitable crash.
+
+```csharp
+// Ths will crash the game!
+Spawn:
+    TNT1 A 0;
+    loop;
+```
+
+#### Custom and preexisting state sequences
+
+Note, that there's a whole lot of actor state sequences that are used by default, defined by specific state labels, such as "Spawn" (entered when an actor spawns) or "Death" (entered when an actor's health is reduced to 0 and it dies). You can find a full list of them [on the ZDoom wiki](https://zdoom.org/wiki/Actor_states). 
+
+You can, however, define custom state sequences simply by adding a state label with any name you want (without spaces). However, you will have to define your own conditions to enter that state sequence, such as `goto` or a jump function.
 
 ### References:
 
@@ -103,21 +262,84 @@ In this example `SPRT` is the sprite name, `A` is a frame letter, and numbers (1
 * [Flow Control: State Control](A1_Flow_Control.md#state-control) in this guide
 * [Sprite naming and use](https://zdoom.org/wiki/Sprite) on the Wiki
 
+## Using inheritance
+
+If you want to create a new version of an already existing class, you can do that by using inheritance. The basic syntax for it is:
+
+```csharp
+class NewClassName : ParentClassName
+{
+    // new code
+}
+```
+
+When creating a new class this way, it inherits all properties, states, functions and other data (such as variable) defined in the parent class. 
+
+If you want to change something this way in a custom class, you *only* need to change the things you need. You don't need to redefine anything that was already defined in the parent actor—that's the point of inheritance.
+
+For example:
+
+```csharp
+class ToughZombieman : Zombieman
+{
+    Default
+    {
+        health 1000;
+    }
+}
+```
+
+This creates a new vesion of the [Doom Zombieman](https://zdoom.org/wiki/Classes:ZombieMan) (which is already defined in gzdoom.pk3, so it already exists in the game), different only in the fact that it has 1000 health instead of 20 that the standard Zombieman has.
+
+You can add or remove flags defined in the original actor:
+
+```csharp
+class ToughNonsolidZombieman : Zombieman
+{
+    Default
+    {
+        health 1000;
+        -SOLID
+    }
+}
+```
+
+This zombieman will not only have more health, but also won't be solid (`-SOLID` unsets the SOLID flag used by the parent actor), meaning it'll be possible to pass through it (however, it'll still be shootable because that's governed by another flag).
+
+You can also redefine states this way if you want to add custom animation—in that case you simply need to add the new state sequences you want. You can also add new behavior to them:
+
+```csharp
+class ExplodingZombieman : Zombieman
+{
+    States
+    {
+    Death:
+        MISL B 8 Bright A_Explode;
+        MISL C 6 Bright;
+        MISL D 4 Bright;
+        Stop;
+    }
+}
+```
+
+This zombieman will explode on death, using the [Doom Rocket](https://zdoom.org/wiki/Classes:Rocket) sprites.
+
 ## Coding a basic object
 
 Basic objects, such as decorations (trees, lamps, etc.) are the simplest type of actor you can define. For an example of a basic actor we can look at a big brown tree from Doom:
 
 ```csharp
 //NOTE: this actor already exists in GZDoom and doesn't need to be redefined
+// I'm using it purely as an example.
 
 class BigTree : Actor
 {
     Default
     {
-        Radius 32; //actor's width
-        Height 108; //actor's height for collision with monstrers/player
-        ProjectilePassHeight -16; //vertical collision for projectiles is 16 units shorter than its height
-        +SOLID //makes the actor solid (monsters/players/projectiles can't pass through it; hitscan attacks can)
+        Radius 32; //actor's width (collision with monster/player)
+        Height 108; //actor's height (collision with monster/player)
+        ProjectilePassHeight -16; //reduces vertical hitbox for projectiles by 16 units
+        +SOLID //solid: other actors/projectiles can't pass through it, hitscan attacks can
     }
     States
     {
@@ -143,7 +365,7 @@ class SmallerTree : BigTree
 //in this example states aren't redefined because we're reusing the same frames
 ```
 
-This will create a version of `BigTree` that looks the same but appears twice as smaller and has twice as smaller collision box.
+This will create a version of `BigTree` that looks the same but appears twice as smaller and has twice as smaller collision box. Note that we had to change `height` and `radius`, because `scale` defines only the visual scale of the sprite, nothing else.
 
 ## Coding a basic monster
 
@@ -231,13 +453,15 @@ You also don't have to always rely on sound properties to play sounds for you, a
 
 ## Weapons
 
-### Coding a basic weapon
+Weapons are classes than can be used by the player. There are a lot of special rules regarding how they're animated and behave (described in detail in a much later chapter, [Weapons, overlays and PSprite](12_Weapons_Overlays_PSprite.md)), but here are the basics.
 
 There are a few rules regarding weapons:
 
-* Weapons must be based on the `Weapon` class (or you can create your own basic class based on `Weapon` and have your weapons inherit from it).
-* [Weapons use their own attack functions](https://zdoom.org/wiki/Category:Decorate_Weapon_attack_functions). While various attack functions are called from the weapon, they're actually executed by the player pawn, a player-controlled class. It's a special interaction; as a result you can't call monster attack functions on weapons.
+* Weapons must be based on the `Weapon` class (or you can create your own basic class based on `Weapon` and have your weapons inherit from it, or inherit from one of the existing weapons, such as `Pistol`).
+* Weapons use [their own attack functions](https://zdoom.org/wiki/Category:Decorate_Weapon_attack_functions). While various attack functions are called from the weapon, they're actually executed by the player pawn, a player-controlled class. It's a special interaction; as a result you can't call monster attack functions on weapons.
 * Weapon states define frames that are drawn directly on the screen.
+
+### Coding a basic weapon
 
 For an example of a basic weapon let's look at Pistol from Doom:
 
@@ -296,7 +520,7 @@ You can also [create a new ammo type](https://zdoom.org/wiki/Creating_new_ammo_t
 
 ### Creating a weapon with a reload mechanic
 
-Weapons with a reload mechanic are very common. Usually to achieve that a special "magazine" ammo type is defined and is used as `AmmoType` while the reserve ammo is defined as `AmmoType2`. A `Reload` state sequence is used to handle the reload mechanics. 
+Weapons with a reload mechanic are very common. Usually to achieve that a special "magazine" ammo type is defined and is used as `AmmoType` while the reserve ammo is defined as `AmmoType2`. A "Reload" state sequence is used to handle the reload mechanics. 
 
 Note, the example below is likely too complex for you to understand right away, so it's recommend that you revisit it later, when you get further in the guide.
 
