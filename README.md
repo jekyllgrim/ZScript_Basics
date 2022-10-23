@@ -42,15 +42,17 @@ This guide is a beginner-friendly introduction to ZScript, a primary coding lang
 
 12. [Player, PlayerInfo and PlayerPawn](12.0_Player.md)
 
-13. [Weapons, PSprite and overlays](12_Weapons_Overlays_PSprite.md) (WIP)
+13. [Inventory](12.1_Inventory.md)
 
-14. [Arrays](13_Arrays.md)
+14. [Weapons, PSprite and overlays](12_Weapons_Overlays_PSprite.md) (WIP)
 
-15. [Constants](14_Constants.md)
+15. [Arrays](13_Arrays.md)
 
-16. Inventory (TBA)
+16. [Constants](14_Constants.md)
 
-17. [HUD](17_HUD_and_statusbar.md)
+17. Inventory (TBA)
+
+18. [HUD](17_HUD_and_statusbar.md)
 * [Appendix 1: Flow Control](A1_Flow_Control.md)
 
 * [Appendix 2: Best Practices and Rules of Thumb](A2_Best_Practices.md)

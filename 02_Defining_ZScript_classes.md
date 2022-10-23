@@ -83,23 +83,15 @@ The basic rules for defining your classes are:
 * Don't use the same names as the existing classes (for example, don't try to code a custom actor named `Zombieman`, give it a different name)
 * To make the actors appear in the game, you either need to create a custom map and place them there manually, or they need to replace existing actors. The [How to see your classes in the game](05_How_to_see_your_classes.md) chapter explains how this works.
 
-## Actor properties
+## Actor properties and flags
 
-[Actor properties](https://zdoom.org/wiki/Actor_properties) are a list of properties that an actor has by default. There are hundreds of properties and flags that can be used on actors, such as `health`, `scale`, `speed` and others. Properties are defined in a `Default` block:
+[Actor properties](https://zdoom.org/wiki/Actor_properties) are a list of properties that an actor has by default. There are hundreds of properties that can be used on actors, such as `health`, `scale`, `speed` and others. All properties take a value after them, such as `health 100` will set the actor's default health.
 
-```csharp
-class MyActor : Actor
-{
-    Default
-    {
-        health 100;
-    }
-}
-```
+Flags are a special variation of properties that can only be true or false, they don't have a value, instead they simply enable or disable specific behaviors. Flags are set by preceding them with `+` and unset with `-`. For example, adding `+SOLID` to the actor's properties will make it solid (other actors won't be able to walk through it and projectiles will collide on it; note that it doesn't make it destructible, that involves a different flag, `+SHOOTALE`).
 
-This will create an actor that has 100 health. Note, this doesn't make it solid, or shootable, or add any animations to it.
+All properties have different default values. All flags are disabled by efault.
 
-Apart from properties, there are also flags that are added using `+`:
+Properties and flags are defined in a `Default` block:
 
 ```csharp
 class MyActor : Actor
@@ -115,11 +107,13 @@ class MyActor : Actor
 }
 ```
 
-This actor is solid (you can't pass through it by walking), shootable (can be damaged by attacks), and has a 32x56 hitbox in map units.
+This will create an actor that has 100 health, is solid (you can't pass through it by walking), shootable (attacks will damage it and reduce its health; it'll also bleed unless you add the `+NOBLOOD` flag), and has a 32x56 hitbox in map units.
 
 Note that flags don't require a `;` after them, in contrast to properties, but you can add them if you want, it doesn't mater.
 
 If you want to *unset* a flag, it has to be preceded with `-`. However, note that all flags are *false by default*. You may need to unset flags if your class is based on another actor, rather than the base `Actor` (this is called inheritance, briefly covered further in this chapter).
+
+Most properties and flags can be modified dynamically on already spawned actors—this will be described in the [Pointers and casting](08_Pointers_and_casting.md) chapter.
 
 ## Actor states
 
@@ -132,6 +126,7 @@ To control the states you need to read about state flow control, which is descri
 A basic state sequence is defined as follows:
 
 ```csharp
+// Pseudocode:
 States 
 {
 StateLabel:
@@ -142,13 +137,15 @@ StateLabel:
 }
 ```
 
-In this example `SPRT` is the sprite name, `A` is a frame letter, and numbers (1, 2 and 5) are the sprites duration in tics (a tic in GZDoom is 1/35th of a second). **Sprites** have to be named in a specific format described [on the wiki](https://zdoom.org/wiki/Sprite) in order to work properly.
+In this example `SPRT` is the sprite name, `A` is a frame letter, and numbers (1, 2 and 5) are the sprites' duration in tics (a tic in GZDoom is 1/35th of a second). **Sprites** have to be named in a specific format described [on the wiki](https://zdoom.org/wiki/Sprite) in order to work properly.
 
 The `stop` command at the end stops the sequence and *destroys the actor*. There are many other commands (also described in [Flow Control: State Control](A1_Flow_Control.md#state-control)). One the most common ones are `stop` (stop animation and destroy the calling actor), `loop` (loop the current state sequence) and `goto <StateLabel>` which moves the actor to a new state sequence titled `StateLabel`.
 
-By default actors spawned in the world will enter `Spawn` state sequence. There are many ways to move from one state animation to another, including `goto <StateLabel>` and various functions, including conditional jumps in the middle of one state sequence into another.
+By default actors spawned in the world will enter `Spawn` state sequence. There are many ways to move from one state animation to another, including `goto <StateLabel>` and various functions, including conditional jumps in the middle of one state sequence into another. There are also plenty of state sequences that are entered automatically under a certain conditions: for example, if an actor's health is reduced to 0, it'll enter its Death sequence, if one is present. Existing state labels and their conditions are described in full [on the wiki](https://zdoom.org/wiki/Actor_states).
 
-Every separate sprite equals a separate state in a state sequence. You can define states with a sprite and duration to display a specific animation frame, and you can also attach functions for them to make something happen at that moment in the animation. When a function is attached to a state, it's executed at the *start* of the state, so the duration of that state isn't relevant for the function's execution. In the example above, the `A_Function()` call will happen 1 tic after the actor was spawned, as soon as the `SPRT A 1` state ends and at the same time as `SPRT B 2` is shown.
+> *Note:* Colloquially, "state" is often used as an umbrella term to refer to state sequences and state labels at the same time. *This is not correct*. The name of the sequence (such as Spawn, Death, etc.) is a **state label**; every separate frame in that sequence is a **state**; all states present under a specific state label are a **state sequeence**.
+
+Every separate sprite is a separate state in a state sequence. You can define states with a sprite and duration to display a specific animation frame for a specific time, and you can also attach functions for them to make something happen at that moment in the animation. When a function is attached to a state, it's executed at the *start* of the state, so the duration of that state isn't relevant for the function's execution. In the example above, the `A_Function()` call will happen 1 tic after the actor was spawned, as soon as the `SPRT A 1` state ends and at the same time as `SPRT B 2` is shown.
 
 Since all sprites contain a base name and a frame letter, it's possible to string multiple letters together:
 
