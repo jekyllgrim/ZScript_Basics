@@ -50,9 +50,9 @@ This guide is a beginner-friendly introduction to ZScript, a primary coding lang
 
 16. [Constants](14_Constants.md)
 
-17. 
+17. [HUD](17_HUD_and_statusbar.md)
+* 
 
-18. [HUD](17_HUD_and_statusbar.md)
 * [Appendix 1: Flow Control](A1_Flow_Control.md)
 
 * [Appendix 2: Best Practices and Rules of Thumb](A2_Best_Practices.md)
