@@ -1,6 +1,6 @@
 🟢 [<<< BACK TO START](README.md)
 
-🔵 [<< Previous: Player, PlayerInfo and PlayerPawn](12.0_Player.md) 🔵 [>> Next: Arrays](13_Arrays.md)
+🔵 [<< Previous: Inventory](12.1_Inventory.md) 🔵 [>> Next: Arrays](13_Arrays.md)
 
 ------
 
