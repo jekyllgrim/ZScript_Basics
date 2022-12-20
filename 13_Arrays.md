@@ -1,6 +1,6 @@
 🟢 [<<< BACK TO START](README.md)
 
-🔵 [<< Previous: Weapons, PSprite and overlays](12_Weapons_Overlays_PSprite.md)    🔵 [>> Next: Flow Control](A1_Flow_Control.md)
+🔵 [<< Previous: Weapons, overlays and PSprite](12_Weapons_Overlays_PSprite.md)    🔵 [>> Next: Flow Control](A1_Flow_Control.md)
 
 ------
 
@@ -348,4 +348,4 @@ Fixed-size arrays are similar to dynamic arrays in the sense that their contents
 
 🟢 [<<< BACK TO START](README.md)
 
-🔵 [<< Previous: Weapons, PSprite and overlays](12_Weapons_Overlays_PSprite.md)    🔵 [>> Next: Flow Control](A1_Flow_Control.md)
+🔵 [<< Previous: Weapons, overlays and PSprite](12_Weapons_Overlays_PSprite.md)    🔵 [>> Next: Flow Control](A1_Flow_Control.md)
