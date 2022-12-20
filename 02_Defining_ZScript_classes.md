@@ -7,14 +7,12 @@
 # Defining ZScript classes
 
 - [ZDoom Wiki and ZScript vs DECORATE](#zdoom-wiki-and-zscript-vs-decorate)
-  * [References:](#references-)
 - [Creating actors](#creating-actors)
 - [Actor properties](#actor-properties)
 - [Actor states](#actor-states)
   + [State keywords](#state-keywords)
   + [Invisible and 0-tic states](#invisible-and-0-tic-states)
   + [Custom and preexisting state sequences](#custom-and-preexisting-state-sequences)
-    * [References:](#references--1)
 - [Using inheritance](#using-inheritance)
 - [Coding a basic object](#coding-a-basic-object)
 - [Coding a basic monster](#coding-a-basic-monster)
@@ -62,15 +60,18 @@ The basic actor definition would look as follows:
 ```csharp
 class MyClassName : Actor 
 {
-    Default //flags and properties go into the Defaults block
+    // The Default block contains states and properties that determine
+    // the default values the actor uses upon spawning:
+    Default
     {        
         +FLAGNAME //an example of how a flag is set (semicolon at the end is optional)
         property value; //an example of a property and a value
     }
-    //States keyword begins a block of states that define the actor's animation and behavior:
+    // States keyword begins a block of states that define the actor's 
+    // animation and behavior:
     States 
     {
-    //when spawned in the world, actors enter their Spawn state by default:
+    // When spawned in the world, actors enter their Spawn sequence:
     Spawn:
         FRAM A 1; //an example of a sprite name and sprite duration
         loop; //this will loop the Spawn state
@@ -83,15 +84,79 @@ The basic rules for defining your classes are:
 * Don't use the same names as the existing classes (for example, don't try to code a custom actor named `Zombieman`, give it a different name)
 * To make the actors appear in the game, you either need to create a custom map and place them there manually, or they need to replace existing actors. The [How to see your classes in the game](05_How_to_see_your_classes.md) chapter explains how this works.
 
+## Actor structure
+
+Now, let's take a look at the general actor structure. Some of thie things outlined here will may be confusing to you at first, but don't worry—they'll all be covered and expanded on in this chapter and the subsequent chapters.
+
+```csharp
+class MyActorName : Actor
+{
+    // This is where class-scope variables (aka fields)
+    // are usually defined.
+    int foo; // example of an integer variable
+    double bar; //example of a double (float-point) variable
+
+    Default
+    {
+        // This is where properties and flags are defined.
+        // They define the actor's initial behavior, when
+        // it spawns. Most of them can be dynamically
+        // changed later.
+    }
+
+    // This is where functions are usually defined.
+    // These can include both fully custom functions,
+    // and virtual functions override (more on those
+    // later).
+
+    // An example of a custom function:
+    void MyFunction()
+    {
+        // do something
+    }
+
+    // This is an example of a virtual function override.
+    // Tick() is a function that all actors run automatically
+    // every tic (1/35 second) while they exist in a level.
+    // By overriding it, you can add extra behavior into
+    // the actor without having to define it inside its
+    // animation states:
+    override void Tick()
+    {
+        // You need to call super.Tick() first to make sure
+        // that the default Actor class Tick() is called
+        // ("super" in this context means "parent class'").
+        // The base Actor Tick() is where stuff like
+        // collision, movement, animation progression and
+        // such happen.
+        super.Tick();
+
+        // You can add more behavior here.
+    }
+
+    // The keyword States begings a states block that
+    // defines the actor's animation states and
+    // related behavior:
+    States
+    {
+    // All actors enter their Spawn state sequence
+    // by default when they spawn:
+    Spawn:
+        TROO A 1; //display TROOA sprite for 1 tic
+        loop; //loop the state sequence
+    }
+}
+```
+
 ## Actor properties and flags
 
 [Actor properties](https://zdoom.org/wiki/Actor_properties) are a list of properties that an actor has by default. There are hundreds of properties that can be used on actors, such as `health`, `scale`, `speed` and others. All properties take a value after them, such as `health 100` will set the actor's default health.
 
 Flags are a special variation of properties that can only be true or false, they don't have a value, instead they simply enable or disable specific behaviors. Flags are set by preceding them with `+` and unset with `-`. For example, adding `+SOLID` to the actor's properties will make it solid (other actors won't be able to walk through it and projectiles will collide on it; note that it doesn't make it destructible, that involves a different flag, `+SHOOTALE`).
 
-All properties have different default values. All flags are disabled by efault.
+All properties have different default values. All flags are false by default.
 
-Properties and flags are defined in a `Default` block:
+Properties and flags are defined in the `Default` block:
 
 ```csharp
 class MyActor : Actor
@@ -109,11 +174,13 @@ class MyActor : Actor
 
 This will create an actor that has 100 health, is solid (you can't pass through it by walking), shootable (attacks will damage it and reduce its health; it'll also bleed unless you add the `+NOBLOOD` flag), and has a 32x56 hitbox in map units.
 
-Note that flags don't require a `;` after them, in contrast to properties, but you can add them if you want, it doesn't mater.
+Note that adding `;` after a flag definition is optiona, in contrast to properties.
 
-If you want to *unset* a flag, it has to be preceded with `-`. However, note that all flags are *false by default*. You may need to unset flags if your class is based on another actor, rather than the base `Actor` (this is called inheritance, briefly covered further in this chapter).
+If you want to *unset* a flag, it has to be preceded with `-`. However, note that all flags are *false by default*. You may need to unset flags if your class is based on another actor, rather than the base `Actor`, which already has some flags set (this is called inheritance, briefly covered further in this chapter). For example, if you create a new class based on `Zombieman` (the Doom enemy), it'll already have flags such as SOLID, SHOOTABLE, ACTIVATEMCROSS and some others set.
 
 Most properties and flags can be modified dynamically on already spawned actors—this will be described in the [Pointers and casting](08_Pointers_and_casting.md) chapter.
+
+ZScript also features two flag combos: `Monster` and `Projectile`. These can be added to the Default block as properties; simply adding them to the definition enables a set of flags that are normally used by all monsters or projectiles. These combos can be seen [on ZDoom Wiki](https://zdoom.org/wiki/Actor_properties#Flag_combos). Note that you don't always need these combos in full. For example, the `Projectile` combo enables the NOGRAVITY flag, but if you want to create a gravity-affected projectile (like a grenade), you'll need to unset that flag. 
 
 ## Actor states
 
@@ -139,13 +206,13 @@ StateLabel:
 
 In this example `SPRT` is the sprite name, `A` is a frame letter, and numbers (1, 2 and 5) are the sprites' duration in tics (a tic in GZDoom is 1/35th of a second). **Sprites** have to be named in a specific format described [on the wiki](https://zdoom.org/wiki/Sprite) in order to work properly.
 
-The `stop` command at the end stops the sequence and *destroys the actor*. There are many other commands (also described in [Flow Control: State Control](A1_Flow_Control.md#state-control)). One the most common ones are `stop` (stop animation and destroy the calling actor), `loop` (loop the current state sequence) and `goto <StateLabel>` which moves the actor to a new state sequence titled `StateLabel`.
+The `stop` command at the end stops the sequence and *destroys the actor*. There are many other commands (also described in [Flow Control: State Control](A1_Flow_Control.md#state-control)). Some of the most common ones are `stop` (stop animation and destroy the calling actor), `loop` (loop the current state sequence) and `goto <StateLabel>` which moves the actor to a new state sequence titled `StateLabel`.
 
-By default actors spawned in the world will enter `Spawn` state sequence. There are many ways to move from one state animation to another, including `goto <StateLabel>` and various functions, including conditional jumps in the middle of one state sequence into another. There are also plenty of state sequences that are entered automatically under a certain conditions: for example, if an actor's health is reduced to 0, it'll enter its Death sequence, if one is present. Existing state labels and their conditions are described in full [on the wiki](https://zdoom.org/wiki/Actor_states).
+By default actors spawned in the world will enter `Spawn` state sequence. There are many ways to move from one state sequence to another, including `goto <StateLabel>` and various functions, including conditional jumps in the middle of one state sequence into another. There are also plenty of state sequences that are entered automatically under a certain conditions: for example, if an actor's health is reduced to 0, it'll enter its Death sequence, if one is present. Existing state labels and their conditions are described in full [on the wiki](https://zdoom.org/wiki/Actor_states).
 
 > *Note:* Colloquially, "state" is often used as an umbrella term to refer to state sequences and state labels at the same time. *This is not correct*. The name of the sequence (such as Spawn, Death, etc.) is a **state label**; every separate frame in that sequence is a **state**; all states present under a specific state label are a **state sequeence**.
 
-Every separate sprite is a separate state in a state sequence. You can define states with a sprite and duration to display a specific animation frame for a specific time, and you can also attach functions for them to make something happen at that moment in the animation. When a function is attached to a state, it's executed at the *start* of the state, so the duration of that state isn't relevant for the function's execution. In the example above, the `A_Function()` call will happen 1 tic after the actor was spawned, as soon as the `SPRT A 1` state ends and at the same time as `SPRT B 2` is shown.
+Every separate sprite frame is a separate state in a state sequence. You can define states with a sprite and duration to display a specific animation frame for a specific time, and you can also attach functions for them to make something happen at that moment in the animation. When a function is attached to a state, it's executed at the *start* of the state, so the duration of that state isn't relevant for the function's execution. In the example above, the `A_Function()` call will happen 1 tic after the actor was spawned, as soon as the `SPRT A 1` state ends and at the same time as `SPRT B 2` is shown.
 
 Since all sprites contain a base name and a frame letter, it's possible to string multiple letters together:
 
@@ -166,6 +233,26 @@ Spawn:
 ```
 
 This piece of code will show 5 frames of animation and also call `A_Explode()` (the basic explosion function) every time, 5 tics between each calls.
+
+If you want to call the function only once, it should be called on one frame. For example, if you want to do it as soon as the animation plays, you can do this:
+
+```csharp
+Spawn:
+    SPRT A 5 A_Explode();
+    SPRT BCDE 5;
+    loop;
+```
+
+The function call can also be attached to an empty frame with no duration instead:
+
+```csharp
+Spawn:
+    TNT1 A 0 A_Explode();
+    SPRT ABCDE 5;
+    loop;
+```
+
+> *Note*: `TNT1` is an internal name for a null sprite with special handling (the actor's rendering will be disabled when using this sprite). If there's ever a need to use a 0-duration state, most of the time it's preferable to use this null sprite as well. Note that *any* frame letter can be used with `TNT1`, it won't change the effect.
 
 #### State keywords
 
@@ -241,13 +328,13 @@ The actor above shows SPRTA, SPRTB, and SPRTC in sequence, 5 tics for each state
 There's one important rule to remember: **never loop state sequences with 0 total duration**. If you try to do this, you'll get a classic infinite loop, where the engine will try to call the same state over and over within the same tic, which will result in an infinite number of calls and an inevitable crash.
 
 ```csharp
-// Ths will crash the game!
+// Ths will freeze the game!
 Spawn:
     TNT1 A 0;
     loop;
 ```
 
-#### Custom and preexisting state sequences
+#### Custom and pre-existing state sequences
 
 Note, that there's a whole lot of actor state sequences that are used by default, defined by specific state labels, such as "Spawn" (entered when an actor spawns) or "Death" (entered when an actor's health is reduced to 0 and it dies). You can find a full list of them [on the ZDoom wiki](https://zdoom.org/wiki/Actor_states). 
 
@@ -326,7 +413,7 @@ This zombieman will explode on death, using the [Doom Rocket](https://zdoom.org/
 Basic objects, such as decorations (trees, lamps, etc.) are the simplest type of actor you can define. For an example of a basic actor we can look at a big brown tree from Doom:
 
 ```csharp
-//NOTE: this actor already exists in GZDoom and doesn't need to be redefined
+// NOTE: this actor already exists in GZDoom and doesn't need to be redefined
 // I'm using it purely as an example.
 
 class BigTree : Actor
@@ -578,7 +665,8 @@ class PistolWithReload : Pistol //it's based on the existing Pistol, so it inher
         PISG A 1 A_WeaponReadyReload;
         Loop;
     Fire:
-        PISG A 4 A_JumpIfNoAmmo("Reload"); //if PistolMagazine ammo is 0, jumps to Reload instead of playing the animation
+        // If PistolMagazine ammo is 0, jumps to Reload instead of firing:
+        PISG A 4 A_JumpIfNoAmmo("Reload"); 
         PISG B 6 A_FirePistol;
         PISG C 4;
         PISG B 5 A_ReFire;
