@@ -10,30 +10,38 @@
 
 ## Table of Contents
 
-* [Overview](#overview)
-* [Handling data from weapons](#handling-data-from-weapons)
-  + [Accessing data from weapon states](#accessing-data-from-weapon-states)
-  + [Accessing data from the weapon's virtual functions](#accessing-data-from-the-weapon-s-virtual-functions)
-  + [Checking current weapon](#checking-current-weapon)
-  + [When to use Tick()](#when-to-use-tick--)
-* [Action functions](#action-functions)
-* [PSprite and overlays](#psprite-and-overlays)
-  + [Differences between PSprites and actor sprites](#differences-between-psprites-and-actor-sprites)
-  + [Difference between PSprites and state sequences](#difference-between-psprites-and-state-sequences)
-* [PSprite manipulation](#psprite-manipulation)
-  + [Creating PSprites](#creating-psprites)
-    * [Native function](#native-function)
-    * [ZScript function](#zscript-function)
-    * [Layer numbers](#layer-numbers)
-    * [PSprite pointers](#psprite-pointers)
-    * [Independent overlay animation](#independent-overlay-animation)
-  + [Removing PSprites](#removing-psprites)
-  + [PSprite flags](#psprite-flags)
-  + [PSprite properties](#psprite-properties)
-  + [Checking PSprite state](#checking-psprite-state)
-  + [PSprite offsets](#psprite-offsets)
-  + [Overlay scale, rotate and pivot](#overlay-scale--rotate-and-pivot)
-  + [Overlay translation](#overlay-translation)
+- [Handling data from weapons](#handling-data-from-weapons)
+  * [Accessing data from weapon states](#accessing-data-from-weapon-states)
+  * [Accessing data from the weapon's virtual functions](#accessing-data-from-the-weapon-s-virtual-functions)
+  * [Checking current weapon](#checking-current-weapon)
+  * [When to use Tick()](#when-to-use-tick--)
+- [Action functions](#action-functions)
+- [PSprite and overlays](#psprite-and-overlays)
+  * [Differences between PSprites and actor sprites](#differences-between-psprites-and-actor-sprites)
+  * [Difference between PSprites and state sequences](#difference-between-psprites-and-state-sequences)
+- [PSprite manipulation](#psprite-manipulation)
+  * [Creating PSprites](#creating-psprites)
+    - [Native function](#native-function)
+    - [ZScript function](#zscript-function)
+    - [Layer numbers](#layer-numbers)
+    - [PSprite pointers](#psprite-pointers)
+    - [Independent overlay animation](#independent-overlay-animation)
+  * [Removing PSprites](#removing-psprites)
+    - [Native function](#native-function-1)
+    - [ZScript method](#zscript-method)
+  * [PSprite flags](#psprite-flags)
+  * [PSprite properties](#psprite-properties)
+    - [Native property-altering functions](#native-property-altering-functions)
+    - [Internal properties](#internal-properties)
+  * [Checking PSprite state](#checking-psprite-state)
+  * [PSprite offsets](#psprite-offsets)
+    - [Native offset functions](#native-offset-functions)
+    - [Internal offset values](#internal-offset-values)
+  * [Overlay scale, rotate and pivot](#overlay-scale--rotate-and-pivot)
+  * [Overlay translation](#overlay-translation)
+- [Akimbo weapons](#akimbo-weapons)
+  * [Classic dual weapon](#classic-dual-weapon)
+  * [Independent dual weapons activated with Fire/Alt Fire keys](#independent-dual-weapons-activated-with-fire-alt-fire-keys)
 
 ## Overview
 
@@ -2097,139 +2105,139 @@ This will look as follows:
 ```csharp
 class TwoPistols : Pistol
 {
-	enum PADLayers
-	{
-		PSP_LeftGun		= 11,
-		PSP_LeftFlash		= 10,
-		PSP_LeftHLights 	= 12,
-		
-		PSP_RightGun		= 21,
-		PSP_RightFlash		= 20,
-		PSP_RightHLights	= 22,
-	}
-	
-	Default
-	{
-		// We'll define Clip as the secondary ammo type,
-		// so that both attacks use the same ammo type:
-		Weapon.Ammotype2 "Clip";
-		Weapon.AmmoUse2 1;
-	}
-	
-	action void A_OverlayLeft(int layer, stateLabel label, bool noOverride = false)
-	{
-		let psp = player.FindPSprite(layer);
-		if (psp && nooverride)
-			return;
-		
-		player.SetPSprite(layer, ResolveState(label));
-		A_OverlayFlags(layer, PSPF_MIRROR|PSPF_FLIP, true);
-	}
-	
-	// A version of A_WeaponReady() that doesn't let the player activate
-	// the traditional Fire or AltFire sequences. Instead it draws the 
-	// corresponding overlay:
-	action void A_DualWeaponReady()
-	{
-		// Check that the player is pressing Fire and has enough primary ammo:
-		if (player.cmd.buttons & BT_ATTACK && invoker.ammo1.amount >= invoker.ammouse1)
-		{
-			let psp = player.FindPSprite(PSP_RightGun);
-			if (!psp || InstateSequence(psp.curstate, ResolveState("SingleGunIdle")))
-			{
-				A_Overlay(PSP_RightGun, "SingleGunFire");
-				A_Overlay(PSP_RightFlash, "MuzzleFlash");
-				A_Overlay(PSP_RightHLights, "Highlights");
-			}
-		}
-		// Check that the player is pressing Alt Fire and has enough secondary ammo:
-		if (player.cmd.buttons & BT_ALTATTACK && invoker.ammo2.amount >= invoker.ammouse2)
-		{
-			let psp = player.FindPSprite(PSP_LeftGun);
-			if (!psp || InstateSequence(psp.curstate, ResolveState("SingleGunIdle")))
-			{
-				A_OverlayLeft(PSP_LeftGun, "SingleGunFire");
-				A_OverlayLeft(PSP_LeftFlash, "MuzzleFlash");
-				A_OverlayLeft(PSP_LeftHLights, "Highlights");
-			}
-		}
-		A_WeaponReady(WRF_NOFIRE);
-	}		
-	
+    enum PADLayers
+    {
+        PSP_LeftGun        = 11,
+        PSP_LeftFlash        = 10,
+        PSP_LeftHLights     = 12,
+
+        PSP_RightGun        = 21,
+        PSP_RightFlash        = 20,
+        PSP_RightHLights    = 22,
+    }
+
+    Default
+    {
+        // We'll define Clip as the secondary ammo type,
+        // so that both attacks use the same ammo type:
+        Weapon.Ammotype2 "Clip";
+        Weapon.AmmoUse2 1;
+    }
+
+    action void A_OverlayLeft(int layer, stateLabel label, bool noOverride = false)
+    {
+        let psp = player.FindPSprite(layer);
+        if (psp && nooverride)
+            return;
+
+        player.SetPSprite(layer, ResolveState(label));
+        A_OverlayFlags(layer, PSPF_MIRROR|PSPF_FLIP, true);
+    }
+
+    // A version of A_WeaponReady() that doesn't let the player activate
+    // the traditional Fire or AltFire sequences. Instead it draws the 
+    // corresponding overlay:
+    action void A_DualWeaponReady()
+    {
+        // Check that the player is pressing Fire and has enough primary ammo:
+        if (player.cmd.buttons & BT_ATTACK && invoker.ammo1.amount >= invoker.ammouse1)
+        {
+            let psp = player.FindPSprite(PSP_RightGun);
+            if (!psp || InstateSequence(psp.curstate, ResolveState("SingleGunIdle")))
+            {
+                A_Overlay(PSP_RightGun, "SingleGunFire");
+                A_Overlay(PSP_RightFlash, "MuzzleFlash");
+                A_Overlay(PSP_RightHLights, "Highlights");
+            }
+        }
+        // Check that the player is pressing Alt Fire and has enough secondary ammo:
+        if (player.cmd.buttons & BT_ALTATTACK && invoker.ammo2.amount >= invoker.ammouse2)
+        {
+            let psp = player.FindPSprite(PSP_LeftGun);
+            if (!psp || InstateSequence(psp.curstate, ResolveState("SingleGunIdle")))
+            {
+                A_OverlayLeft(PSP_LeftGun, "SingleGunFire");
+                A_OverlayLeft(PSP_LeftFlash, "MuzzleFlash");
+                A_OverlayLeft(PSP_LeftHLights, "Highlights");
+            }
+        }
+        A_WeaponReady(WRF_NOFIRE);
+    }        
+
     States
     {
     Select:
-		TNT1 A 1
-		{
-			A_Overlay(PSP_RightGun, "SingleGunIdle", true);
-			A_OverlayLeft(PSP_LeftGun, "SingleGunIdle", true);
-			A_Raise();
-		}
+        TNT1 A 1
+        {
+            A_Overlay(PSP_RightGun, "SingleGunIdle", true);
+            A_OverlayLeft(PSP_LeftGun, "SingleGunIdle", true);
+            A_Raise();
+        }
         loop;
-	Deselect:
-		TNT1 A 1
-		{
-			A_Overlay(PSP_RightGun, "SingleGunIdle", true);
-			A_OverlayLeft(PSP_LeftGun, "SingleGunIdle", true);
-			A_Lower();
-		}
+    Deselect:
+        TNT1 A 1
+        {
+            A_Overlay(PSP_RightGun, "SingleGunIdle", true);
+            A_OverlayLeft(PSP_LeftGun, "SingleGunIdle", true);
+            A_Lower();
+        }
         loop;
     Ready:
         TNT1 A 1 
-		{
-			A_Overlay(PSP_RightGun, "SingleGunIdle", true);
-			A_OverlayLeft(PSP_LeftGun, "SingleGunIdle", true);
-			A_DualWeaponReady();
-		}
+        {
+            A_Overlay(PSP_RightGun, "SingleGunIdle", true);
+            A_OverlayLeft(PSP_LeftGun, "SingleGunIdle", true);
+            A_DualWeaponReady();
+        }
         loop;
-	SingleGunIdle:
-		PGUN A -1;
-		stop;
+    SingleGunIdle:
+        PGUN A -1;
+        stop;
     // GZDoom requires that all weapons have Ready, Fire,
     // Select and Deselect sequences defined. Since we're
     // not going to be using Fire, we'll just define a
     // dummy empty sequence:
-	Fire:
-		TNT1 A 0;
-		stop;
+    Fire:
+        TNT1 A 0;
+        stop;
     SingleGunFire:
         PGUN A 2
         {
-			A_OverlayOffset(OverlayID(), 2, 2, WOF_ADD);
-			A_OverlayPivot(OverlayID(), 0.5, 1);
+            A_OverlayOffset(OverlayID(), 2, 2, WOF_ADD);
+            A_OverlayPivot(OverlayID(), 0.5, 1);
         }
         PGUN D 2 
-		{
-			A_OverlayOffset(OverlayID(), 10, 10, WOF_ADD);
-			A_OverlayRotate(OverlayID(), -8, WOF_ADD);
-			A_OverlayScale(OverlayID(), 0.2, 0.2, WOF_ADD);
-		}
+        {
+            A_OverlayOffset(OverlayID(), 10, 10, WOF_ADD);
+            A_OverlayRotate(OverlayID(), -8, WOF_ADD);
+            A_OverlayScale(OverlayID(), 0.2, 0.2, WOF_ADD);
+        }
         PGUN CBA 3 
-		{
-			A_OverlayOffset(OverlayID(), -3, -3, WOF_ADD);			
-			A_OverlayRotate(OverlayID(), 2.2, WOF_ADD);
-			A_OverlayScale(OverlayID(), -0.06, -0.06, WOF_ADD);
-		}
+        {
+            A_OverlayOffset(OverlayID(), -3, -3, WOF_ADD);            
+            A_OverlayRotate(OverlayID(), 2.2, WOF_ADD);
+            A_OverlayScale(OverlayID(), -0.06, -0.06, WOF_ADD);
+        }
         TNT1 A 0
-		{
-			A_OverlayRotate(OverlayID(), 0, WOF_INTERPOLATE);			
-			A_OverlayScale(OverlayID(), 1, 1, WOF_INTERPOLATE);
-			A_OverlayOffset(OverlayID(), 0, 0, WOF_INTERPOLATE);
-		}
+        {
+            A_OverlayRotate(OverlayID(), 0, WOF_INTERPOLATE);            
+            A_OverlayScale(OverlayID(), 1, 1, WOF_INTERPOLATE);
+            A_OverlayOffset(OverlayID(), 0, 0, WOF_INTERPOLATE);
+        }
         goto SingleGunIdle;
     MuzzleFlash:
         PGUF Z 2 bright
-		{
-			A_Light1();
-			let psp = player.FindPSprite(OverlayID());
-			if (psp)
-			{
-				psp.pivot = (0.5, 0.5);
-				double s = frandom(0.85, 1);
-				psp.scale = (s, s);
-				psp.rotation = frandom(0, 360);
-			}
-		}
+        {
+            A_Light1();
+            let psp = player.FindPSprite(OverlayID());
+            if (psp)
+            {
+                psp.pivot = (0.5, 0.5);
+                double s = frandom(0.85, 1);
+                psp.scale = (s, s);
+                psp.rotation = frandom(0, 360);
+            }
+        }
         TNT1 A 0 A_Light0;
         stop;
     Highlights:
