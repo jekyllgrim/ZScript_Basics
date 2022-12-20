@@ -4,6 +4,8 @@
 
 ------
 
+*This chapter is a work in progress. To be revised/completed.*
+
 # Weapons, overlays and PSprite
 
 ## Table of Contents
@@ -1875,6 +1877,373 @@ class ColorfulPlasmaball : Plasmaball replaces Plasmaball
 This orb will replace the vanilla Plasmaball (do remember that you can handle replacements not only with a `replaces` keyword but also [with an event handler](11_Event_Handlers.md#actor-replacement-via-event-handlers)). It uses a static array (these will be covered in detail in the [Arrays](13_Arrays.md) chapter) to hold a list of translation names and picks one randomly when the orb is spawned. After that it finds the Flash PSprite on the shooter's weapon and sets its translation to the same value.
 
 Basically this is the inverse of the earlier method.
+
+## Akimbo weapons
+
+A fairly common concept for a weapon is an akimbo weapon, i.e. dual-wielding two identical weapons, such as pistols. While in the old days it was often done in a very direct manner—by simply drawing sprites that display two weapons—nowadays, with PSprite manipulation, it's possible to make a system like that much more flexible.
+
+> *Note:* In this instance we're not talking about actually trying to simultaneously use two different, independently-defined weapons. This is theoretically possible — with a whole lot of headache — but this section is about a much simpler and much more common concept: making a single weapon that functions like two guns, e.g. dual pistols, dual assault rifles, etc.
+
+As an example we'll code a dual pistols weapon based on the same angled pistol sprites posted earlier in this chapter.
+
+First, let's note that there are 2 ways this can be handled:
+
+1. We can draw and animate one of the pistols on `PSP_WEAPON`, while drawing a second one (as well as its muzzle flash and muzzle highlights) on another layer.
+
+2. We can keep `PSP_WEAPON` invisible and only call functions from it, while drawing *both* pistols in overlays.
+
+I'm going to use the second method here because I find it a bit more flexible: we'll basically set up simple state sequences for idle and firing animations, and then just draw it either as-is, or mirrored, to display both guns (as mentioned earlier, there's no problem with drawing the same state sequence multiple times in different layers).
+
+The core idea of an akimbo weapon is that we fire one while the other one is still in the middle of its animation (e.g. is recoiling). There are 3 main ways a weapon like this can be designed:
+
+1. Classic: you hold the Fire button, and the weapons just keep firing alternatingly while you're holding the button.
+
+2. Semi-auto: the same as above, but the player has to press the Fire button every time they want to fire, and it fires either the left or the right weapon, depending on which one is ready. This means the input timing will affect the firerate. *Left 4 Dead* akimbo pistols are a typical example of this.
+
+3. Independent: a fairly exotic system, where the right and the left weapon are activated with Fire and AltFire buttons respectively. This can be done both in full auto and semi-auto.
+
+### Classic dual weapon
+
+Let's start simple and create a classic Dual Pistols. First, let's cover the main concepts:
+
+* We're going to have *one* set of sprite animations (idle and firing), but we'll be drawing them twice, for each pistol, on different layers. The left pistol is going to use the same sprites as the right one, but with FLIP and MIRROR flags applied, so that its graphics and offsets become mirrored.
+
+* We'll define one custom action function: a custom version of `A_Overlay` that not only creates a layer but also sets its PSPF_FLIP and PSPF_MIRROR flags to true.
+
+* We'll define a custom bool `rightFired` which will be set to true once the right pistol has fired, or to false once the left pistol has fired.
+
+* All the sequences drawn on the `PSP_WEAPON` layer will only contain empty sprites. They'll only draw overlays containing the right and left pistol sprites.
+
+* The Fire sequence, based on the value of `rightFired`, will move the right or left layer into the firing animation sequence. The actual firing (the sound and `A_FireBullets` call) will be handled in Fire as well.
+
+* The duration of the Fire sequence (despite the fact that it's invisible) will determine how fast the guns can fire. The idea is that the firing animation of a single pistol is *longer* than the duration of the Fire sequence, so while one pistol is still finishing its firing animation, the *other* pistol can already start firing.
+
+Now, the code:
+
+```csharp
+class PistolAngledDual : Pistol
+{
+    // True: right pistol has fired
+    // False: left pistol has fired:
+    bool rightFired;
+
+    // Our layer numbers:
+    enum PADLayers
+    {
+        PSP_LeftGun        = 11, //main left layer 
+        PSP_LeftFlash        = 10, //left muzzle flash
+        PSP_LeftHLights     = 12, //left muzzle highlights
+
+        PSP_RightGun        = 21, //main right layer 
+        PSP_RightFlash        = 20, //right muzzle flash 
+        PSP_RightHLights    = 22, //right muzzle highlights
+    }
+
+    // A version of A_Overlay designed specifically to draw mirrored
+    // sprites. While it's not, strictly speaking, necessary, it's just
+    // more convenient to have a dedicated function that does this:
+    action void A_OverlayLeft(int layer, stateLabel label, bool noOverride = false)
+    {
+        // Get a pointer to the specified layer:
+        let psp = player.FindPSprite(layer);
+        // If the layer exists AND the 'noOverride' argument is true,
+        // don't do anything else.
+        if (psp && nooverride)
+            return;
+
+        // Otherwise, move the layer to the specified state label
+        // (this will also create it if it wasn't created):
+        player.SetPSprite(layer, ResolveState(label));
+        // And set the FLIP and MIRROR flags on it:
+        A_OverlayFlags(layer, PSPF_MIRROR|PSPF_FLIP, true);
+    }
+
+    States
+    {
+    Select:
+        TNT1 A 1
+        {
+            // Create layers once and move them up:
+            A_Overlay(PSP_RightGun, "SingleGunIdle", true);
+            A_OverlayLeft(PSP_LeftGun, "SingleGunIdle", true);
+            A_Raise();
+        }
+        loop;
+    Deselect:
+        TNT1 A 1
+        {
+            // Create layers once and move them down:
+            A_Overlay(PSP_RightGun, "SingleGunIdle", true);
+            A_OverlayLeft(PSP_LeftGun, "SingleGunIdle", true);
+            A_Lower();
+        }
+        loop;
+    Ready:
+        TNT1 A 1 
+        {
+            // Create layers once and make the weapon ready:
+            A_Overlay(PSP_RightGun, "SingleGunIdle", true);
+            A_OverlayLeft(PSP_LeftGun, "SingleGunIdle", true);
+            A_WeaponReady();
+        }
+        loop;
+    // This is an idle animation for an angled pistol.
+    // Since there's no actual animation, we'll just set
+    // tics to -1 and stop it:
+    SingleGunIdle:
+        PGUN A -1;
+        stop;
+    Fire:
+        TNT1 A 8
+        {
+            // Do the attack and play the sound:
+            A_FireBullets(5.6, 0, 1, 5);
+            A_StartSound("weapons/pistol");
+            // If 'rightFired' is FALSE, create right layers:
+            if (!invoker.rightFired)
+            {
+                A_Overlay(PSP_RightGun, "SingleGunFire");
+                A_Overlay(PSP_RightFlash, "MuzzleFlash");
+                A_Overlay(PSP_RightHLights, "Highlights");
+            }
+            // Otherwise create layers:
+            else
+            {
+                A_OverlayLeft(PSP_LeftGun, "SingleGunFire");
+                A_OverlayLeft(PSP_LeftFlash, "MuzzleFlash");
+                A_OverlayLeft(PSP_LeftHLights, "Highlights");
+            }
+            // Flip the 'rightFired' value:
+            invoker.rightFired = !invoker.rightFired;
+        }
+        TNT1 A 0 A_ReFire();
+        goto ready;
+    // The firing animation for the angled pistol.
+    // It doesn't define anything besides aniimation:
+    SingleGunFire:
+        PGUN A 2
+        {
+            A_OverlayOffset(OverlayID(), 2, 2, WOF_ADD);
+            A_OverlayPivot(OverlayID(), 0.5, 1);
+        }
+        PGUN D 2 
+        {
+            A_OverlayOffset(OverlayID(), 10, 10, WOF_ADD);
+            A_OverlayRotate(OverlayID(), -8, WOF_ADD);
+            A_OverlayScale(OverlayID(), 0.2, 0.2, WOF_ADD);
+        }
+        PGUN CBA 3 
+        {
+            A_OverlayOffset(OverlayID(), -3, -3, WOF_ADD);            
+            A_OverlayRotate(OverlayID(), 2.2, WOF_ADD);
+            A_OverlayScale(OverlayID(), -0.06, -0.06, WOF_ADD);
+        }
+        // Double-check the offsets, scale and rotation are properly
+        // reset to their default values:
+        TNT1 A 0
+        {
+            A_OverlayRotate(OverlayID(), 0, WOF_INTERPOLATE);            
+            A_OverlayScale(OverlayID(), 1, 1, WOF_INTERPOLATE);
+            // Don't forget that for overlays the default Y value is 0,
+            // not 32 (since we did not disable the PSPF_ADDWEAPON flag):
+            A_OverlayOffset(OverlayID(), 0, 0, WOF_INTERPOLATE);
+        }
+        // After that the pistol will go back to its idle animation:
+        goto SingleGunIdle;
+    // Flash sequence:
+    MuzzleFlash:
+        PGUF Z 2 bright
+        {
+            A_Light1();
+              // A bit of visual spice: randomly change
+              // the muzzle flash's size and rotation:
+            let psp = player.FindPSprite(OverlayID());
+            if (psp)
+            {
+                psp.pivot = (0.5, 0.5);
+                double s = frandom(0.85, 1);
+                psp.scale = (s, s);
+                psp.rotation = frandom(0, 360);
+            }
+        }
+        TNT1 A 0 A_Light0;
+        stop;
+    // Muzzle highlights:
+    Highlights:
+        PGUF A 2 bright;
+        stop;
+    }
+}
+```
+
+As you can see, the only state in the Fire sequence is `TNT1 A 8` — meaning it's 8 tics long, despite the fact that the total duration of SingleGunFire is 13 tics. This allows you to activate the Fire sequence while one of the guns is still firing, and it'll move the other gun into the firing animation.
+
+If you want to implement semi-auto firing (i.e. the player has to press the fire button every time they want to fire), you can basically use the same thing but just remove `A_ReFire()` from the Fire sequence. You may also want to optionally make the Fire sequence shorter so that the players can refire faster.
+
+### Independent dual weapons activated with Fire/Alt Fire keys
+
+Now, if you want to create independent guns, where the player can press Fire to fire the right gun and Alt Fire to fire the left gun, that is possible as well. But the approach this time will be a little different:
+
+* This will require removing the Fire sequence completely (or rather, making it non-functional); the AltFire sequence won't be used either. Instead we will have to create a custom version of `A_WeaponReady()` that detects when the player presses Fire or AltFire and then draws the corresponding overlay. The `PSP_WEAPON` layer in this case remains in the Ready sequence.
+
+* In order not to cut off already running firing animation, we'll have to utilize the `InStateSequence` check: when the player presses Fire, we first check if the corresponding layer isn't *already* in firing animation, and only if the check passes we'll activate the animation (the same is done for Alt Fire).
+
+* Otherwise, a lot of the code will be the same as `PistolAngledDual` defined above.
+
+This will look as follows:
+
+> *Note:* To keep the code shorter I removed the comments that are identical to the ones defined in `PistolAngledDual` above. Only the features specific to `TwoAngledPistols` class are commented.
+
+```csharp
+class TwoPistols : Pistol
+{
+	enum PADLayers
+	{
+		PSP_LeftGun		= 11,
+		PSP_LeftFlash		= 10,
+		PSP_LeftHLights 	= 12,
+		
+		PSP_RightGun		= 21,
+		PSP_RightFlash		= 20,
+		PSP_RightHLights	= 22,
+	}
+	
+	Default
+	{
+		// We'll define Clip as the secondary ammo type,
+		// so that both attacks use the same ammo type:
+		Weapon.Ammotype2 "Clip";
+		Weapon.AmmoUse2 1;
+	}
+	
+	action void A_OverlayLeft(int layer, stateLabel label, bool noOverride = false)
+	{
+		let psp = player.FindPSprite(layer);
+		if (psp && nooverride)
+			return;
+		
+		player.SetPSprite(layer, ResolveState(label));
+		A_OverlayFlags(layer, PSPF_MIRROR|PSPF_FLIP, true);
+	}
+	
+	// A version of A_WeaponReady() that doesn't let the player activate
+	// the traditional Fire or AltFire sequences. Instead it draws the 
+	// corresponding overlay:
+	action void A_DualWeaponReady()
+	{
+		// Check that the player is pressing Fire and has enough primary ammo:
+		if (player.cmd.buttons & BT_ATTACK && invoker.ammo1.amount >= invoker.ammouse1)
+		{
+			let psp = player.FindPSprite(PSP_RightGun);
+			if (!psp || InstateSequence(psp.curstate, ResolveState("SingleGunIdle")))
+			{
+				A_Overlay(PSP_RightGun, "SingleGunFire");
+				A_Overlay(PSP_RightFlash, "MuzzleFlash");
+				A_Overlay(PSP_RightHLights, "Highlights");
+			}
+		}
+		// Check that the player is pressing Alt Fire and has enough secondary ammo:
+		if (player.cmd.buttons & BT_ALTATTACK && invoker.ammo2.amount >= invoker.ammouse2)
+		{
+			let psp = player.FindPSprite(PSP_LeftGun);
+			if (!psp || InstateSequence(psp.curstate, ResolveState("SingleGunIdle")))
+			{
+				A_OverlayLeft(PSP_LeftGun, "SingleGunFire");
+				A_OverlayLeft(PSP_LeftFlash, "MuzzleFlash");
+				A_OverlayLeft(PSP_LeftHLights, "Highlights");
+			}
+		}
+		A_WeaponReady(WRF_NOFIRE);
+	}		
+	
+    States
+    {
+    Select:
+		TNT1 A 1
+		{
+			A_Overlay(PSP_RightGun, "SingleGunIdle", true);
+			A_OverlayLeft(PSP_LeftGun, "SingleGunIdle", true);
+			A_Raise();
+		}
+        loop;
+	Deselect:
+		TNT1 A 1
+		{
+			A_Overlay(PSP_RightGun, "SingleGunIdle", true);
+			A_OverlayLeft(PSP_LeftGun, "SingleGunIdle", true);
+			A_Lower();
+		}
+        loop;
+    Ready:
+        TNT1 A 1 
+		{
+			A_Overlay(PSP_RightGun, "SingleGunIdle", true);
+			A_OverlayLeft(PSP_LeftGun, "SingleGunIdle", true);
+			A_DualWeaponReady();
+		}
+        loop;
+	SingleGunIdle:
+		PGUN A -1;
+		stop;
+    // GZDoom requires that all weapons have Ready, Fire,
+    // Select and Deselect sequences defined. Since we're
+    // not going to be using Fire, we'll just define a
+    // dummy empty sequence:
+	Fire:
+		TNT1 A 0;
+		stop;
+    SingleGunFire:
+        PGUN A 2
+        {
+			A_OverlayOffset(OverlayID(), 2, 2, WOF_ADD);
+			A_OverlayPivot(OverlayID(), 0.5, 1);
+        }
+        PGUN D 2 
+		{
+			A_OverlayOffset(OverlayID(), 10, 10, WOF_ADD);
+			A_OverlayRotate(OverlayID(), -8, WOF_ADD);
+			A_OverlayScale(OverlayID(), 0.2, 0.2, WOF_ADD);
+		}
+        PGUN CBA 3 
+		{
+			A_OverlayOffset(OverlayID(), -3, -3, WOF_ADD);			
+			A_OverlayRotate(OverlayID(), 2.2, WOF_ADD);
+			A_OverlayScale(OverlayID(), -0.06, -0.06, WOF_ADD);
+		}
+        TNT1 A 0
+		{
+			A_OverlayRotate(OverlayID(), 0, WOF_INTERPOLATE);			
+			A_OverlayScale(OverlayID(), 1, 1, WOF_INTERPOLATE);
+			A_OverlayOffset(OverlayID(), 0, 0, WOF_INTERPOLATE);
+		}
+        goto SingleGunIdle;
+    MuzzleFlash:
+        PGUF Z 2 bright
+		{
+			A_Light1();
+			let psp = player.FindPSprite(OverlayID());
+			if (psp)
+			{
+				psp.pivot = (0.5, 0.5);
+				double s = frandom(0.85, 1);
+				psp.scale = (s, s);
+				psp.rotation = frandom(0, 360);
+			}
+		}
+        TNT1 A 0 A_Light0;
+        stop;
+    Highlights:
+        PGUF A 2 bright;
+        stop;
+    }
+}
+```
+
+As you can see, this is very similar to our previous example, except we're drawing overlays with a check from the Ready sequence and not using the Fire sequence at all.
+
+## Creating PSprite animations with CustomInventory
+
+*TBD*
 
 ------
 
