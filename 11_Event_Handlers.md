@@ -49,15 +49,36 @@ class CorpseDestroyer : EventHandler
     override void WorldThingDied (Worldevent e) 
     {
         if (e.thing && e.thing.bISMONSTER);
-            e.thing.Destroy();
+        {
+            e.thing.A_DropItem("HealthBonus");
+        }
     }
 }
 ```
 
-This event destroys monsters as soon as they die. Let's break it down how this works:
+The event handler above will make all monsters drop a Health Bonus when they die.
 
-- All events of an event handler have access to a pointer `e` (in this case the type of that pointer is `WorldEvent). This pointer is a bit different from actor pointers we covered earlier; it's not a pointer to an in-game object, but rather to the *event itself*. 
-- Through pointer `e` you can access various other pointers that this specific event can access.
+Here's another example:
+
+```csharp
+class CorpseDestroyer : EventHandler 
+{
+    override void WorldThingDied (Worldevent e) 
+    {
+        if (e.thing && e.thing.bISMONSTER);
+        {
+            e.thing.Destroy();
+        }
+    }
+}
+```
+
+This event destroys monsters as soon as they die. 
+
+Let's break it down how this works:
+
+- All events of an event handler have access to a pointer `e` (in this case the type of that pointer is `WorldEvent`). This pointer is a bit different from actor pointers we covered earlier; it's not a pointer to an in-game object, but rather to the *event itself*. 
+- Through pointer `e` you can access various other pointers that this specific event can access. One of those pointers is `thing` — the actor that triggers the event (the full pointers to it is, thus, `e.thing`).
 - Whenever anything in the world is killed, it triggers a `WorldThingDied` event. This event has access to the actor that was killed via `e.thing` pointer (`e` being pointer to the event, and `thing` being the pointer to the thing that event is concerned with—the thing that died).
 - In the example above we first check if `e.thing` exists (a standard null-check), and then we check if it has an `ISMONSTER` flag (which is normally the best defining feature of a monster).
 - If both checks pass, we call `Destroy()` on the thing to make it disappear from the map.
@@ -136,15 +157,19 @@ class CheckMonsterAmount : EventHandler
     override void WorldThingSpawned (worldevent e) 
     { 
         //check if actor exists, is a monster and isn't friendly:
-        if (e.thing && e.thing.bISMONSTER && !e.thing.bFRIENDLY)    
+        if (e.thing && e.thing.bISMONSTER && !e.thing.bFRIENDLY)
+        {
             alivemonsters++; //if so, increase counter
+        }
     }
 
     // This is called when an actor dies in a map:
     override void WorldThingDied (worldevent e) 
     {
         if (e.thing && e.thing.bISMONSTER && !!e.thing.bFRIENDLY)
+        {
             alivemonsters--; //decrease counter
+        }
     }
 
     // This is called when an actor is destroyed,
@@ -152,7 +177,9 @@ class CheckMonsterAmount : EventHandler
     override void WorldThingDestroyed (worldevent e) 
     {
         if (e.thing && e.thing.bISMONSTER && !!e.thing.bFRIENDLY)
+        {
             alivemonsters--; //decrease counter
+        }
     }
 
     // This is called when an actor is revived,
@@ -160,7 +187,9 @@ class CheckMonsterAmount : EventHandler
     override void WorldThingRevived (worldevent e) 
     {
         if (e.thing && e.thing.bISMONSTER && !!e.thing.bFRIENDLY)
+        {
             alivemonsters++; //decrease counter
+        }
     }
 }
 
@@ -171,8 +200,10 @@ class CyberdemonLeader : Cyberdemon replaces Cyberdemon
         super.PostBeginPlay();
         //cast the event handler just like you cast actors:
         let event = CheckMonsterAmount(EventHandler.Find("CheckMonsterAmount"));
-        if (event) //null-check the cast        
+        if (event) //null-check the cast
+        {
             A_SetHealth(3000 + 100*event.alivemonsters); //change health value
+        }
         console.Printf("cyberdemon health: %d",health);     //debug string that prints the result
     }
 }
@@ -200,7 +231,7 @@ class MyEventHandler : EventHandler
 {
     override void CheckReplacement (ReplaceEvent e)
     {
-        if (e.Replacee == "ReplaceeClassName")
+        if (e.Replacee is "ReplaceeClassName")
         {
             e.Replacement = "ReplacementClassName";
         }
@@ -214,6 +245,14 @@ class MyEventHandler : EventHandler
 - `Replacement` — a `Class<Actor>`-type value that contains the name of the class to be used as a replacement
 - `isFinal` — a boolean value that determines if this replacement should be considered final. If there are multiple event handlers that have their own `CheckReplacement()` overrides (such as when multiple mods are run together), some of the overrides can choose to not set their `Replacement`s if another handler set `e.isFinal` to true. If this isn't used, then whatever event handler comes last in the load order will take precedence. Normally you don't need to worry about this.
 
+Note, there are several ways to check *what* the replacement is:
+
+1. You can use the `is` operator like in the example above. `is` checks if the given pointer belogs to the specified class *or* inherits from it (so, `e.Replacee is 'Zombieman'` will be true for all Zombieman instances, as well as actors that inherit from Zombieman.
+
+2. You can call `GetClass()` to get the exact class. That function returns a class type, i.e. `class<Actor>`, and you can check it against a specific class with the `==` operator, e.g.: `if (e.ReplaceeGetClass() == "Zombieman"`.
+
+3. You can also use `GetClassName()`. This returns the class name as a `name` (a case-insensitive string). Usually it's functionally identical to `GetClass()`, but since it's a string, it can be combined with various string operators, such as getting partial matches or utilizing a `switch` block (shown below).
+
 An event handler with replacements would look like this:
 
 ```csharp
@@ -221,7 +260,7 @@ class ActorReplacementHandler : EventHandler
 {
     override void CheckReplacement(replaceEvent e)
     {
-        if (e.Replacee == "Zombieman")
+        if (e.Replacee is "Zombieman")
         {
             e.Replacement = "MyCustomZombieman";
         }
@@ -236,7 +275,7 @@ class ActorReplacementHandler : EventHandler
 {
     override void CheckReplacement(replaceEvent e)
     {
-        if (e.Replacee == "Zombieman" && !e.isFinal)
+        if (e.Replacee is "Zombieman" && !e.isFinal)
         {
             e.Replacement = "MyCustomZombieman";
         }
@@ -244,7 +283,7 @@ class ActorReplacementHandler : EventHandler
 }
 ```
 
-Replacing multiple monsters with if/else blocks may be inconvenient, so I would recommend using a `switch` block (you can read more about it in the [Flow Control](A1_Flow_Control.md#Switch) chapter):
+Replacing multiple monsters with if/else blocks may be inconvenient, so I would recommend using a `switch` block (you can read more about it in the [Flow Control](A1_Flow_Control.md#Switch) chapter). Note, the `switch` operator only works with integers and names, so we'll need to use `GetClassName()` to make it work (thus it won't be aware of inheritance and will only check for specific classes):
 
 ```csharp
 class ActorReplacementHandler : EventHandler
