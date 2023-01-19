@@ -78,6 +78,20 @@ So, what are the differences here?
 - All lines except block names (`Class`, `Default`, `states`) and flags have to end with a semicolon. (Flags *can* end with a semicolon, but it’s optional.)
 - Not shown in the example: flag prefixes are *not* optional in ZScript. I.e. for example, in `+INVENTORY.AUTOACTIVATE` you can’t omit `INVENTORY`.
 
+## More syntax differences
+
+There are a few extra syntax differences between ZScript and DECORATE you need to be aware about:
+
+1. In ZScript, class names can't begin with a number, while DECORATE doesn't have that limitation. So, in Decorate you can create a class named `12gauge`, but in ZScript it won't work. You can use something like `Shells_12gauge` or `ShotgunAmmo_12gauge` instead.
+
+2. DECORATE allows specifying DoomEdNums (aka editor numbers) directly in the code, while ZScript doesn't. Instead you should specify them with MAPINFO. (This is a preferred method anyway, even if you were using DECORATE, since it's more convenient to keep all your editor numbers in one place.)
+
+3. Class-specific flag prefixes, such as `INVENTORY` in `INVENTORY.AUTOACTIVATE` or `WEAPON` in `WEAPON.NOAUTOFIRE`, and others, are *not* optional in ZScript.
+
+4. In classes based on `PowerupGiver`, the `Powerup.Type` property requires a full powerup class name. So, while in DECORATE you could use `Powerup.Type "Invulnerable"`, in ZScript it has to be `Powerup.Type "PowerInvulnerable"`. On the flipside, when creating custom powerup classes in ZScript, their names don't have to begin with "Power", as opposed to DECORATE.
+
+5. `A_ChangeFlag`, while still supported, is considered deprecated in ZScript. Instead you can and should change flag values directly (e.g. `bFLAGNAME = true` / `bFLAGNAME = false`).
+
 Knowing just these points, you can already start coding in ZScript. Next, we delve into ZScript-only features.
 
 ------
