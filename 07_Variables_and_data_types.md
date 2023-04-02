@@ -21,9 +21,9 @@ A variable is a piece of data that holds some information — a number, a string
 Usually custom variables look like this:
 
 ```csharp
-string foo;            //creates a variable 'foo' that holds a text string
-int bar;            //creates a variable 'bar' that holds an integer number
-bool tobeornot;        //creates a variable 'tobeornot' that holds a 'true' or 'false' value
+string foo; //creates a variable 'foo' that holds a text string
+int bar; //creates a variable 'bar' that holds an integer number
+bool tobeornot; //creates a variable 'tobeornot' that holds a 'true' or 'false' value
 ```
 
 Here’s a simple example of declaring a variable in a class and using it:
@@ -81,7 +81,7 @@ class WeirdImp : DoomImp
             {
                 speedups++;            //++ is the same as +=1
                 // create a temporary variable 'foo' that holds a random value between 0.8 and 1.2:
-                double foo = frandom(0.8,1.2);    
+                double foo = frandom(0.8, 1.2);    
                 speed *= foo;        // multiply speed by that value
                 scale /= foo;        // divide scale by the same value
             }
@@ -91,7 +91,7 @@ class WeirdImp : DoomImp
 }
 ```
 
-This weird Imp will randomly change its `speed` and `scale` (inversely related) when being hit, up to 10 times. Notice that `speed` is multiplied and `scale` is divided always by the same value: so, *first* a random value between 0.8 and 1.2 is selected, and *then*, after it's chosen, the multiplication and division happen.
+This weird Imp will randomly change its `speed` and `scale` (inversely related) when being hit, up to 10 times. Notice that `speed` is multiplied and `scale` is divided always by the same value: so, *first* a random value between 0.8 and 1.2 is selected, and *then*, after it's chosen, the multiplication and division happen. So, when it's damaged, it either becomes faster and smaller, or slower and bigger.
 
 Variable `foo` in this example exists only inside that anonymous function and isn't available anywhere else. This is a **local** variable.
 
@@ -100,15 +100,15 @@ Let's summarize the differences between these two types:
 **Class-scope variables aka fields:**
 
 - Fields by default can be changed from anywhere (this class, inheriting classes, even other classes if they get access to it—see [Pointers and Casting](#08_Pointers_and_casting.md)).
-- Fields can’t be declared and receive a value at the same time; when you declare them, they receive a default value (for `int` this is 0), and then you have to modify it somewhere. In the example above `speedups` is initially equal to 0 and it’s increased by 1 when the Imp enters its Pain state for the first time.
+- Fields can’t be declared with a value. When you declare them, they receive a default value (for `int` this is 0, for `string` it's an empty string), and then you have to modify it somewhere (for example, inside an actor state). In the example above `speedups` is initially equal to 0 and it’s increased by 1 when the Imp enters its Pain state for the first time.
 - Fields keep their value while the class exists. That’s why every time we do `speedups += 1`, it increases by 1 and will keep that value throughout whatever the Imp does.
 - Since fields can be accessed from multiple places, it’s a good idea to give them a sensible and understandable name.
 
 **Local variables:**
 
-- Variables declared inside anonymous functions are available only within that function. 
-- They can be declared *and* given a value within the same line.
-- Obviously, whenever the function is executed again, this variable will be re-declared and receive the value. That’s why double `foo = frandom(0.8,1.2)` will create a temporary variable `foo` equal to a random value between 0.8 and 1.2 every time the Pain state sequence is entered. (Note that actors can enter the Pain state multiple times simultaneously when hit by multiple attacks, such as a shotgun blast.)
+- Local variables are declared inside a code block (such as an anonymous function) and are available only within that code block. 
+- They can be declared with a value.
+- Obviously, whenever the function is executed again, this variable will be re-declared and receive the value again. That’s why `double foo = frandom(0.8,1.2)` will create a temporary variable `foo` equal to a random value between 0.8 and 1.2 every time the Pain state sequence is entered. (Note that actors can enter the Pain state multiple times simultaneously when hit by multiple attacks, such as a shotgun blast.)
 - Their names aren’t that important, since they won’t exist after the function stops executing. Usually something very short is used.
 
 ## Turning variables into actor properties
@@ -219,42 +219,42 @@ You will find more information on accessing and manipulating data in weapon cont
 
 ## Data types
 
-Of course, `int` isn't the only existing variable type. In fact, variables can any type of data that exists in GZDoom. It's important to have a general understanding of these data types, since actor properties and function arguments in Doom are also essentially variables and they also hold data of various types. 
+Of course, `int` isn't the only existing variable type. It's important to have a general understanding of these data types, since actor properties and function arguments in Doom are also essentially variables and they also hold data of various types. 
 
 Hence here's a list of various data types. You don't need to immediately learn them by heart, but rather use it as a reference. This list might not be exhaustive.
 
 - **`int`** — holds an integer number (such as 1, 2, 3, 10, 500, etc.)
   - Many existing properties are also integer values, for example `damage` and `health`. That’s why projectiles can’t deal 2.5 points of damage, only 2 or 3.
-- **`double`** — holds a float-point number (such as 2.5). Note that `float` is also an existing type, but `double` is used in ZScript instead because it’s essentially the same thing but it has higher precision. That’s usually not something you need to worry about as a user, just remember that what’s called **`float`** in ACS is **`double`** in ZScript.
-  - There’s a whole lot of values in GZDoom that are doubles. For example, an actor’s `angle`, `height`, `radius`, `speed`, `alpha`, `bouncefactor` are all doubles.
+- **`double`** — holds a float-point number (such as 2.5). Note that `float` is also an existing type, but `double` is used in ZScript instead because it’s essentially the same thing but it has higher precision. That’s usually not something you need to worry about as a user, just remember that a float-point number should be stored in a `double` variablle.
+  - There’s a whole lot of values in GZDoom that are doubles. For example, actors' `angle`, `height`, `radius`, `speed`, `alpha`, `bouncefactor` are all doubles.
 - **`bool`** — a boolean variable holds a `true`/`false` value. You can set and check it against true and false, such as `if (foo == true)` (to check if it's true) and `foo = false`; (to set foo to true).
   - The most common example of a bool is actor flags. While flags in the Default block are a special case, since you can set them with + and -, those flags are internally connected to boolean variables named `bFLAGNAME`. You can change the majority of flags on the fly by using those names; for example, you can do `bSHOOTABLE = false;` to suddenly make an actor unshootable.
     - A shorthand for `if (foo == true)` is simply `if (foo)`. And `if (foo == false)` can be replaced with `if (!foo)` (`!` means "not" and inverts any check).
   - No quotation marks! `"True"` is a string holding the text "True", while `true` is a boolean value.
-  - Internally boolean values are also numbers, where 0 is considered `false`, while a non-zero value is `true`. However, while `if (mybool > 0)` is technically correct, you shouldn't use this syntax because you'll just confuse yourself. When possible, always use variables in such a way that their type is obvious from just looking at them.
+  - Internally boolean values are also numbers, where 0 is considered `false`, while a non-zero value is `true`. However, while `if (mybool > 0)` is technically correct, you shouldn't use this syntax because you'll just confuse yourself (and others who might be reading your code). Whenever possible, always use variables in such a way that their type is obvious from just looking at them.
 - **`string`** — holds *case-sensitive* text (such as "Adam")
   - Setting and changing it requires using double quotation marks: `string foo = "Bar";` creates a variable foo that holds the text "Bar". 
 - **`name`** — holds *case-insensitive* text (i.e. 'adam', 'Adam' and 'ADAM' are all the same)
-  - In contrast to strings setting and changing them can be done by using *single* quotes. You can still use double quotes, but it’s a good idea not to do that, so that when you look at the variable, you’ll immediately know it’s a `name` and not a `string` (same as you should do `if (mybool == true)` not `if (mybool > 0)`. In fact, for custom variables in the majority of cases it’s better to use a name than a string, since there are relatively few applications for case-sensitive text.
-  - A bunch of stuff in GZDoom are names, for example class names and values of various properties such as `Renderstyle` or `Bouncetype`.
-- **`vector2`** — holds global (map-wise) 2D coordinates of something, i.e. an object’s `pos.x` and `pos.y`; or an object’s velocity in 2D space, i.e. the object’s `vel.x` and `vel.y`. The contents of this type of variable is two float-point values enclosed in parentheses, such as `(15.0,14.2)`. 
-- **`vector3`** — similar to vector2, but for 3D space, so it can hold `pos.x`, `pos.y` and `pos.z`, or, in case of velocities, `vel.x`, `vel.y` and `vel.z`. An example of a `vector3` expression that you can use it your code is `pos` which holds the coordinates of the actor it’s called from.
-  - If you have only a vague understanding of how coordinates work and why they’re called "vectors", it’s very simple: every map has an origin point with coordinates of (0, 0, 0). Any object within a map has coordinates *relative* to that origin point; for example, if an actor is positioned at `(15, 12.3, 0)` that means it’s located 15 units to the east, 12.3 units to the north and 0 units vertically off the map origin point. Since all coordinates are *relative* to that (0,0,0) origin, this makes all coordinates *vectors*; a vector in this context is basically a line that starts at (0,0,0) and ends wherever the object is.
+  - In contrast to strings, setting and changing `name`s is possible with *single* quotation marks. You can still use double quotes, but it’s a good idea not to do that, so that when you look at the variable, you’ll immediately know it’s a `name` and not a `string` (same as you should do `if (mybool == true)` not `if (mybool > 0)`. In fact, for custom variables in the majority of cases it’s better to use a name than a string, since there are relatively few applications for case-sensitive text.
+  - A bunch of stuff in GZDoom are names, for example class names and values of properties such as `Bouncetype`.
+- **`vector2`** — holds two float-point values that are accessible with `.x` and `.y` postfixes. So, if you declare `vector2 foo`, you can read its components with `foo.x` and `foo.y`. Vector2 type is used for things like position or velocity in 2D space (i.e. `pos.x` and `pos.y` or `vel.x` and `vel.y` respectively). The contents of this type of variable is two float-point values enclosed in parentheses, such as `(15.0, 14.2)`. 
+- **`vector3`** — similar to vector2, but holds 3 values accessible with postfixes `.x`, `.y` and `.z`. Actors use vector3 `pos` to store their XYZ position in a map, and vector3 `vel` to store their velocity alongside XYZ axes.
+  - If you have only a vague understanding of how coordinates work and why they’re called "vectors", it’s very simple: every map has an origin point with coordinates of (0, 0, 0). Any object within a map has coordinates *relative* to that origin point; for example, if an actor is positioned at `(15, 12.3, 0)` that means it’s located 15 units to the east, 12.3 units to the north and 0 units vertically away from the map's origin point. Since all coordinates are *relative* to that (0,0,0) origin, this makes all coordinates *vectors*; a vector in this context is basically a line that starts at (0,0,0) and ends wherever the object is.
   - Similarly, velocity is just how quickly an object is changing position per tic (1/35 of a second). If an actor’s velocity is `(15, 0, 1.2)`, every tic it moves 15 units north, 0 units east/west and 1.2 units upward. Basically, actor movement is their vector3 of velocity being constantly added to their vector3 position.
-- **`Class<Actor>`** — a variable that holds a name of an actor. 
-  - The `<Actor>` part can be substituted for something else, if you want to limit this variable to being able to hold a pointer to only something specific, for example `Class<Ammo>`.
+- **`Class<Actor>`** — a variable that holds a actor class name. 
+  - The `<Actor>` part can be substituted for something else, if you want to limit this variable to being able to hold a name of a specific subclass, for example `Class<Ammo>`.
   - Note that while it holds a name, it's not the same as a `name`. `Class<Actor>` isn't just a line of text; it also contains information that tells the game that this is, in fact, an existing actor class. In contrast, a `name` simply contains text and nothing else.
-- **`actor`** — a variable that holds an instance of an actor (i.e. a pointer to it). It’s not a name of an actor class, but a *pointer* to a *specific* actor that exists in the level. Learn more in [Pointers and Casting](08_Pointers_and_casting.md).
-- **`stateLabel`** — holds a reference to a state sequence name, aka state label, such as "Ready", "Fire", etc. Note, state labels are not strings, they're a special type of data, and in fact strings can't be converted to state labels or vice versa. `StateLabel` type is commonly used as function arguments: for example, in the [`A_Jump`](https://zdoom.org/wiki/A_Jump) function the first argument is an integer number defining the jump chance, while the second argument is a state label defining the jump destination.
+- **`Actor`** — a variable that holds an instance of an actor (i.e. a pointer to it). It’s not a name of an actor class, but a *pointer* to a *specific* actor that exists in the level. Learn more in [Pointers and Casting](08_Pointers_and_casting.md).
+- **`stateLabel`** — holds a reference to the name of a state sequence, aka state label, such as "Ready", "Fire", etc. Note, state labels are not strings, they're a special type of data, and in fact strings can't be converted to state labels or vice versa. `StateLabel` type is commonly used as function arguments: for example, in the [`A_Jump`](https://zdoom.org/wiki/A_Jump) function the first argument is an integer number defining the jump chance, while the second argument is a state label that tells the state machine which state sequence to go to.
 - **`state`** — holds a reference to a state. Not to be confused with state sequences or state labels. (See [State control](A1_Flow_Control.md#state-control) for details on the differences.) For example, doing `state st = FindState("Ready"),` creates a variable `st` that holds a pointer to the first state in the `Ready` sequence.
   - One commonly used state-type variable used in actors is `curstate`: it holds a pointer to the state the actor is currently in. It can be used in combination with [`InStateSequence`](https://zdoom.org/wiki/InStateSequence) function to check which state *sequence* the actor is in with `if ( InStateSequence(pointer.curstate, pointer.FindState("Label") )`, where `poitner` is a pointer to actor and "Label" is a state label.
   - Another native actor state variable is `SpawnState` which holds a pointer to the first state in the Spawn sequence.
 - **`SpriteID`** — holds a reference to a sprite. All actors have `sprite`, which is a `SpriteID`-type variable that always holds their current sprite; you can use it to make one actor copy the appearance of another by doing `pointer1.sprite = pointer2.sprite`. (Note that "appearance" includes many more characteristics, such as scale, alpha, renderstyle, etc.)
   - Note that `SpriteID` isn't a sprite *name*; instead it's a special internal identifier of a sprite. Converting a sprite name to a SpriteID requires `GetSpriteIndex()` function. E.g.: `sprite = GetSpriteIndex("BAL1")` will set the current actor's sprite to BAL1, the sprite used by Imp's fireballs. Note that you can also modify `frame` to modify the frame letter of a sprite, where `0` is `A`, `1` is `B` and so on.
   - You can also get a pointer to the sprite used in any state simply by having a pointer to that state. For example, normally you can check `SpawnState.sprite` in any actor to get the first sprite used in the actor's Spawn state sequence. In this sense `sprite` is identical to `curstate.sprite`.
-- **`TextureID`** — holds a reference to an image (texture, graphic) but not a sprite. Similarly to SpriteID, this isn't a name of the texture but rather an internal identifier. You normally won't need this in actors; instead this is commonly used in UI and HUDs.
+- **`TextureID`** — holds a reference to an image (any kind of image that exists in the loaded archive), but not a sprite that can be used in an actor (in contrast to SpriteID). Similarly to SpriteID, this isn't a name of the texture but rather an internal identifier. You normally won't need this in actors; instead this is commonly used in UI and HUDs.
 
-Elements of the map itself can also be interacted with in ZScript, and as such you can get pointers to them. One commonly used way to do that is the [`LineTrace`](https://zdoom.org/wiki/LineTrace) function that fires an invisible ray and returns a pointer to what it hits (an actor, a sector, a linedef, etc.). Also actors contain a number of native fields that are meant to hold pointers to map elements; some of these a mentioned below.
+Elements of the map itself can also be interacted with in ZScript, and as such you can get pointers to them. One commonly used way to do that is the [`LineTrace`](https://zdoom.org/wiki/LineTrace) function that fires an invisible ray and returns a pointer to what it hits (an actor, a sector, a linedef, etc.). Also, actors contain a number of native fields that are meant to hold pointers to map elements; some of these a mentioned below.
 
 Some of the data types that can contain pointers to map elements are:
 
