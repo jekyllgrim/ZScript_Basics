@@ -6,6 +6,24 @@
 
 # Pointers and casting
 
+## Table of contents
+
+- [Overview](#overview)
+  * [Class types vs class instances](#class-types-vs-class-instances)
+- [Overview of pointers](#overview-of-pointers)
+- [Native pointers](#native-pointers)
+  * [Target](#target)
+  * [Tracer](#tracer)
+  * [Master](#master)
+  * [Puff pointers](#puff-pointers)
+- [Custom pointers and their use in ZScript](#custom-pointers-and-their-use-in-zscript)
+- [Null-checking pointers](#null-checking-pointers)
+- [Casting and custom pointers](#casting-and-custom-pointers)
+  * [Type casting](#type-casting)
+  * [Non-actor pointers](#non-actor-pointers)
+
+## Overview
+
 One of the primary concepts you need to have a good grasp on to use ZScript efficiently is pointers. Depending on your coding experience, you may be aware of what a pointer is (DECORATE actually uses some pointers, albeit in a much more limited manner than ZScript), but for people who have no experience in the area they can be rather confusing.
 
 ### Class types vs class instances
