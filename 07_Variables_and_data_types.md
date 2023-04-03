@@ -80,7 +80,8 @@ class WeirdImp : DoomImp
             if (speedups < 10) 
             {
                 speedups++;            //++ is the same as +=1
-                // create a temporary variable 'foo' that holds a random value between 0.8 and 1.2:
+                // Create a temporary variable 'foo' that holds 
+                // a random value between 0.8 and 1.2:
                 double foo = frandom(0.8, 1.2);    
                 speed *= foo;        // multiply speed by that value
                 scale /= foo;        // divide scale by the same value
@@ -99,16 +100,16 @@ Let's summarize the differences between these two types:
 
 **Class-scope variables aka fields:**
 
-- Fields by default can be changed from anywhere (this class, inheriting classes, even other classes if they get access to it—see [Pointers and Casting](#08_Pointers_and_casting.md)).
-- Fields can’t be declared with a value. When you declare them, they receive a default value (for `int` this is 0, for `string` it's an empty string), and then you have to modify it somewhere (for example, inside an actor state). In the example above `speedups` is initially equal to 0 and it’s increased by 1 when the Imp enters its Pain state for the first time.
-- Fields keep their value while the class exists. That’s why every time we do `speedups += 1`, it increases by 1 and will keep that value throughout whatever the Imp does.
+- Fields by default can be changed from anywhere (this class, inheriting classes, even other classes if they get access to it — the latter will be covered in the [Pointers and Casting](#08_Pointers_and_casting.md) chapter).
+- Fields can’t be declared with a value. When you declare them, they receive a default value (for `int` this is 0, for `string` it's an empty string), and then you have to modify it somewhere (for example, inside an actor state). In the example above `speedups` is initially equal to 0 and it’s increased by 1 when the Imp enters its Pain state for the first time and calls `speedups++`.
+- Fields keep their value while the class exists. That’s why every time we do `speedups += 1` (or `speedups++`, which is the same), it increases by 1 and will keep that value throughout whatever the Imp does.
 - Since fields can be accessed from multiple places, it’s a good idea to give them a sensible and understandable name.
 
 **Local variables:**
 
 - Local variables are declared inside a code block (such as an anonymous function) and are available only within that code block. 
 - They can be declared with a value.
-- Obviously, whenever the function is executed again, this variable will be re-declared and receive the value again. That’s why `double foo = frandom(0.8,1.2)` will create a temporary variable `foo` equal to a random value between 0.8 and 1.2 every time the Pain state sequence is entered. (Note that actors can enter the Pain state multiple times simultaneously when hit by multiple attacks, such as a shotgun blast.)
+- Obviously, whenever the function is executed again, this variable will be re-declared and receive the value again. That’s why `double foo = frandom(0.8, 1.2)` will create a temporary variable `foo` equal to a random value between 0.8 and 1.2 *every* time the Pain state sequence is entered. (Note that actors can enter the Pain state multiple times per tic when hit by multiple attacks, such as a shotgun blast.)
 - Their names aren’t that important, since they won’t exist after the function stops executing. Usually something very short is used.
 
 ## Turning variables into actor properties

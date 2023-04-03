@@ -22,41 +22,41 @@ Indentation is the practice of using tabs and/or spaces at the start of lines of
 
 Your instinctive reaction, most likely, is to say, "I can read my code just fine, thank you very much!" This, however, isn't the point. Messy code leads to some major problems:
 
-1. You'll have problems reading your own code. You may think you won't, and perhaps you don't—for now. But when you decide to come back to some code you wrote months or years earlier, you'll be surprised how hard it is to navigate it.
+1. You'll eventually inevitably have problems reading your own code. You may think you won't, and perhaps you don't—for now. But when you decide to come back to some code you wrote months or years earlier, you'll be surprised how hard it is to navigate it.
 2. You'll have a much harder time getting help from others—and not because everyone is a snob who only wants to read well-written code, but because it's *genuinely* hard to read somebody else's code that isn't well-organized.
 3. While an average player may not be concerned with it, clean code will make a good impression on other modders and creators.
 
 In short: check out [existing indentation styles](https://en.wikipedia.org/wiki/Indentation_style), pick Allman or K&R (since the absolute majority are using one of those) and use it consistently. Remember, this is how it should look (using Allman because this is the style I use throughout this guide):
 
 ```csharp
-class MyClass : Actor        //level 1 header
+class MyClass : Actor     //level 1 header
 {
-    int foo;            //level 1 code
+    int foo;                  //level 1 code
     string bar;
     property bar : bar;
-    Default                //level 2 header
+    Default                   //level 2 header
     {
-        property1;            //level 2 code
+        property1;                //level 2 code
         property2;
         property3;
         +FLAGNAME
-    }                              //end of level 2 block
-    States              //another level 2 header
+    }                             //end of level 2 block
+    States                    //another level 2 header
     {                
-    Spawn:                       //state labels may or may not be indented further (see notes below)
-        SPRT A 1;            //level 2 code
+    Spawn:                    //state labels may or may not be indented further (see notes below)
+        SPRT A 1;                 //level 2 code
         loop;
     Death:
         SPRT B 5 A_Function;
-        SPRT CD 5                   //level 3 header
+        SPRT CD 5                 //level 3 header
         {
             A_Function1();            //level 3 code
             A_Function2();
-        }                //end of level 3 block
+        }                             //end of level 3 block
         SPRT E -1;
         stop;
-    }                //end of level 2 block
-}                //end of level 1 block
+    }                             //end of level 2 block
+}                              //end of level 1 block
 ```
 
 There *is* some discussion regarding how to indent the contents of the `States` block though, but both of these options should be fine:
@@ -126,7 +126,7 @@ Using WADs as a sole method of storing data is still popular. Avoid this! WAD fi
 
 However, a next-level strategy would be using a *folder* instead of an archive. Specifically, instead of having a packed PK3 (which, remember, is just a zip file), you can unpack it and keep it as an unpacked folder that uses the same internal structure as PK3 would. For example, this is how a development version of Beautiful Doom looks in a folder on my PC:
 
-![image-20200422172321943](image-20200422172321943.png)
+![](assets/folder structure.png)
 
 GZDoom can run folders in the same way it can run archives:
 
@@ -169,3 +169,5 @@ A good number of well-known mods use GitHub because of the obvious benefits:
 ---
 
 🟢 [<<< BACK TO START](README.md)
+
+

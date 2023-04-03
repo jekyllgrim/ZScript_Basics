@@ -249,7 +249,7 @@ Assignment operators are used to *set* a value. They don't check or compare, the
   alpha *= 0.5;
   ```
   
-    Note: changing alpha will only work on if actor's `renderstyle` is of type that supports translucency (e.g. `'add'` or `'translucent'`).
+    Note: changing alpha will only work if the actor's `renderstyle` is of type that supports translucency (e.g. `'add'` or `'translucent'`).
 
 * `%=` — gives the **remainder** of dividing the first operator by the second operand:
   
@@ -377,9 +377,9 @@ Used to *check* whether two values are equal, or whether one is greater than, le
   }
   ```
   
-    For all intents and purposes this check is pretty much the same as `if (vel == (0,0,0))`, but edge cases are possible, so for doubles it's recommended. It's slightly less performance efficient than `==`, but most of the time the difference is negligible.
+  For all intents and purposes this check is pretty much the same as `if (vel == (0,0,0))`, but edge cases are possible, so for doubles it's recommended. It's slightly less performance efficient than `==`, but most of the time the difference is negligible.
   
-    Doesn't work with integer values.
+  `~==` doesn't work with integer values.
 
 * `>` — checks if the first operand is **greater than** the second:
   
@@ -1209,9 +1209,7 @@ Actor states in ZScript can be compared to a code block, but they have a number 
 - Everything that goes after a state label and until an operator (such as `stop`, `loop`, `wait`, `goto`) is called a **state sequence**.
 - *Every separate frame* inside a state sequence is called a **state**.
 
-![Graph](state_structure.png)
-
-(Separate states not highlighted because it'd make the image too noisy, but each frame, such as POSSA, POSSB, etc., is a separate state.)
+![](assets/state_structure.png)
 
 As you know, you can attach functions and code blocks (i.e. [anonymous functions](Anonymous_functions.md)) to states inside the states block. The state sequences inside a state block, however, have their own flow operators. They're the same as in DECORATE, but it's still important to understand how they work and what peculiarities they have.
 
