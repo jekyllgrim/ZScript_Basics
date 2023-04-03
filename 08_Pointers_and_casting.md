@@ -6,32 +6,122 @@
 
 # Pointers and casting
 
-* [Basic pointers](#basic-pointers)
-* [Using pointers in ZScript](#using-pointers-in-zscript)
-* [Null-checking pointers](#null-checking-pointers)
-* [Casting and custom pointers](#casting-and-custom-pointers)
-* [Type casting](#type-casting)
+One of the primary concepts you need to have a good grasp on to use ZScript efficiently is pointers. Depending on your coding experience, you may be aware of what a pointer is (DECORATE actually uses some pointers, albeit in a much more limited manner than ZScript), but for people who have no experience in the area they can be rather confusing.
 
-## Basic pointers
+### Class types vs class instances
 
-One of the primary concepts you need to have a good grasp on to use ZScript is pointers. A **pointer** is, in essence, a type of [variable](07_Variables_and_data_types.md) that gives you *access* to something—often that's an actor.
+Before we talk about pointers, however, it's important to cover another major aspect of ZScript (and object-oriented programming in general): **class types** and **class instances**. These terms are often used in the context of pointers and are generally fundamental to coding.
 
-DECORATE actually has pointers! But you are limited to using three of them: **master, target** and **tracer**. You’re probably familiar with them, but here’s a quick recap:
+The idea of class types and class instances is actually fairly simple, but beginner scripters can sometimes go on for a while without a clear understanding of it. Here's how it goes:
 
-- `Target` is the most common pointer and it’s automatically used by monsters and projectiles:
-  - In case of **monsters** `target` is literally their current target—the actor they’ll be chasing and attacking (if there is one). Monsters acquire a target by calling `A_Look`, then chase it with `A_Chase`, and they aim at the target with `A_FaceTarget`.
-  - In case of **projectiles** `target` is (counter-intuitively) the **shooter** of the projectile. So, if it’s a player-spawned projectile, the player pawn will be its target. Why is it even tracked? Because the shooter has to get **kill credit**: it allows the game to track how many monsters the player killed, who killed whom in multiplayer, and print out obituary messages (such as "*Playername* stood in awe of Spider Demon"). If for some reason the projectile loses its `target` pointer (which normally shouldn’t happen), the killer won’t get the credit. (There are other more obscure mechanics involved; for example, a projectile can’t hit its shooter as long as the shooter is the projectile’s `target`).
-    - *Note*: if you’re wondering if a projectile has any pointer to its actual target, i.e. the monster that it'll hit, the answer is no. Projectiles don’t need pointers to actors they hit because they simply hit whatever they collide with. (They do get a pointer to what they hit briefly when the hit happens, but you can't access it in DECORATE; more on that later.)
-- `Tracer` pointer is normally only used by seeker projectiles, such as **RevenantTracer**. Projectiles using seeking functions such as `A_Tracer` or `A_SeekerMissile` continuously face their tracer to change their direction towards it.
-- `Master` pointer is not set by anything in vanilla Doom, but you might’ve set it yourself via `A_SpawnItemEx` which allows setting pointers manually via flags (`SXF_SETMASTER` in this case).
+* A **class type** is a specific class, as defined in the code, compiled and loaded into memory by GZDoom. For example, the `DoomImp` class, as defined in gzdoom.pk3, with all of its default values (such as how much health it has, what sounds it makes, etc.) is a *class type*. There can be only type of each class.
 
-Pointers in DECORATE can be set manually mostly with `A_SpawnItemEx` by using the function’s flags. Doing this, you get access to functions such as `A_KillMaster` or `A_RemoveChildren` and such, which allow killing/removing actors from another actor that has a pointer to them. `A_FaceTarget` is also a common example of a function that interacts with a pointer, making the actor face its target (if it has one).
+* A **class instance** is a specific manifestation of that class. Every time an object of a specific class type is created in a running game, that object is an instance of said class. For example, when you're playng GZDoom and there are ten Imps on the map, *each* of those imps is an *instance* of the `DoomImp` class. Every separate instance of a class can be in a different state (in case of Imps—they can be in different positions, with different amount of remaining health, damaged, killed, hostile, friendly, etc.). 
 
-## Using pointers in ZScript
+In real-life terms, a class type can be seen as a blueprint for something, but each *specific* object made from that blueprint is a class instance.
 
-In ZScript pointers are much more flexible. The first difference is in how you use them: you can use them as prefixes for calling functions and setting properties on a specific actor. For example, doing `alpha = 0.5;` will change the translucency of the actor that calls this code but `master.alpha = 0.5;` will change the alpha of the actor’s `master`. 
+The process of creating an instance of a class is called **instantiation**. When we're talking about GZDoom actors, they're instantiated by **spawning** in the playable space with the use of the `Spawn()` function (which is defined in the base `Actor` class).
 
-You can use the same syntax to call functions on a specific actor from another actor, like so:
+> *Note:* Sometimes the term "class type" is conflated with the term "class name." This is incorrect. A class name is literally the name by which the class is known, but a name is just a name—it doesn't imply any data. A class type is the class itself, it's something that exists in your computer's memory while running GZDoom, and it contains all the information relevant to that class (its default properties and flags, its states, etc.) Continuing the blueprint analogy, imagine you have a blueprint that has "Shotgun" written on it, and the schematics for a shotgun: in this case, the word "Shotgun" is the class name, but the blueprint itself with all the information it contains is the `Shotgun` class type.
+
+Using a more GZDoom-specific example, let's say you have a weapon that calls this:
+
+```csharp
+WEAP A 1 A_FireProjectile("Rocket");
+```
+
+The "Rocket" in that function is a class type: you're telling the function what *class type* should be used as the projectile.
+
+When the function is called, it spawns a Rocket actor—that actor is an *instance* of the `Rocket` class.
+
+In the context of GZDoom coding and gameplay, when we talk about the `Actor` class, we're talking about a class type (the base `Actor` class). But when we say "an actor," we imply any instance of the `Actor` class (which, as we know, can be an item, an enemy, a player-controlled PlayerPawn, a projectile, etc.—all of these are actors, because they're all based on the `Actor` class, either directly on through inheritance).
+
+This distinct terminology is going to be used throughout this chapter.
+
+## Overview of pointers
+
+A **pointer** is a type of [variable](07_Variables_and_data_types.md). Like any variable, a pointer is a piece of data that contains a value, and that value can change dynamically (i.e., it's variable). However, when you think of variables, you might tend to think of numeric values (like integers, float-points, vectors, etc.) or boolean values (true/false). Pointers aren't like that; instead, a pointer contains a memory address that quite literally *points* to another object. Most of the time pointers point to *Actor instances*, i.e. from one actor to another.
+
+The **purpose** of pointers is, to put it simply, to let class instances *interact with each other*. For example:
+
+* When a monster is chasing/attacking a player pawn actor, the monster has a pointer to that player pawn actor.
+
+* When an actor fires a projectile, that projectile gets a pointer to whoever fired it (so that the projectile *knows* who fired it), and when said projectile eventually hits another actor, it briefly gets a pointer to the actor it hit and deals damage to it, and the damaged actor gets a pointer to the projectile that hit it *and* the shooter of the projectile, so that it knows who was responsible for the attack.
+
+* When an item is picked up and placed in player's inventory, the item gets a pointer to the player pawn, so that it knows who its owner is.
+
+...And so on. Whenever class instances in GZDoom interact with each other, they get pointers to each other. 
+
+Just like variables, pointers may be class-wide, i.e. they can defined as **fields**, or they can be **local**, existing only within the context of one function, one code block, etc.
+
+For example, monsters have a `target` field that contains a pointer to an actor the monster is chasing and/or attacking. Inventory items have an `owner` field that contains a pointer to whoever picked that item up. If there's no actor to track in those fields (for example, a monster hasn't found a suitable target yet, or an item hasn't been picked up yet), the value of those pointers will be `null`, meaning they won't point to anything.
+
+Local pointers, just like local variables, exist only in specific context. For example, when a projectile collides with another actor, it briefly gets a `victim` pointer to it, but that pointer only exists at the moment of hit (you'll learn more about that in the [chapter on virtual functions](10_Virtual_functions.md)).
+
+The most important aspect of pointers is that, as long as a pointer exists (for example, it's defined as an actor field), that pointer allows you to check the data, state, values, etc. of the actor it points to all the time. For example, as long as a monster actor exists and has a valid target, through its `target` pointer it'll always know where the target is, what it is doing, and so on.
+
+## Native pointers
+
+Just like with other variables, there are some pointers that already exist in GZDoom classes, but you also have an ability to define your own.
+
+There are 3 pointers defined in the `Actor` class that are avaialble to all GZDoom actors (both in ZScript and DECORATE). These are actor pointers defined as fields (and you might already be familiar with them): **`target`**,  **`master`** and **`tracer`**. 
+
+Let's cover their use briefly.
+
+### Target
+
+`Target` is the most commonly used native pointer and it’s primarily used by monsters and projectiles:
+
+- In case of **monsters**, `target` is the actor they’re be chasing and attacking (if there is one). Monsters acquire a target by calling `A_Look()`, then chase it with `A_Chase()`, and they aim at the target with `A_FaceTarget()`. Here's an example from Doom's [Zombieman](https://zdoom.org/wiki/Classes:ZombieMan):
+  
+  ```csharp
+      Spawn:
+          // A_Look tries to acquire a target. 
+          // If found, the actor goes to the See sequence.
+          POSS AB 10 A_Look; 
+          Loop;
+      See:
+          // A_Chase chases the target, or tries to find a new one,
+          // if the current one disappears or dies.
+          // Has a chance to move the actor to the Missile sequence
+          // so that they can attack.
+          POSS AABBCCDD 4 A_Chase;    
+          Loop;
+      Missile:
+          POSS E 10 A_FaceTarget; // Turns the actor to face its target
+          POSS F 8 A_PosAttack; // Fires a hitscan attack
+          POSS E 8;
+          Goto See;
+  ```
+  
+  - If a monster is killed by another actor, that actor is *also* set as the killed monster's `target`. It doesn't matter if the monster was aware of their killer or not; even if you manage to kill a non-alerted monster, you will be set as their `target`. Yes, dead monsters still track their killers with that pointer.
+* In case of **projectiles** `target` is (rather counter-intuitively) the *shooter* of the projectile. So, if a player fires a rocket, their PlayerPawn will be the rocket's `target`. Why is it important? Because the shooter has to get **kill credit**: it allows the game to track how many monsters the player killed, who killed whom in multiplayer, and print out obituary messages (such as "*Playername* stood in awe of Spider Demon"). If for some reason the projectile loses its `target` pointer (which normally shouldn’t happen), the killer won’t get the credit. There are other, more nuanced mechanics involved as well: for example, a projectile can’t hit its shooter as long as the shooter is the projectile’s `target`; that's why even if you manage outrun a rocket you fired and stand in front of it, it will just fly through you without colliding with you.
+
+> *Note*: If you’re wondering if a projectile has any global pointers to the actors it hits—it doesn't. Projectiles don’t need such pointers, because they simply hit whatever SHOOTABLE or SOLID actor they collide with. (They do get a pointer to what they hit briefly when the hit happens, but it's a local pointer that only exists within their `SpecialMissileHit()` virtual function—more on that later).
+
+- Similarly to projectiles, [puffs](https://zdoom.org/wiki/Puff) used by hitscan attacks also get a `target` pointer to whoever fired the attack, provided the puff has the PUFFGETSOWNER flag. (Note that Doom's default puff class, [BulletPuff](https://zdoom.org/wiki/Classes:BulletPuff), doesn't use it.)
+
+### Tracer
+
+The `tracer` pointer is normally only used by seeker projectiles, such as [RevenantTracer](https://zdoom.org/wiki/Classes:RevenantTracer). Projectiles use special seeking functions, such as `A_Tracer` or `A_SeekerMissile`, in order to continuously aim at their `tracer`.
+
+### Master
+
+The `master` pointer is not set by anything in vanilla Doom, but it can be set via [`A_SpawnItemEx`](https://zdoom.org/wiki/A_SpawnItemEx) which allows setting pointers manually with special flags (`SXF_SETMASTER` in this case). Doing that allows the use of such functions a `A_KillMaster` (kills the calling actor's `master`) or `A_KillChildren` (kills all actors that have the calling actor as their `master`) and a few other similar ones. 
+
+### Puff pointers
+
+Puffs used by hitscan attacks can also utilize HITTARGET, HITMASTER and HITTRACER pointers, which sets their `target`, or `master`, or `tracer` field (respectively) to the actor hit by the attack. Puffs with the PUFFGETSOWNER flag will also track whoever fired the attack with their `target` pointer.
+
+## Custom pointers and their use in ZScript
+
+ZScript allows you to define custom pointers, both as fields and local, and this is one of the primary features of the language.
+
+So far we haven't quite covered how pointers are used. The most important aspect of pointers is that they give you access to another actor in the game. You already know that you can read and modify an actor's own variables and fields by using their names—for example, in [anonymous functions](06_Anonymous_functions.md). But through pointers you can read and modify values on *another* actor from the calling actor. All you need to do is use the pointer as the prefix. 
+
+For example, calling `alpha = 0.5;` will change the translucency of the actor that calls this code, but `target.alpha = 0.5;` will change the alpha of the actor that is stored in the `target` pointer of the calling actor.
+
+Here's a simple example:
 
 ```csharp
 class GraciousImp : DoomImp
@@ -41,66 +131,44 @@ class GraciousImp : DoomImp
     Death:
         TNT1 A 0
         {
-            if (target != null)    //checks that target exists before doing anything
-                target.GiveInventory("Shell",20);    //if so, give it 20 shells
+            // Checks that a target exists before doing anything:
+            if (target != null)
+            {
+                target.GiveInventory("Shell",20); // Gives 20 shells to the target
+            }
         }
-        goto super::Death;
+        goto super::Death; // Continues to the default DoomImp's Death sequence
     }
 }
 ```
 
-This gracious Imp gives the target some shells when it dies (hence, if you killed it, it'll be you).
+This gracious Imp gives whoever killed it 20 shells (as mentioned before, when an actor is killed, its killer is set as its `target`).
 
-*Notes on the example:*
+Some notes on the example:
 
-- `if (target != null)` checks if `target` exists. This is called **null-checking** (because it checks if a pointer isn't null), and you *have* to do it before trying to call anything on the `target`. See the next subsection for more information.
+- `if (target != null)` checks if `target` exists. This is called **null-checking** (because it checks if a pointer isn't `null`), and you *have to* do it before trying to call anything on the `target`. See the next subsection for more information.
   
-  - Note that it can be simplified to `if (target)` — this does the same thing as `if (target != null)`.
+  - Note that this can be simplified to `if (target)` — this does the same thing as `if (target != null)`.
 
 - `GiveInventory` is an internal ZScript version of `A_GiveInventory` and it works basically the same way.
 
-- You might've noticed there are no curly braces after around the **target.GiveInventory** block. You can do that when there’s only **one line** after the condition. However, if there are 2 or more lines, you can’t do that:
-  
-  ```csharp
-  //this is OK:
-  if (target)
-  {
-      target.GiveInventory("Shell",20);
-  }
-  
-  //this is also OK and will do the same thing:
-  if (target)
-      target.GiveInventory("Shell",20);
-  
-  //this is OK:
-  if (target)
-  {
-      target.GiveInventory("Shotgun",1)
-      target.GiveInventory("Shell",20);
-  }
-  
-  //THIS IS NOT OK!
-  if (target)
-      target.GiveInventory("Shotgun",1)
-      target.GiveInventory("Shell",20); //this will ignore the null-check
-  ```
-
-Now let's make something more advanced. We'll use the `tracer` pointer that is normally not used by monsters. But first, to make it a bit more colorful, we'll create a TRNSLATE lump and add some translations:
+Now let's make something more advanced. This time we'll use the `tracer` pointer that is normally not used by monsters. But first, to make it a bit more colorful, we'll create a TRNSLATE lump and add some translations:
 
 **TRNSLATE:**
 
 ```csharp
-//a desaturated color translation that tints the actor red:
+// A desaturated color translation that tints the actor red:
 BabyAngry = "0:255=%[0.85,0.00,0.00]:[2.00,1.96,1.39]" 
 
-//a similar translation but it tints the actor blue:
+// A similar translation but it tints the actor blue:
 BabyCalm = "0:255=%[0.05,0.01,0.84]:[1.39,1.96,2.00]"
 ```
 
  **ZSCRIPT:**
 
 ```csharp
-//This is a smaller version of Cacodemon that has x2 health and is blue:
+// This is a smaller version of the Cacodemon 
+// that has x2 health and is blue:
 class CacoBaby : Cacodemon
 {
     Default
@@ -115,12 +183,14 @@ class CacoBaby : Cacodemon
     }
 }
 
+// A version of the Cacodemon that spawns CacoBaby
+// when it appears, and modifies it when it dies:
 class CacoDaddy : Cacodemon
 {
     States 
     {
     Spawn:
-        //spawn Cacobaby: SXF_ISTRACER will make it CacoDaddy's tracer
+        // Spawn Cacobaby and set it as CacoDaddy's tracer:
         TNT1 A 0 NoDelay A_SpawnItemEx("Cacobaby", 64, flags:SXF_ISTRACER);    
         HEAD A 10 A_Look;
         wait; //loops the previous frame instead of the whole state, in contrast to 'loop'
@@ -129,14 +199,14 @@ class CacoDaddy : Cacodemon
         {
             if (tracer && tracer.health > 0) //check that tracer exists and is alive
             {
-                tracer.A_StartSound("caco/active"); //play Cacodemon "wake up" sound on the tracer
-                tracer.A_SetTranslation("BabyAngry"); //change translation, as defined in TRNSLATE
+                tracer.A_StartSound("caco/active"); //play Cacodemon's "wake up" sound on the tracer
+                tracer.A_SetTranslation("BabyAngry"); //change translation of the tracer
                 tracer.speed *= 2; //multiply tracer's speed by 2 
-                tracer.floatspeed*= 1.5; //multiply tracer's floatspeed by 1.5
+                tracer.floatspeed *= 1.5; //multiply tracer's floatspeed by 1.5
                 tracer.bNOPAIN = true; //set tracer's NOPAIN flag to true
             }
         }
-        goto super::Death;    //continue to default Cacodemon death
+        goto super::Death; //continue to default Cacodemon death
     }
 }
 ```
@@ -149,19 +219,21 @@ We use `tracer.` as a prefix to execute functions on it and change its propertie
 
 ## Null-checking pointers
 
-Null-checking is the process of checking that specific data isn't null. This is most commonly done on pointers, and the syntax is as follows:
+Null-checking is the process of checking that specific data isn't null (i.e. it exists). This is most commonly done on pointers, and the syntax is as follows:
 
 ```csharp
 if (pointer != null)
 ```
 
-where `pointer` is an existing pointer, such as `target`. It can also be shortened to this:
+where `pointer` is an existing pointer, such as `target`.
+
+It can also be shortened to this:
 
 ```csharp
 if (pointer)
 ```
 
-Basically at any time when you're using a custom pointer, you need to null-check it when you're doing something with it. If you don't do the null-check and for some reason the actor doesn't exist (for example, a monster's `target` pointer will be empty if their target is already dead), the game will try to read data that doesn't exist. As a result GZDoom will close with an error, "Tried to read from address zero" (this is known as a **VM abort**). A null-check tells GZDoom to first *check* if the data exists, and only do what needs to be done if the check passes.
+Basically, at any time when you're using a pointer, you need to null-check it before doing something with it. If you don't do the null-check and for some reason the actor doesn't exist (for example, a monster's `target` pointer will be empty if their target is already dead), the game will try to read data that doesn't exist. As a result GZDoom will close with a "Tried to read from address zero" error. A null-check tells GZDoom to first *check* if the data exists, and only do what needs to be done if the check passes.
 
 If you need to check that a pointer *is* null, just invert the check:
 
@@ -181,26 +253,39 @@ You can learn more about operators and operands in the [Flow Control](A1_Flow_Co
 
 ## Casting and custom pointers
 
-But casting and custom pointers is where the actual fun begins. **Casting** is the process of defining a variable and attaching a value to it, and if that value is an actor, the variable becomes a pointer to that actor.
+Casting and custom pointers is where the actual fun begins. 
+
+**Casting** is the process of defining a variable and then attaching a value to it. For example, you can define an empty pointer first, then spawn an actor and castin the resulting actor to said pointer:
+
+```csharp
+Actor myPointer = Spawn("Cacodemon", pos);
+```
+
+Doing the above will first create an actor pointer `myPointer`, then spawn a Cacodemon at the calling actor's position (`pos`) and cast the result to the `myPointer` pointer.
+
+Note: As you know, all variables have a data type. For example, when you declare `int foo;`, you create a variable `foo` whose data type is `int`, i.e. an integer number. When it comes to actor pointers, their data type is literally `Actor`.
 
 There are two main cases when you need to use casting:
 
-- To create a custom pointer that doesn't take place of `master`, `target` or `tracer`. As I mentioned earlier, you should avoid using these pointers when you can, since there's a lot of implicit behavior attached to them (for example, monsters will target their attacks at their `target` pointer, while projectiles track their shooters as `target`, which is important for kill credit and other things).
-- To get access to **class-specific variables**, which includes your custom variables. This concerns any custom variables you may have created as well.
+- To create a custom pointer that doesn't take place of `master`, `target` or `tracer`. Ideally, you should avoid using these native pointers when you can, since there's a lot of implicit behavior attached to them (for example, monsters and projectiles already use `target` in their core behaviors, `tracer` is used by seeking projectiles, and so on).
+- To get access to **class-specific fields**, which includes your custom variables. This concerns fields that are defined in a specific class and don't exist in the base `Actor` class. This will be explained separately.
 
-First, creating the pointers. Just like any variables, they can be class-scope (a.k.a. fields) or local. Let's modify our daddy Cacodemon slightly:
+First, let's talk about defining custom pointers.
+
+As mentioned before, pointers can be class-scope (fields) or local (existing only within a specific ontext). Let's create a pointer field:
 
 ```csharp
 class CacoDaddy : Cacodemon
 {
-    Actor baby;    // define a field 'baby' (notice its type is 'Actor')
+    Actor baby; // Defines a field 'baby' (notice its type is 'Actor')
 
     States 
     {
     Spawn:
         TNT1 A 0 NoDelay 
         {
-            baby = Spawn("CacoBaby", pos); // Spawn CacoBaby and cast it to 'baby'
+            // Spawn CacoBaby and cast it to 'baby':
+            baby = Spawn("CacoBaby", self.pos);
         }
         HEAD A 10 A_Look;
         wait;
@@ -223,24 +308,28 @@ class CacoDaddy : Cacodemon
 
 *Notes on the example:*
 
-- `Spawn("actorname", coordinates)` is a ZScript function that simply spawns something at the coordinates you provide. The position is a `vector3` (see [Data types](07_Variables_and_data_types.md#data-types)).
-- `pos` is a vector3 expression that simply contains the actor's own coordinates. We use it as a second argument of `Spawn` to spawn CacoBaby at CacoDaddy's position.
+- `Spawn("actorname", coordinates)` is a ZScript function that simply spawns something at the coordinates you provide. The position is a `vector3` (see [Data types](07_Variables_and_data_types.md#data-types)). 
+- `pos` is a vector3 expression that simply contains the actor's own current coordinates. By passing `self.pos` as a second argument of `Spawn` we spawn CacoBaby at CacoDaddy's position.
+- `self` is, as you probably guessed, a pointer to the actor itself. We're using `self.pos` in the `Spawn()` call to spawn CacyBaby at CacyDaddy's current position.
 
-The behavior barely changes, but we're now using a custom pointer `baby` instead of pre-existing `tracer`. This frees up the tracer pointer to be used somewhere else (perhaps by one of the existing functions, who knows!). 
+The behavior of this version isn't much different from the earlier verison we used, but we're now using a custom pointer `baby` instead of the native `tracer`. This frees up the `tracer` pointer to be used somewhere else (perhaps by one of the existing functions, who knows!). 
 
-What exactly happens: `baby = Spawn("CacoBaby", pos)` spawns an actor named CacoBaby at the position `pos` (CacoDaddy's position) *and* casts CacoBaby to the variable `baby`. 
+What exactly happens: `baby = Spawn("CacoBaby", self.pos)` spawns an actor named CacoBaby at the CacoDaddy's position and **casts** a pointer to CacoBaby to the variable `baby`. 
 
-You may wonder why we're not using `A_SpawnItemEx` here. That's because ZScript `Spawn` function not only spawns an actor but also tells us what actor was spawned—as a result, we can immediately cast it to the variable. `A_SpawnItemEx`, however, spawns an actor but returns two sets of data instead of one and casting with it is a little more complex. (See [Custom Functions](09_Custom_functions.md) to learn more about return values.) In short, `A_SpawnItemEx` isn't really necessary when we simply want to spawn something.
+> *Note:* You may wonder why we're not using `A_SpawnItemEx` here. Simply put, because we don't need `A_SpawnItemEx`—it's a more complex function with a lot of values. What's more, `A_SpawnItemEx` returns multiple values, and casting through it is more difficult, so we don't really need to concern ourselves with it here. (You'll learn more about return values in the [Custom Functions](09_Custom_functions.md) chapter).
 
-One minor downside is that `Spawn` uses global offsets, not relative, so we can't spawn CacoBaby 64 units in front of CacoDaddy. But that's not a problem, since we can spawn it and then immediately move it using `Warp` (a ZScript internal version of the [A_Warp](https://zdoom.org/wiki/A_Warp) function):
+One minor downside is that `Spawn` uses global offsets, not relative (in contrast to `A_SpawnItemEx`), so we can't spawn CacoBaby 64 units in front of CacoDaddy. But that's not a problem, since we can spawn it and then immediately move it using `Warp` (a ZScript internal version of the [`A_Warp`](https://zdoom.org/wiki/A_Warp) function):
 
 ```csharp
 Spawn:
     TNT1 A 0 NoDelay 
     {
         baby = Spawn("CacoBaby",pos);
-        if (baby)    //don't forget to immediately null-check the pointer!
-            baby.Warp(self, 64, 0, 0);    //moves the spawned baby 64 units in front of self (CacoDaddy)
+        // don't forget to null-check the pointer:
+        if (baby)
+        {
+            baby.Warp(self, 64, 0, 0); // moves the spawned baby 64 units in front of self (CacoDaddy)
+        }
     }
     HEAD A 10 A_Look;
     wait;
@@ -248,7 +337,7 @@ Spawn:
 
 > *Note*: For this simple example, we're not checking the position here at all, so if CacoDaddy was in front of a wall, the baby can end up inside a wall.
 
-`Self`, as you probably already guessed, is a pointer to the current actor; since we're calling this from CacoDaddy, `self` is CacoDaddy. The full syntax for `Warp` is `Warp(pointer, xoffsets, yoffsets, zoffsets)`, and the offsets are relative, just like with `A_Warp`, so we move the spawned baby 64 units in front of `self` (CacoDaddy).  (`Self` is an existing pointer, you don't need to define or cast it.)
+`Self`, as mentioned, is a pointer to the current actor; since we're calling this from CacoDaddy, `self` is this instance of CacoDaddy. The full syntax for `Warp` is `Warp(pointer, xoffsets, yoffsets, zoffsets)`, and the offsets are relative, just like with `A_Warp`, so we move the spawned baby 64 units in front of `self` (CacoDaddy).  (`Self` is an existing pointer, you don't need to define or cast it.)
 
 Now, we can go even deeper. Instead of using two different actors, we can use only one and modify it on the fly to make it look different:
 
@@ -299,7 +388,7 @@ By doing the above, we spawn the baby Cacodemon and immediately set all of prope
 
 You may ask at this point, is it safe to have this actor replace the vanilla Cacodemon? After all, it spawns *another* Cacodemon when it appears, won't this cause an infinite chain?
 
-Actually, no, it won't See, `Spawn` has a third argument that determines whether the spawnee can be replaced or not. The possible values for that argument are `NO_REPLACE` and `ALLOW_REPLACE`, and `NO_REPLACE` is the default one. 
+Actually, no, it won't! See, `Spawn` has a third argument that determines whether the spawnee can be replaced or not. The possible values for that argument are `NO_REPLACE` and `ALLOW_REPLACE`, and `NO_REPLACE` is actually the default one. In other words, by default actors spawned with `Spawn()` are *not* subject to actor replacements.
 
 Obviously, you do *not* want to do anything like this:
 
@@ -321,9 +410,11 @@ class FreezeTheGameCacodemon : Cacodemon replaces Cacodemon
 
 because that would freeze the game with an endless cycle of Cacodemons spawning each other. But then, why would you do that, right?
 
-It's important to remember that all DECORATE spawn functions (such as `A_SpawnItemEx`) *do* allow replacement by default, whereas `Spawn` doesn't.
+It's important to remember that all DECORATE spawn functions (such as `A_SpawnItemEx`) *do* allow replacement, whereas `Spawn` doesn't.
 
-Actually, let's take a look at an internal function where `NO_REPLACE` is very important for it to function correctly. It's a function used by BossBrain, the Romero head inside the Icon of Sin (don't worry that you don't understand all of it, it's a bit advanced):
+Since we're talking about `Spawn()` and its relationship with actor replacement, let's take a look at an internal function where `NO_REPLACE` is important for functioning correctly. It's a function used by the `BossBrain` class — the Romero head inside the Icon of Sin.
+
+When you destroy the Icon of Sin, `BossBrain` uses the following function (don't worry that you don't understand all of it, it's a bit advanced):
 
 ```csharp
 private static void BrainishExplosion(vector3 pos)    //defines a function for BossBrain to use
@@ -342,13 +433,13 @@ private static void BrainishExplosion(vector3 pos)    //defines a function for B
 }
 ```
 
-There's a lot of stuff in this example we haven't covered yet, like creating custom functions, but now you should be able to mostly understand what's happening: the function creates a rocket, changes its explosion sound, disables rocket trail and damage and slightly randomizes its animation speed. On the whole, Icon of Sin's death effect is more complicated than that (and it only works at specific map coordinates, by the way), but you get the gist.
+There's a lot of stuff in this example we haven't covered yet, like creating custom functions, but now you should be able to mostly understand what's happening: this function creates a rocket, changes its explosion sound, disables rocket trail and damage and slightly randomizes its animation speed. On the whole, Icon of Sin's death effect is more complicated than that (and it only works at specific map coordinates, by the way), but you get the gist.
 
-## Type casting
+### Type casting
 
-There's one other case of casting that you'll need to use when working with classes that use custom variables or functions. 
+There's one other method of casting, known as type casting. This method is used when you need a pointer whose type is more specific than just Actor.
 
-Let's say we want to make a version of Baron of Hell that drops a big Soulsphere when it's killed: this Soulsphere should set our health to 300 instead giving 100 HP limited to 200. Of course, we could create a new Soulsphere actor, but since we now know about casting, we try do this:
+Let's say we want to make a version of Baron of Hell that drops a big Soulsphere when it's killed: this Soulsphere should set our health to 300 instead of the standard behavior of giving 100 HP. Of course, we could create a new Soulsphere actor, but since we now know about casting, we try do this:
 
 ```csharp
 // This doesn't actually work:
@@ -364,7 +455,6 @@ class PrinceOfHell : BaronOfHell
             {
                 orb.amount = 300;
                 orb.maxamount = 300;
-                orb.pickupmessage = "Overcharge!";
                 orb.scale = (1.5,1.5);
             }
         }
@@ -373,7 +463,7 @@ class PrinceOfHell : BaronOfHell
 }
 ```
 
-But if you run the code above, you'll get "Unknown identifier" script errors about `amount`, `maxamount` and `pickupmessage`.
+But if you run the code above, you'll get "Unknown identifier" script errors about `amount` and `maxamount`. 
 
 The reason is simple: we're casting Soulsphere as **actor**, but properties like `amount` and `maxamount` are *not* defined in the `Actor` class; they're actually defined in the `Inventory` class. To avoid the error that, we need to cast it explicitly as `Inventory`. And this is what's called **type casting**:
 
@@ -386,12 +476,11 @@ class PrinceOfHell : BaronOfHell
     Death:
         TNT1 A 0 
         {
-            inventory orb = Inventory(Spawn("Soulsphere",pos));
+            Inventory orb = Inventory(Spawn("Soulsphere",pos));
             if (orb) 
             {
                 orb.amount = 300;
                 orb.maxamount = 300;
-                orb.pickupmessage = "Overcharge!";
                 orb.scale = (1.5,1.5);
             }
         }
@@ -402,106 +491,41 @@ class PrinceOfHell : BaronOfHell
 
 In this case inventory orb creates a variable orb of type `Inventory`, then casts it to an `Inventory` class and spawns it. You'll need to use this method whenever you're trying to get access to variables, properties and functions defined only for a specific class. 
 
-You can simplify type casting by using the word `let`:
+As such, the syntax for type casing is this:
+
+```csharp
+Type pointerName = Type(<another pointer or function>);
+```
+
+You may wonder, why do we need to do `Inventory orb = Inventory(Spawn("Soulsphere", pos))`, why can't we just do `Inventory orb = Spawn("Soulsphere", pos)`? The answer is, the `Spawn()` function doesn't know beforehand what kind of actor you'll be spawning, and it doesn't know if you need to cast the spawned actor as a specific type or not, so it returns an Actor pointer to the spawned actor. That's why you need to explicitly tell the function what type of pointer you need to get.
+
+*However*, while you have to provide the class type before `Spawn()`, you *can* skip the pointer type—or rather, you can replace it with the keyword `let` as follows:
 
 ```csharp
 let orb = Inventory(Spawn("Soulsphere",pos));
 ```
 
-`Let` automatically sets the variable's type to what you're casting it to: in example above `orb` will automatically be cast to `Inventory`. Usually there's no reason not to use that, since it's very convenient, but manually specifying the variable type arguably makes the code more readable: you'll be able to immediately tell what type it is.
+`Let` automatically sets the variable's type to what you're casting to it: in the example above the type of `orb` will be automatically set to `Inventory`.
 
-You'll need to use type casting for your own custom actors and their functions as well. Let's take a more advanced example: say, you created a sprite light halo and you want to attach it to torches. You have 3 versions of a halo (red, green, blue) and you don't want to define separate actors for each; instead you want to have only one actor and you want it to change its color depending on which torch spawned it. You can do this:
+### Non-actor pointers
 
-```csharp
-class UniversalLightHalo : Actor 
-{
-    name halocolor;            //this will hold the color
+There are other pointer types besides Actor pointers. For example, you can have pointers to actor states. A state is a specific frame defined in the actor's States block (the use of states and the terminology is covered in more detail in [Appendix 1: Flow Control](A1_Flow_Control.md)).
 
-    Default 
-    {
-        +NOINTERACTION        //disables gravity and collision
-        Renderstyle 'add';
-        alpha 0.35;
-        scale 0.5;
-    }
+Some of the non-Actor pointer fields you may need to be aware of:
 
-    States 
-    {
-    Spawn:
-        TNT1 A 0 NoDelay 
-        {
-            //using 'sprite' allows you to manually set which sprite to use:
-            if (halocolor == 'red')
-                sprite = GetSpriteIndex("HRED");
-            else if (halocolor == 'blue')
-                sprite = GetSpriteIndex("HBLU");
-            else if (halocolor == 'green')
-                sprite = GetSpriteIndex("HGRN");
-        }
-        #### A -1;        //#### means "use previous sprite"
-        stop;
-    Load: //this dummy state sequence is used to simply load sprites into memory
-        HRED A 0;
-        HBLU A 0;
-        HGRN A 0;
-        stop; //this sequence will never be entered, but better add stop for consistency
-    }
-}
+* `curstate` — points to whatever state the actor is currently in
 
-class CustomRedTorch : RedTorch replaces RedTorch 
-{
-    States 
-    {
-    Spawn:
-        TNT1 A 0 NoDelay 
-        {
-            let halo = UniversalLightHalo(Spawn("UniversalLightHalo",(pos.x,pos.y,pos.z+48)));
-            if (halo)
-                halo.halocolor = 'Red';
-        }
-        goto super::spawn;
-    }
-}
+* `spawnstate` — points to the first state in the actor's Spawn sequence
 
-Class CustomGreenTorch : GreenTorch replaces GreenTorch 
-{
-    States 
-    {
-    Spawn:
-        TNT1 A 0 NoDelay
-        {
-            let halo = UniversalLightHalo(Spawn("UniversalLightHalo",(pos.x,pos.y,pos.z+48)));
-            if (halo)
-                halo.halocolor = 'Green';
-        }
-        goto super::spawn;
-    }
-}
+* `cursector` — points to the sector the actor is currently in
 
-Class CustomBlueTorch : BlueTorch replaces BlueTorch
-{
-    States 
-    {
-    Spawn:
-        TNT1 A 0 NoDelay 
-        {
-            let halo = UniversalLightHalo(Spawn("UniversalLightHalo",(pos.x,pos.y,pos.z+48)));
-            if (halo)
-                halo.halocolor = 'Blue';
-        }
-        goto super::spawn;
-    }
-}
-```
+* `floorsector` — points to the sector the actor is standing in
 
-Using the code above each of the torches will spawn a halo and immediately set its `halocolor` variable to whatever you need. 
+* `ceilingsector` — points to the sector above the actor
 
-Notes:
+* `blockingline` — points to the line the actor is currently crossing/touching
 
-* `sprite` is a pointer to the currently used sprite; by modifying its value you can manually set which sprite to set. Note that it doesn't take an image name directly, but rather an imagine ID—hence you need to use `GetSpriteIndex("spritename")` to set an image to it.
-* `NOINTERACTION`, among other things, makes actors much less resource-intensive, so use it whenever possible on actors that don't need collision and gravity.
-* If you're setting `sprite` directly, the sprites you're providing via `GetSpriteIndex` need to be defined *somewhere* in order to be loaded into memory when GZDoom starts. This can be done anywhere—you can even simply define a dummy class somewhere that only has one state used to load sprites.
-* `scale` and `alpha` values in the example above are arbitrary and are provided just as an example.
+* `readyWeapon` (PlayerPawn only) — points to the currently selected weapon
 
 ------
 
