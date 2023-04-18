@@ -24,7 +24,7 @@ type name (arguments)
 }
 ```
 
-Functions have to be defined inside a class and by default only that class will be able to call them—this type of function is called a **method**. 
+Functions have to be defined inside a class, and by default only that class will be able to call them—this type of function is called a **method**. 
 
 Non-method functions are possible—those are known as **static functions** and they're described in a [later subsection](#Static-functions).
 
@@ -52,7 +52,7 @@ class CacoSingleDad : Cacodemon replaces Cacodemon
 
     void AngerBaby() 
     {
-        if (baby) 
+        if (baby && baby.health > 0)
         {
             baby.A_StartSound("caco/active");
             baby.A_SetTranslation("BabyAngry");
@@ -60,6 +60,9 @@ class CacoSingleDad : Cacodemon replaces Cacodemon
             baby.floatspeed*= 1.5;
             baby.bNOPAIN = true;
         }
+        // Note, if the 'baby' pointer is null,
+        // or its health is 0 or less, this
+        // function simply won't do anything.
     }
 
     States 
@@ -75,7 +78,7 @@ class CacoSingleDad : Cacodemon replaces Cacodemon
 }
 ```
 
-The code should be simple enough to understand: we defined two functions, `SpawnBaby` and `AngerBaby`. The first one spawns the baby Caco and performs all the stuff we need to do (sets color, health, speed, etc.), and the second one checks if baby exists and does the other stuff. 
+The code should hopefully be simple enough to understand: we defined two functions, `SpawnBaby` and `AngerBaby`. The first one spawns the baby Caco and performs all the stuff we need to do (sets color, health, speed, etc.), and the second one checks if baby exists and is alive, and if so, does the other stuff. 
 
 There are two characteristics of this function to consider:
 
@@ -109,7 +112,7 @@ TNT1 A 0 NoDelay SpawnBabyExtended("Cacodemon",800,12);
 The arguments are defined in the same way as variables:
 
 ```csharp
-type name = value
+type name = defaultValue
 ```
 
 If you provide a **value**, this will be the **default value** for the corresponding argument. For example, `int babyspeed = 10` defines **babyspeed** as an optional argument: if you don't set a value when calling this function, then the default value will be used (which in the example above is 10). 
@@ -138,13 +141,13 @@ void SpawnBabyUniversal(Class<Actor> spawnclass, int babyhealth = 0, int babyspe
 }
 ```
 
-In this version of the function the default values are 0 and they're treated as an instruction to use default values for the actor: unless you specify values for `health`, `speed` and `scale` explicitly, the spawned actor will simply use its own default values. So, for example, if you spawn a Mancubus instead of a Cacodemon, it'll have Mancubus' default `health` value; same goes for `scale` and `speed`.
+In this version of the function the default values are 0 and they're treated as an instruction to use default values for the actor: unless you specify values for `health`, `speed` and `scale` explicitly, the spawned actor will simply use its own default values (as provided in its `Default` block). So, for example, if you spawn a Mancubus instead of a Cacodemon, it'll have Mancubus' default `health` value; same goes for `scale` and `speed`.
 
-It's up to you which arguments to make optional and which to leave compulsory (in `SpawnBabyUniversal()` above the only non-optional argument is `spawnclass`—the name of the actor to spawn); the only rule to remember is that non-optional arguments should be defined *first*—you can't have non-optional arguments defined after optional ones.
+It's up to you which arguments to make optional and which to leave compulsory (in `SpawnBabyUniversal()` above the only non-optional argument is `spawnclass`—the type of the actor to spawn); the only rule to remember is that non-optional arguments should be defined *first*—you can't have non-optional arguments defined after optional ones.
 
 You can notice that this function doesn't actually cover everything we used in CacoSingleDad originally (such as modifying the baby's `floatspeed`), but you can easily expand it. It will also only work on actors that actually have a `baby` variable defined—so, if you want to create multiple custom functions, it may be a good idea to put them all inside your own version of the base Actor class and have your classes inherit from it.
 
-A note on **function names**: you can give your functions any names you like, but in general it's a good idea to not use DECORATE's naming convention (which would be `A_FunctionName`) simply to avoid confusing yourself: this way you'll be able to tell at a glance that it's not a DECORATE function. However, it *can* be a good idea to use some sort of a custom prefix, such as your mod's initials.
+A note on **function names**: you can give your functions any names you like. It's considered somewhat traditional to use the `A_` prefix for **action** functions (a later section of this chapter explains what these are), and not use it otherwise. You may also use a custom prefix, like the abbreviation for your mod. Just make sure the name is sensible and not overly long.
 
 ### Non-void functions and return values
 
@@ -154,15 +157,19 @@ Void functions are the functions that do stuff and don't return any data. But th
 int GetTargetHealth() 
 {
     if (target)
+    {
         return target.health;
+    }
     else
+    {
         return 0; //we have to return something, so let's use 0 as default
+    }
 }
 ```
 
 This function checks if the actor that called it has a `target`, and if so, returns the amount of health it has. If there's no target, it doesn't return anything.
 
-Note that you *have to* include a null-check here, as well as cover all possible cases: there has to be a return value for the case where target doesn't exist, that's why we must provide `return null`. If we don't, the function won't know what to do. (Nothing terrible will happen, GZDoom simply won't start. Bad stuff will happen if you skip the null-check, however, since it can cause a VM abort due to a null pointer).
+Note that you *have to* include a null-check here, as well as cover all possible cases: there has to be a return value for the case where target doesn't exist, that's why we must provide `return 0`. If we don't, the function won't know what to do. (Nothing terrible will happen, GZDoom simply won't start. Bad stuff will happen if you skip the null-check, however, since it can cause a VM abort due to a null pointer).
 
 It can also be slightly simplified:
 
@@ -170,7 +177,9 @@ It can also be slightly simplified:
 int GetTargetHealth() 
 {
     if (target)
+    {
         return target.health;
+    }
     return 0;
 }
 ```
@@ -193,9 +202,13 @@ class ChaingunGuyWithAMagazine : ChaingunGuy
     state CustomMonsterRefire(int ChanceToEnd = 0, statelabel endstate = "See") 
     { 
         if (monstermag <= 0)                  //check how much "ammo" is left
+        {
             return ResolveState("Reload");      //if 0, goto Reload state
+        }
         else if (ChanceToEnd > random(0,100))  //otherwise check ChanceToEnd against a random value
+        {
             return ResolveState(endstate);      //if true, go to end state
+        }
         return null;                         //otherwise don't do anything
     }
 
@@ -232,8 +245,8 @@ This function works as a state jump, such as `A_Jump`: when the function is call
 - Checks if the monster has run out of "ammo" (`monstermag` is 0). If so, it returns "Reload" state where other stuff happens (`monstermag` gets reset to whatever value is considered as full magazine).
 - Otherwise it checks its argument `ChanceToEnd` (by default it's 0): if it's greater than 0, there's a randomized chance that the monster stops firing. In the example above the monster uses the value of 5.
   - It jumps to a state provided in the second argument of the function. By default, it's "See" but in the example above it's "AttackEnd". (I.e. this monster has a custom animation for stopping the attack, but other monsters using this function may not and they just jump to "See".)
-- Finally, if none of the checks go through, the function returns nothing. `ResolveState()` is the correct way to return states in ZScript (you can't directly put in a state name). `ResolveState` will be covered in more detail in [Flow Control](#_Flow_Control_1).
-  - In this case, if the function returns null, the state machine will continue going through the state. In the example above it'll show frame `CPAS E` for 1 tic and then it'll hit `loop` and go back to the beginning of the state.
+- Finally, if none of the checks go through, the function returns nothing. `ResolveState()` is the correct way to return states in ZScript (you can't directly put in a state name). `ResolveState` is covered in more detail in [Flow Control](#_Flow_Control_1).
+  - In this case, if the function returns null, the state machine will simply move to the next state in the state sequence. In the example above it'll show frame `CPAS E` for 1 tic and then it'll hit `loop` and go back to the beginning of the state.
 
 ## Action functions
 
@@ -276,9 +289,9 @@ static void MyFunction()
 Static functions are *not* **methods**, since they're not bound to the class they're defined it. However, static functions still have to be defined within a class, and to call them from another class, you'll have to use the original class's name as a prefix:
 
 ```csharp
-class FunctionContainer : Actor
+class StaticFunctionContainer : Actor
 {
-    static void MyFunction()
+    static void MyStaticFunction()
     {
         [...] //function contents
     }
@@ -291,7 +304,7 @@ class SomeOtherClass : Actor
     Spawn:
         TNT1 A 0 NoDelay
         {
-            FunctionContainer.MyFunction();
+            StaticFunctionContainer.MyStaticFunction();
         }
     [...] //the rest of the actor's code
     }
@@ -308,7 +321,9 @@ class MathContainer : Actor
     int Sign (double i) 
     {
         if (i >= 0)
+        {
             return 1;
+        }
         return -1;
     }
 }
@@ -324,7 +339,7 @@ Many existing ZScript functions are static. For example, the [`InStateSequence`]
 override void Tick()
 {
     super.Tick();
-    if (InStateSequence(curstate,FindState("Spawn"))
+    if (InStateSequence(curstate,FindState("Spawn")))
     {
         Spawn("RocketTrail",pos);
     }
@@ -340,9 +355,13 @@ class FearfulCacodemon : Cacodemon
     {
         super.Tick();
         if (target && InStateSequence(target.curstate, target.FindState("Missile")))
+        {
             bFRIGHTENED = true;
+        }
         else
+        {
             bFRIGHTENED = false;
+        }
     }
 }
 ```
@@ -359,10 +378,12 @@ class FearfulCacodemon : Cacodemon
     override void Tick() 
     {
         super.Tick();
-        bFRIGHTENED = (target && InStateSequence(target.curstate,target.FindState("Missile"));
+        bFRIGHTENED = (target && InStateSequence(target.curstate,target.FindState("Missile")));
     }
 }
 ```
+
+This is possible because `(target && InStateSequence(target.curstate,target.FindState("Missile")))` is a condition, and like all conditions, it can be either true or false. That's why we can use its result to set the value of a flag to true or false, respectively.
 
 ## Virtual functions
 

@@ -508,9 +508,11 @@ void DrawInventoryIcon(Inventory item, Vector2 pos, int flags = 0, double alpha 
 This function is largely similar to `DrawImage()` but instead it draws the inventory icon defined in a specific `Inventory` class (retrieving it from the item's `Inventory.Icon` property). You need to pass a pointer to an inventory item to make it work, e.g.:
 
 ```csharp
-let armor = CPlayer.mo.FindInventory("BasicArmor"); //a pointer to the class that handles armor
-if (it)
+let arm = CPlayer.mo.FindInventory("BasicArmor"); //a pointer to the class that handles armor
+if (arm)
+{
     DrawInventoryIcon(it, (0, 0), DI_SCREEN_RIGHT_BOTTOM|DI_ITEM_RIGHT_BOTTOM);
+}
 ```
 
 #### Information functions

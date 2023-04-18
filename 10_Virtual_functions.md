@@ -15,7 +15,7 @@
 `Virtual` is a keyword that makes a function overridable. You can add it before the type of the function when defining it:
 
 ```csharp
-virtual void MyCoolFunction()
+virtual void MyVirtualFunction()
 ```
 
 There are two primary uses for it. First, a child class can override its parent's virtual function and make it do something else:
@@ -47,7 +47,9 @@ class SomeOtherCaco : CacoSingleDad
     {
         actor a = Spawn("Cacodemon",pos,NO_REPLACE);
         if (a)
+        {
             a.master = self;
+        }
     }
 }
 ```
@@ -97,11 +99,11 @@ class SomeOtherCaco : CacoSingleDad
 
 ## Overriding ZScript Virtual Functions
 
-While **virtual** is just a type of function, the one that you can even use yourself (as described above), much more often you'll be using (overriding) the existing virtual functions.
+While **virtual** is just a type of function, the one that you can even use yourself (as described above), much more often you'll be using the existing virtual functions by **overriding** them.
 
-The base **Actor** class has a lot of virtual functions attached to it which it calls under certain conditions *outside* of states. Overriding them allows to add a bunch of effects to your actors that don't have to (or can't) be bound to a specific state.
+The base `Actor` class has a lot of virtual functions attached to it which it calls under certain conditions *outside* of states. Overriding them allows to add a bunch of effects to your actors that don't have to (or can't) be bound to a specific state.
 
-One of the most common virtuals you'll be using this way is `Tick()`: a virtual function that is called by all actors every game tic. It performs everything actors need to do continuously: changes positions, velocity, checks for collision and a bunch of other things. You can add your own effects into that function:
+One of the most common virtuals you'll be using this way is `Tick()`: a virtual function that is called by all actors every game tic. It performs everything actors need to do continuously: changes positions, velocity, checks for collision and a bunch of other things. You can add your own behavior into that function:
 
 ```csharp
 class TemporaryZombieman : Zombieman 
@@ -135,7 +137,9 @@ class TemporaryZombieman : Zombieman
     {
         super.Tick();
         if (!isFrozen())
+        {
             A_FadeOut(0.01);
+        }
     }
 }
 ```
@@ -145,10 +149,10 @@ Notes:
 - `IsFrozen()` is a ZScript bool that returns `true` if the actor that calls it is currently frozen, which can happen when:
   - "freeze" cheat has been entered in the console;
   - the player has a PowerTimeFreezer powerup and the actor in question does *not* have a NOTIMEFREEZE flag;
-  - any other custom scripts that for whatever reason freeze actors.
-- Boolean checks such as `if (bool == true)` can be shortened to `if (bool)`. And `!` means "not" and cab be used to invert any check. `if (!isFrozen())` is the same as `if (IsFrozen() == false)`. See [Flow Control, Statements](A1_Flow_Control.md#statements) for more information.
+  - any other custom scripts that for whatever reason freeze actors or the level.
+- Boolean checks such as `if (bool == true)` can be shortened to `if (bool)`. And `!` means "not" and can be used to invert any check. `if (!isFrozen())` is the same as `if (isFrozen() == false)`. See [Flow Control, Statements](A1_Flow_Control.md#statements) for more information.
 
-There's a ton of things you can do this way. A common example when using Tick() is convenient is when your actor needs to continuously spawn some sort special effect every tick (such as a trail or an after-image). Here's a handy example of doing an after-image this way:
+There's a ton of things you can do this way. A common example when using `Tick()` is convenient is when your actor needs to continuously spawn some sort special effect every tick (such as a trail or an after-image). Here's a handy example of doing an after-image this way:
 
 ```csharp
 class BlurryCacoBall : CacoDemonBall 
@@ -158,13 +162,16 @@ class BlurryCacoBall : CacoDemonBall
         super.Tick();
         if (isFrozen())        //check if the actor is frozen
             return;            //if so, we stop here and don't do anything else
-        actor img = Spawn("CacoBall_AfterImage",pos);    //spawn after-image and cast it
-    //transfer current actor's alpha, renderstyle and sprite frame to the spawned after-image
+
+        // Spawn after-image and cast it to a local pointer:
+        actor img = Spawn("CacoBall_AfterImage",pos);
+        // Ttransfer current actor's alpha, renderstyle and 
+        // sprite frame to the spawned after-image:
         if (img) 
         {
             img.A_SetRenderstyle(alpha,GetRenderstyle());
-            img.sprite = sprite;    //sprite is the current sprite, such as "BAL2"
-            img.frame = frame;        //frame is a frame letter, such as A, B, C
+            img.sprite = sprite;  //sprite is the current sprite, such as "BAL2"
+            img.frame = frame;    //frame is a frame letter, such as A, B, C
         }
     }
 }
@@ -179,7 +186,9 @@ class CacoBall_AfterImage : Actor
     States 
     {
     Spawn:
-        #### # 1    //#### # means "use previous sprite & frame" (as set by BlurryCacoBall earlier)
+        // '#### #' means "use previous sprite & frame" 
+        // (as set by BlurryCacoBall earlier):
+        #### # 1 
         {
             A_FadeOut(0.05);
             scale *= 0.95;
@@ -206,9 +215,9 @@ class MyActor : Actor
 }
 ```
 
-As explained earlier, when you declare class-scope variables, like `myvalue` above, you can't immediately give them a value. You either have to turn it into a property, or set that value somewhere. `PostBeginPlay()` is a good place to do that. Notice, that `PostBeginPlay()` is not like `Tick()`: it's called only once, so there's no need to check if the actor is frozen. If your actor has some sort of an attached "companion" actor (for example, a fireball that spawns an actor-based light flare around itself), it's also a good place to spawn them.
+As explained earlier, when you declare class-scope variables, like `myvalue` above, you can't immediately give them a value. You either have to turn it into a property, or set that value somewhere — `PostBeginPlay()` is a good place to do the latter. Notice that `PostBeginPlay()` is not like `Tick()`: it's called only once, so there's no need to check if the actor is frozen. If your actor has some sort of an attached "companion" actor (for example, a fireball that spawns an actor-based light flare around itself), it's also a good place to spawn them.
 
-There are many, many other virtual functions that you will need to override. And remember: you won't always need to call **super** on them; sometimes you'll need to completely fill in what the function does, without calling its original version. Let's take a quick look at `ModifyDamage()` — an **Inventory** function used by protective items such as PowerProtection (a power-up that reduces incoming damage). This function gets the damage that is supposed to be dealt to the owner of the item, and then uses `newdamage` argument to tell the game how much damage to actually deal:
+There are many, many other virtual functions that you will need to override. And remember: you won't always need to call **super** on them; sometimes you'll need to completely fill in what the function does, without calling its original version. Let's take a quick look at `ModifyDamage()` — an **Inventory** function used by items that modify incoming or outgoing damage, such as `PowerDamage` and `PowerProtection` . This function gets the damage that is supposed to be dealt to or by the owner of the item, and then uses `newdamage` argument to tell the game how much damage to actually deal:
 
 ```csharp
 class CustomProtection : Inventory 
@@ -220,7 +229,13 @@ class CustomProtection : Inventory
 
     override void ModifyDamage (int damage, Name damageType, out int newdamage, bool passive, Actor inflictor, Actor source, int flags) 
     {
-        // check if the inflictor exists and has a MISSILE flag:
+        // First check that the passive argument is true,
+        // which means it's modifying *incoming* damage.
+        // If it's false, we stop here and do nothing else:
+        if (!passive)
+            return;
+
+        // Check if the inflictor exists and has a MISSILE flag:
         if (inflictor && inflictor.bMISSILE) 
         {
             newdamage = damage * 0.5;
@@ -237,9 +252,9 @@ class CustomProtection : Inventory
 
 The overridden `ModifyDamage()` above first checks what dealt the damage: whether it a missile or a monster itself (i.e. a monster's melee attack). For missiles the damage will be cut in half, while for monsters (melee attacks) it'll be reduced by 90%.
 
-`ModifyDamage()` gets a bunch of pointers, and we use them to decide what to do. Inflictor is an actor pointer to the object that dealt the damage directly (projectile, puff or a monster in case of a melee attack).
+`ModifyDamage()` gets a bunch of pointers, and we use them to decide what to do. `Inflictor` is a pointer to the actor that dealt the damage directly (projectile, puff or, if it was an enemy melee attack, it'll be the enemy).
 
-Notice that both `Tick()` and `PostBeginPlay()` are **void** functions (they have no return value) and they have no arguments.` ModifyDamage()` has arguments but it's also a void function. But that's not true for all virtual functions. 
+Notice that both `Tick()` and `PostBeginPlay()` are **void** functions (they have no return value) and they have no arguments. In contrast, `ModifyDamage()` has arguments but it's also a void function. But that's not true for all virtual functions. 
 
 A good example of that is `SpecialMissileHit()` — an integer function that is called by projectiles when they collide with an actor. When a projectile collides with an actor, it calls `SpecialMissileHit()`, which returns an integer number that tells the projectile what to do: 
 
@@ -247,7 +262,7 @@ A good example of that is `SpecialMissileHit()` — an integer function that is 
 - `1` will make the projectile unconditionally pass through the actor without colliding (+RIPPER or other flags aren't required for that; in fact, they are ignored in this case);
 - `0` will unconditionally destroy the projectile (remove it completely without doing anything else; it won't be put into its Death sequence either).
 
-This function is used in Hexen by MageStaffFX2—a homing projectile fired by Bloodscourge, the most powerful Mage weapon:
+This function is used in Hexen by [MageStaffFX2](https://github.com/ZDoom/gzdoom/blob/master/wadsrc/static/zscript/actors/hexen/magestaff.zs#L220)—a homing projectile fired by Bloodscourge, the most powerful Mage weapon:
 
 ```csharp
 //you can find this code in gzdoom.pk3/zscript/actors/hexen/magestaff.zs
@@ -268,11 +283,11 @@ Notice that `SpecialMissileHit()` also gets a pointer `victim` of type actor: th
 In the example above the projectile does the following:
 
 1. Checks that the `victim` isn't the `target` (shooter of the projectile*), or a player (any player) or a boss (has +BOSS flag)
-   1. *If you wonder why you need to check if the projectile didn't hit the shooter—it's because when spawned, projectiles basically spawn inside the actor that shot them, and they *will* collide with them, unless this check is added.
-2. If all checks pass, it deals damage to the victim by calling `DamageMobj()` function (see below) and keeps going.
+   * If you wonder why you need to check if the projectile didn't hit the shooter—it's because when spawned, projectiles basically spawn inside the actor that shot them, and they *will* collide with them, unless this check is added.
+2. If all checks pass, it deals damage to the victim by calling the `DamageMobj()` function (see below) and keeps going.
 3. Otherwise (i.e. If the victim is the shooter, *or* a player, *or* a boss), the projectile explodes.
 
-As you can see, virtual functions are already attached to actors, and you can mix your own stuff into them to add various effects. However, you can also *call* them just like you call regular actor functions. A common example of a function that you may often need to both override and call is `DamageMobj()`:
+As you can see, virtual functions are already attached to actors and called automatically, so you can mix your own stuff into them to add various effects. However, some of them can also be *called* just like you call regular actor functions. A common example of a function that you may often need to both override and call is `DamageMobj()`:
 
 ```csharp
 int DamageMobj (Actor inflictor, Actor source, int damage, Name mod, int flags = 0, double angle = 0)
@@ -280,16 +295,16 @@ int DamageMobj (Actor inflictor, Actor source, int damage, Name mod, int flags =
 
 It's called by the actor whenever it takes damage.
 
-- **inflictor** - The actor pointer dealing the damage. Missiles are used here, with their owners being the *source*.
-- **source** - The actor pointer which claims responsibility for the damage, responsible for causing infighting.
-- **damage** - The amount of damage to deal out.
-- **mod** - The 'means of death', or the damagetype.
+- `inflictor` - The pointer to the actor that deals the damage. Missiles are used here, with their owners being the *source*.
+- `source` - The pointer to the actor which claims responsibility for the damage, responsible for causing infighting.
+- `damage` - The amount of damage to deal out.
+- `mod` - The 'means of death', or the damagetype.
 
 (See the rest [on ZDoom wiki](https://zdoom.org/wiki/ZScript_virtual_functions#Actor))
 
 The function is called on actors when they would receive damage (but before it's actually dealt). It gets a bunch of information, including the pointers to actors that deal the damage, and the raw damage value (as `damage`) before it's modified by various resistances.
 
-When the base `DamageMobj()` is called, it'll *deal* the damage. (As with other virtual functions, if you override it, then to call the *base* function you need to call `super.DamageMobj`).
+When the base `DamageMobj()` is called, it'll *deal* the damage. You can override `DamageMobj()` on an actor to change the behavior of how they receive damage.
 
 Apart from dealing damage, it also *returns* an integer number: normally it should be the same as the amount of damage dealt.
 
@@ -301,7 +316,9 @@ class ZombieTroopman : Zombieman
     override int DamageMobj(Actor inflictor, Actor source, int damage, Name mod, int flags, double angle) 
     {
         if (source && source is "Zombieman")
+        {
             return 0;
+        }
         return super.DamageMobj(inflictor, source, Damage, mod, flags, angle);        
     }
 }
@@ -335,7 +352,9 @@ class RetaliatingZombieman : Zombieman
     override int DamageMobj(Actor inflictor, Actor source, int damage, Name mod, int flags, double angle) 
     {
         if (source)
+        {
             source.DamageMobj(self,self,damage,'normal'); //deals damage to whatever damaged it
+        }
         return super.DamageMobj(inflictor, source, Damage, mod, flags, angle);        
     }    
 }
