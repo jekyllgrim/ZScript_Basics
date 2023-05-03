@@ -22,8 +22,6 @@
   * [Coding a basic weapon](#coding-a-basic-weapon)
   * [Creating a weapon with a reload mechanic](#creating-a-weapon-with-a-reload-mechanic)
 
-
-
 ## About classes
 
 ZScript is an [object-oriented](https://en.wikipedia.org/wiki/Object-oriented_programming) coding language, which means that all of the code that is executed at runtime (during the game) must be defined within an object (the most common object being a Class). This is different from [ACS](https://zdoom.org/wiki/ACS) (another GZDoom coding language, used to script map events), which is a list of scripts that define various events that happen in order; ACS scripts are not bound to a specific object.
@@ -679,7 +677,7 @@ class PistolWithReload : Pistol //it's based on the existing Pistol, so it inher
         Goto Ready;
     Reload:
         PISG AAAA 2 A_WeaponOffset(3, 5, WOF_ADD); //simply shifts the weapon downward and to the right
-        PISG A 15 // simply wait for 15 tics
+        PISG A 15; // simply wait for 15 tics
         TNT1 A 0  // perform the following anonymous function:
         {
             A_StartSound("misc/w_pkup"); //plays Doom's "weapon pickup" sound
