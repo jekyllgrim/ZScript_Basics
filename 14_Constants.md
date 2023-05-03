@@ -1,3 +1,9 @@
+🟢 [<<< BACK TO START](README.md)
+
+🔵 [<< Previous: Arrays](13_Arrays.md)
+
+---
+
 # Constants
 
 ## Overview
@@ -161,3 +167,9 @@ The use of constants is a matter of convenience; technically, you could just use
 * If the same number is used in many places in the code (e.g. a sprite layer number in a weapon code) and then you realize you need to change that value, it's becomes much easier if that number is defined as a constant, because then you can just change it one place (the constant definition).
 
 * A constant lets you give your static value a nice, sensible name. For example, you can give your sprite layers in a multi-layered weapon descriptive names, such as `PSP_LEFTGUN` instead of `5`. This is especially important in case of bitfields and function flags, since using descriptive names, such as `FBF_USEAMMO` and `FBF_NOFLASH` is much better than just using numbers.
+
+---
+
+🟢 [<<< BACK TO START](README.md)
+
+🔵 [<< Previous: Arrays](13_Arrays.md)
