@@ -62,7 +62,7 @@ Note:
 * Other zscript files can be placed *anywhere* in your mod folder, as long as you use `#include` with the correct path.
 * `version` only needs to be specified *once* in your root `zscript.zs` file.
 
-### Step #5: How to test eyour project
+### Step #5: How to test your project
 
 When you want to test your mod, you can just run the folder directly in GZDoom. For example, using the command line:
 
