@@ -154,21 +154,17 @@ Do the following:
 
 Now place a thing on your map, right-click it, and if you scroll down the list of available thing categories, at the bottom you'll see "User-defined". There you will find your custom actors.
 
-If you're planning a big project with multiple classes and you want them to have custom categories, you can either create a custom UDB config, or you can use **editor keys** in the definitions of your classes: these are special comments that can be added to a class, so that UDB can parse them and apply the values. For example:
+If you're planning a big project with multiple classes and you want them to have custom categories, you can either create a custom UDB config, or you can use **editor keys** in the definitions of your classes: these are special comments that can be added to a class, so that UDB can parse them and apply the values. Editor keys must be placed in the Default block, and GZDoom itself ignores them, but the map editor is designed to read their values. Example:
 
 ```csharp
 class BigZombieman : Zombieman
 {
-    // These comments will be ignored by GZDoom,
-    // but UDB is specifically designed to parse them
-    // and get information from them:
-
-    //$Title "Big Zombieman"
-    //$Angled
-    //$Category "Monsters"
 
     Default
     {
+        //$Title "Big Zombieman"
+        //$Angled
+        //$Category "Monsters"
         health 1000;
         scale 1.5;
         radius 30;
