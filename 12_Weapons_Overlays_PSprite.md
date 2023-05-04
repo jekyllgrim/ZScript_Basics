@@ -807,7 +807,7 @@ class PistolAngledFist : Pistol
 
 ##### Native function
 
-An existing overlay can be removed by calling `A_ClearOverlay(<start>, <end>)` where and are the first and last layer number for the range you want removed. Note, the second argument is not optional; if you want only one layer removed, you need to provide the same value for both.
+An existing overlay can be removed by calling [`A_ClearOverlays(<start>, <end>)`](https://zdoom.org/wiki/A_ClearOverlays) where and are the first and last layer number for the range you want removed. Note, the second argument is not optional; if you want only one layer removed, you need to provide the same value for both.
 
 ##### ZScript method
 
