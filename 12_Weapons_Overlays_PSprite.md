@@ -106,6 +106,7 @@ class OverheatingPlasmaRifle : PlasmaRifle
             A_FirePlasma();
             return ResolveState(null);
         }
+        TNT1 A 0 A_ReFire();
         // note we're not using any cooldown animation here
         goto Ready;
     Cooldown:
