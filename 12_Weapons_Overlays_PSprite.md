@@ -929,7 +929,7 @@ However, in contrast to the previous section on flags, here I will split the nat
 
 There are a few functions that can modify PSprite properties. Most of them will be covered in separate subchapters, but here's a brief overview:
 
-* `A_OverlayRendestyle(<layer>, <style>)` — modifies the renderstyle of the specified layer. The styles are mostly the same as actor render styles: normal, translucent, additive and so on. The full list and their names is provided [on the wiki](https://zdoom.org/wiki/A_OverlayRenderstyle). Note, this is the only way to modify the renderstyle of a PSprite—similarly to actors, its renderstyle can't be modified directly (actors require the `SetRenderstyle` function).
+* `A_OverlayRenderstyle(<layer>, <style>)` — modifies the renderstyle of the specified layer. The styles are mostly the same as actor render styles: normal, translucent, additive and so on. The full list and their names is provided [on the wiki](https://zdoom.org/wiki/A_OverlayRenderstyle). Note, this is the only way to modify the renderstyle of a PSprite—similarly to actors, its renderstyle can't be modified directly (actors require the `SetRenderstyle` function).
 
 * `A_OverlayAlpha(<layer>, <value>)` sets the specified layer's alpha (translucency) to the specified double value. For this to work, the renderstyle has to support alpha modification. The fastest way to allow this is to set the `PSPF_ForceAlpha` flag to true, since this forcibly allows alpha manipulation with any renderstyle.
 
