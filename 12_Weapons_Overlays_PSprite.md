@@ -439,7 +439,7 @@ class PistolAngled : Pistol
         PGUN A 2
         {
             A_FireBullets(5.6, 0, 1, 5);
-            A_PlaySound("weapons/pistol", CHAN_WEAPON);
+            A_StartSound("weapons/pistol", CHAN_WEAPON);
             A_Overlay(-2, "Flash");
             A_Overlay(2, "Highlights");
         }
@@ -499,7 +499,7 @@ class PistolAngled : Pistol
         PGUN A 2
         {
             A_FireBullets(5.6, 0, 1, 5);
-            A_PlaySound("weapons/pistol", CHAN_WEAPON);
+            A_StartSound("weapons/pistol", CHAN_WEAPON);
             player.SetPSprite(-2, ResolveState("Flash"));
             player.SetPSprite(2, ResolveState("Highlights"));
         }
@@ -562,7 +562,7 @@ class PistolAngled : Pistol
         PGUN A 2
         {
             A_FireBullets(5.6, 0, 1, 5);
-            A_PlaySound("weapons/pistol", CHAN_WEAPON);
+            A_StartSound("weapons/pistol", CHAN_WEAPON);
             A_Overlay(PSP_MFlash, "Flash");
             A_Overlay(PSP_Hlights, "Highlights");
         }
@@ -675,7 +675,7 @@ class PistolAngledFist : Pistol
         PGUN A 2
         {
             A_FireBullets(5.6, 0, 1, 5);
-            A_PlaySound("weapons/pistol", CHAN_WEAPON);
+            A_StartSound("weapons/pistol", CHAN_WEAPON);
             A_Overlay(PSP_MFlash, "Flash");
             A_Overlay(PSP_Hlights, "Highlights");
         }
@@ -773,7 +773,7 @@ class PistolAngledFist : Pistol
         PGUN A 2
         {
             A_FireBullets(5.6, 0, 1, 5);
-            A_PlaySound("weapons/pistol", CHAN_WEAPON);
+            A_StartSound("weapons/pistol", CHAN_WEAPON);
             A_Overlay(PSP_MFlash, "Flash");
             A_Overlay(PSP_Hlights, "Highlights");
         }
@@ -1132,7 +1132,7 @@ class PistolAngled : Pistol
         PGUN A 2
         {
             A_FireBullets(5.6, 0, 1, 5);
-            A_PlaySound("weapons/pistol", CHAN_WEAPON);
+            A_StartSound("weapons/pistol", CHAN_WEAPON);
             A_Overlay(PSP_MFlash, "Flash");
             A_Overlay(PSP_Hlights, "Highlights");
             A_WeaponOffset(2, 34);
@@ -1190,7 +1190,7 @@ class PistolAngled : Pistol
         PGUN A 2
         {
             A_FireBullets(5.6, 0, 1, 5);
-            A_PlaySound("weapons/pistol", CHAN_WEAPON);
+            A_StartSound("weapons/pistol", CHAN_WEAPON);
             A_Overlay(PSP_MFlash, "Flash");
             A_Overlay(PSP_Hlights, "Highlights");
             A_WeaponOffset(2, 2, WOF_ADD); //light offset on the first frame of shooting
@@ -1245,7 +1245,7 @@ class PistolAngled : Pistol
         PGUN A 2
         {
             A_FireBullets(5.6, 0, 1, 5);
-            A_PlaySound("weapons/pistol", CHAN_WEAPON);
+            A_StartSound("weapons/pistol", CHAN_WEAPON);
             // Create the flash:
             A_Overlay(PSP_MFlash, "Flash");
             // Randomize the position of the flash within
@@ -1342,7 +1342,7 @@ class PistolAngledFist : Pistol
         PGUN A 2
         {
             A_FireBullets(5.6, 0, 1, 5);
-            A_PlaySound("weapons/pistol", CHAN_WEAPON);
+            A_StartSound("weapons/pistol", CHAN_WEAPON);
             A_Overlay(PSP_MFlash, "Flash");
             A_Overlay(PSP_Hlights, "Highlights");
             A_WeaponOffset(2, 2, WOF_ADD);
@@ -1432,7 +1432,7 @@ class PistolAngledFist : Pistol
         PGUN A 2
         {
             A_FireBullets(5.6, 0, 1, 5);
-            A_PlaySound("weapons/pistol", CHAN_WEAPON);
+            A_StartSound("weapons/pistol", CHAN_WEAPON);
             A_Overlay(PSP_MFlash, "Flash");
             A_Overlay(PSP_Hlights, "Highlights");
             A_WeaponOffset(2, 2, WOF_ADD);
@@ -1557,7 +1557,7 @@ class PistolAngled : Pistol
         PGUN A 2
         {
             A_FireBullets(5.6, 0, 1, 5);
-            A_PlaySound("weapons/pistol", CHAN_WEAPON);
+            A_StartSound("weapons/pistol", CHAN_WEAPON);
             A_Overlay(PSP_MFlash, "Flash");
             A_Overlay(PSP_Hlights, "Highlights");
             A_WeaponOffset(2, 2, WOF_ADD);
@@ -1622,7 +1622,7 @@ class PistolAngled : Pistol
         PGUN A 2
         {
             A_FireBullets(5.6, 0, 1, 5);
-            A_PlaySound("weapons/pistol", CHAN_WEAPON);
+            A_StartSound("weapons/pistol", CHAN_WEAPON);
             A_Overlay(PSP_MFlash, "Flash");
             A_Overlay(PSP_Hlights, "Highlights");
             A_WeaponOffset(2, 2, WOF_ADD);
@@ -1695,7 +1695,7 @@ class PistolAngled : Pistol
         PGUN A 2
         {
             A_FireBullets(5.6, 0, 1, 5);
-            A_PlaySound("weapons/pistol", CHAN_WEAPON);
+            A_StartSound("weapons/pistol", CHAN_WEAPON);
             A_Overlay(PSP_MFlash, "Flash");
             A_Overlay(PSP_Hlights, "Highlights");
             A_WeaponOffset(2, 2, WOF_ADD);
