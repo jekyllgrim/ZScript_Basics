@@ -318,7 +318,7 @@ Static functions are usually used to get some data. For example, here's a simple
 ```csharp
 class MathContainer : Actor
 {
-    int Sign (double i) 
+    static int Sign (double i) 
     {
         if (i >= 0)
         {
