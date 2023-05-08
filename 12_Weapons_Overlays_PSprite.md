@@ -2204,6 +2204,9 @@ class TwoPistols : Pistol
     SingleGunFire:
         PGUN A 2
         {
+            A_FireBullets(5.6, 0, 1, 5);
+            A_StartSound("weapons/pistol");
+
             A_OverlayOffset(OverlayID(), 2, 2, WOF_ADD);
             A_OverlayPivot(OverlayID(), 0.5, 1);
         }
