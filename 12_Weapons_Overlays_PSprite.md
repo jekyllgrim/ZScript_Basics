@@ -1529,7 +1529,7 @@ Note that rotation and scale is normally done relative to the sprite's top left 
 
 * [`A_OverlayPivot(<layer>, <x offset>, <y offset>, <flags>)`](https://zdoom.org/wiki/A_OverlayPivot) — modifies the vector2 `pivot` field of the corresponding PSprite layer, also moving the pivot point using the double offset values. If combined with `A_OverlayPivotAlign`, these values will be added on top of it. The values specified here depend on the value of the `PSPF_PivotPercent` (internally `bPivotPercent`) flag of the specified PSprite layer:
   
-  * If `PSPF_PivotPercent` is true (which is the default value): `A_OverlayPivot` arguemnts are used as scalar coordinates, going from 0.0 to 1.0, which is left to right for the horizontal offset, and top to bottom for the vertical offset. (I.e. `0, 0` is top left, `0.5, 0.5` is center, `1.0, 1.0` is bottom right, etc.)
+  * If `PSPF_PivotPercent` is true (which is the default value): `A_OverlayPivot` arguments are used as scalar coordinates, going from 0.0 to 1.0, which is left to right for the horizontal offset, and top to bottom for the vertical offset. (I.e. `0, 0` is top left, `0.5, 0.5` is center, `1.0, 1.0` is bottom right, etc.)
   
   * If `PSPF_PivotPercent` is false: the arguments are used as coordinates in pixels, similarly to how offsets work in `A_WeaponOffset`/`A_OverlayOffset`. For example, for a 16x16 pixels graphic, `8, 8` will be its center, `16, 16` will be bottom right.
 
@@ -2204,6 +2204,9 @@ class TwoPistols : Pistol
     SingleGunFire:
         PGUN A 2
         {
+            A_FireBullets(5.6, 0, 1, 5);
+            A_StartSound("weapons/pistol");
+
             A_OverlayOffset(OverlayID(), 2, 2, WOF_ADD);
             A_OverlayPivot(OverlayID(), 0.5, 1);
         }
