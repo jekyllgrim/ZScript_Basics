@@ -4,18 +4,20 @@
 
 ------
 
-# Arrays
+# Arrays and linked lists
 
-* [Overview](#overview)
-* [Static constant arrays](#static-constant-arrays)
-* [Dynamic arrays](#dynamic-arrays)
-  + [Note on data types](#note-on-data-types)
-* [Dynamic array methods](#dynamic-array-methods)
-* [Fixed-size arrays](#fixed-size-arrays)
+- [Overview](#overview)
+- [Static constant arrays](#static-constant-arrays)
+  * [Data access](#data-access)
+- [Dynamic arrays](#dynamic-arrays)
+  * [Note on data types](#note-on-data-types)
+- [Dynamic array methods](#dynamic-array-methods)
+- [Fixed-size arrays](#fixed-size-arrays)
+- [Linked lists](#linked-lists)
 
 ## Overview
 
-An array is a [variable](07_Variables_and_data_types.md) that can hold multiple pieces of data instead of one. In essence, arrays are lists.
+An **array** is a [variable](07_Variables_and_data_types.md) that can hold multiple pieces of data instead of one. In essence, arrays are lists.
 
 The main terms related to arrays are:
 
@@ -24,6 +26,8 @@ The main terms related to arrays are:
 * **Element** or **item**: an entry in an array that contains some data.
 * **Index**: the position of an element in an array. Indexes start at 0.
 * **Size**: how many indexes there are in the array.
+
+A **linked list** is another type of list-like structure that functions similarly to array but requires different syntax to iterate through them.
 
 ## Static constant arrays
 
@@ -343,6 +347,97 @@ Class<Actor> traps[5];
 ```
 
 Fixed-size arrays are similar to dynamic arrays in the sense that their contents can be change dynamically. However, they don't have access to any of the dynamic array methods except `Size()`. You can't use `Pop()`, `Push()`, `Clear()` and other methods, since they all implying changing the array's size, which is obviously not an option with a fixed-size array. Instead, your only option to set and clear data is using `arrayName[index] = value`.
+
+## Linked lists
+
+Linked lists are somewhat similar to arrays but are used much more rarely. The main reason for this is that you can't define custom linked lists in ZScript. There are several places where they're used and exposed to ZScript, but those linked lists themselves are defined in the C++ side of the engine.
+
+The most common linked list you might come across is inventory — not the `Inventory` class (the base class for all items), but the actual inventory of an actor. An inventory is a linked lists containing pointers to all items the actor is carrying. The inventory linked list is defined in the base `Actor` class as `native Inventory inv`; here `inv` is the name of the list, while `Inventory` is the data type. `Native`, as usual, points to the fact that this variable is defined and filled in C++, but ZScript can still read the data in it.
+
+The basics of a linked list, using inventory as an example, work like this:
+
+* Every actor that can carry items has an `Inv` pointer that points to the *first item* in their inventory.
+
+* Every *item* in the list also has an `Inv` pointer, which points to the *next item* in the same list.
+
+Thus, to iterate through an actor's inventory, you'd begin with an actor whose inventory you want to check, and then you'd move from each item to the next in that list.
+
+Iterating through an inventory linked list looks like this:
+
+```csharp
+for (let iitem = <pointer>.Inv; iitem != null; iitem = iitem.Inv)
+{
+    // do something with 'iitem'
+}
+```
+
+In this example `<pointer>` is a pointer to an actor who is holding some items, and `<pointer>.Inv` is a pointer to the first item in their inventory. 
+
+This iteration functions as a FOR loop, but the syntax may look a bit unusual. As explained in [Appendix 1: Flow Control](A1_Flow_Control.md), FOR loops function as follows:
+
+```
+for (<initial values>; <condition to check against at the start of each loop>; <what to do at the end of each loop>)
+```
+
+In case of linked lists it works as follows:
+
+* `let iitem = <pointer>.Inv` begins the iteration. This declares variable `iitem`, which is an `Inventory`-type pointer. We begin iteration by casting `<pointer>.Inv` to it, i.e. the first item in the desired actor's inventory.
+
+* `iitem != null` is a condition checked at the start of each loop. In this case it's a simple null-check: we check that `iitem` is not null. If it is null, that means we've reached the end of this linked list, and it's time to abort the loop.
+
+* `iitem = iitem.Inv` is what we do after each loop. Once we've successfully cast `iitem` and did whatever we wanted with it, we need to move on to the next item: this is done by reading the current item's `Inv` pointer, which pointers to the next item in the same list (meaning, in the same actor's inventory), and casting it to `iitem`, thus obtaining the value of `iitem`. After that it goes back to the null-check, and, if it passes, loops again.
+
+As an example of using this iteration, here's an item that will give the toucher maximum ammo for all weapons they're currently carrying:
+
+```csharp
+class AmmoRefiller : Inventory
+{
+    Default
+    {
+        // This flag makes sure this item will call
+        // its Use() function as soon as it's received:
+        +INVENTORY.AUTOACTIVATE
+        Inventory.pickupmessage "Refilled ammo for all weapons";
+    }
+
+    // This will be called upon receiving this item:
+    override bool Use(bool pickup)
+    {
+        // null-check the owner first:
+        if (owner)
+        {
+            // Iterate through the owner's inventory:
+            for (let iitem = owner.Inv; iitem != null; iitem = iitem.Inv)
+            {
+                // Try casting the current item as weapon:
+                let weap = Weapon(iitem);
+                // If the cast succeeded, this means it's indeed
+                // a Weapon. If not, the iteration will move on
+                // to the next loop:
+                if (weap)
+                {
+                    // Null-check this weapon's `ammo1` pointer.
+                    // If it's valid, set its amount to its maxamount:
+                    if (weap.ammo1)
+                        weap.ammo1.amount = weap.ammo1.maxamount;
+                    // Same for ammo2:
+                    if (weap.ammo2)
+                        weap.ammo2.amount = weap.ammo2.maxamount;
+                }
+            }
+        }
+        // Returning true will unconditionally consume this item:
+        return true;
+    }
+
+    // For simplicity, this item uses Doom Backpack sprites:
+    States {
+    Spawn:
+        BPAK A -1;
+        stop;
+    }
+}
+```
 
 ------
 
