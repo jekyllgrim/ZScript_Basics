@@ -938,10 +938,10 @@ You can also set up an **endless** loop by doing `while (true)` (since, well, `t
 
 ```c
 //psuedocode:
-for (<counter value>; <condition>; <change>)
+for (<initial value>; <condition to check before each loop>; <what to do after each loop>)
 ```
 
-In a `for` loop the "counter value" is an initial value (e.g. an integer number) that will define the number of iterations. "Condition" normally defines what to check the counter value against, "change" is how the counter value will be changed with every iteration of the loop.
+In a `for` loop the "initial value" is usually an integer number that will define the number of iterations. "Condition" normally defines what to check the counter value against, and "what to do" is how the counter value will be modified with every iteration of the loop.
 
 A typical `for` loop looks like this:
 
@@ -1097,6 +1097,8 @@ In other words:
 
 1. `i` must never be equal to the array's size if you use it as an index, because you'll get an "out of bounds" error.
 2. Also, if you use the second template the condition must be `i >= 0`, because if you make it `i > 0`, the loop won't iterate through the first item in the array, since its index is 0.
+
+It's also important to know that FOR loops are *not* actually limited to numbers. Other conditions can be utilized as well. [Iterating through linked lists](13_Arrays.md#linked-lists) is one common example of doing that.
 
 ### break
 
