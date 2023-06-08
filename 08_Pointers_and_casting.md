@@ -512,7 +512,7 @@ In this case inventory orb creates a variable orb of type `Inventory`, then cast
 As such, the syntax for type casing is this:
 
 ```csharp
-Type pointerName = Type(<another pointer or function>);
+Type pointerName = Type(<another pointer>);
 ```
 
 You may wonder, why do we need to do `Inventory orb = Inventory(Spawn("Soulsphere", pos))`, why can't we just do `Inventory orb = Spawn("Soulsphere", pos)`? The answer is, the `Spawn()` function doesn't know beforehand what kind of actor you'll be spawning, and it doesn't know if you need to cast the spawned actor as a specific type or not, so it returns an Actor pointer to the spawned actor. That's why you need to explicitly tell the function what type of pointer you need to get.
@@ -543,7 +543,9 @@ Some of the non-Actor pointer fields you may need to be aware of:
 
 * `blockingline` — points to the line the actor is currently crossing/touching
 
-* `readyWeapon` (PlayerPawn only) — points to the currently selected weapon
+* `floorpic` — contains a TextureID of the floor texture under the calling actor
+
+* `ceilingpic` — contains a TextureID of theceiling texture above the calling actor
 
 ------
 
