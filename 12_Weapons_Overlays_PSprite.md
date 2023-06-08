@@ -1511,7 +1511,7 @@ As you can see, it's a lot longer and not particularly better in terms of readab
 
 So, as I said, use cases for this are fairly niche. One example that comes to mind is when you want to offset two layers relative to each other but still independently, but it's hard to come up with a generic use for that.
 
-### Overlay scale, rotate and pivot
+### Overlay scale, rotation and pivot
 
 As of GZDoom 4.5.0, sprite layers can be rotated and scaled. This can be done vial the following methods:
 
@@ -1793,7 +1793,8 @@ For a very simple example, let's take our PlasmaShotgun we used earlier and make
 
 **TRNSLATE:**
 
-```css
+```csharp
+// This converts any color range to a general blue range:
 PlasmaFlash = "0:255=%[0.00,0.07,0.94]:[0.49,1.32,2.00]"
 ```
 
@@ -1831,17 +1832,21 @@ class PlasmaShotgun : Shotgun
 }
 ```
 
-And here's an example of how the PSprite translation can be modified from outside:
+Translation can also be applied to a PSprite from outside of a weapon. Let's make a colorful version of PlasmaRifle where orbs are colorized randomly, and then the same color is applied to the Plasma Rifle's muzzle flash.
+
+First, let's create a series of translations that convert the blue range of the Doom palette to some other color ranges:
 
 **TRNSLATE:**
 
-```css
-PlasmaOrb_Green = "192:207=112:127"
-PlasmaOrb_Orange = "192:207=208:223"
-PlasmaOrb_Red = "192:207=169:191"
-PlasmaOrb_Purple = "192:207=250:254"
-PlasmaOrb_Pink = "192:207=16:31"
+```csharp
+PlasmaOrb_Green = "192:207=112:127" //convert blue to green
+PlasmaOrb_Orange = "192:207=208:223" //blue to orange
+PlasmaOrb_Red = "192:207=169:191" // blue to red
+PlasmaOrb_Purple = "192:207=250:254" //blue to purple
+PlasmaOrb_Pink = "192:207=16:31" //blue to pink
 ```
+
+> *Note:* This list of translations isn't the same as the translation we used earlier for our plasma shotgun. In the plasma shotgun we used what's called "desaturated color translation", which can tint the whole graphic with a specific color tone. In this example here, however, we're explicitly converting the blue range to other ranges, which means these colorful plasma translations won't work on a graphic that isn't using the blue color range from the Doom palette.
 
 **ZScript:**
 
