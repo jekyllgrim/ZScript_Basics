@@ -434,14 +434,20 @@ class MyHUD : BaseStatusBar
     {
         super.Init();
         Font fnt = "MYHUDFNT"; //obtain the font named "MYHUDFNT"
-        mIndexFont = HUDFont.Create(fnt); //cache the font
+        mIndexFont = HUDFont.Create(fnt); //create the font and cache it to mIndexFont
     }
 }    
 ```
 
 After this point you'll be able to use `mIndexFont` in functions like `DrawString()`. Note, the variable name, as usual, can be anything; I'm using `mIndexFont` as an example, since this is what is used in `DoomStatusBar`.
 
-I should note that `HUDFont` is a whole separate class, whose purpose is to handle HUD fonts, and `Create()` is its only method. Among other things, `Create()` allows specifying monospaced fonts or defining custom spacing. You can find the documentation for this class [on ZDoom Wiki](https://zdoom.org/wiki/Classes:HUDFont).
+I should note that `HUDFont` is a whole separate class, whose purpose is to handle HUD fonts, and `Create()` is its only method. Among other things, `Create()` allows specifying monospaced fonts or defining custom spacing. The full list of arguments of this method goes like this:
+
+```csharp
+HUDFont.Create(Font fnt, int spacing = 0, bool monospaced = false, int shadowx = 0, int shadowy = 0)
+```
+
+You can find the documentation for this class [on ZDoom Wiki](https://zdoom.org/wiki/Classes:HUDFont).
 
 #### DrawImage()
 
@@ -470,8 +476,6 @@ void DrawTexture(TextureID texture, Vector2 pos, int flags = 0, double Alpha = 1
 ```
 
 This function is largely identical to `DrawImage()`, with the exception of the first argument: instead of taking the name of a graphic as a `string`, it takes a `TextureID`-type argument. `TextureID` is a special [data type](07_Variables_and_data_types.md) that contains a reference to a texture, but not the actual texture name.
-
-You likely won't need this texture often.
 
 #### DrawString()
 
