@@ -10,38 +10,53 @@
 
 ## Table of Contents
 
-- [Handling data from weapons](#handling-data-from-weapons)
-  * [Accessing data from weapon states](#accessing-data-from-weapon-states)
-  * [Accessing data from the weapon's virtual functions](#accessing-data-from-the-weapon-s-virtual-functions)
-  * [Checking current weapon](#checking-current-weapon)
-  * [When to use Tick()](#when-to-use-tick--)
-- [Action functions](#action-functions)
-- [PSprite and overlays](#psprite-and-overlays)
-  * [Differences between PSprites and actor sprites](#differences-between-psprites-and-actor-sprites)
-  * [Difference between PSprites and state sequences](#difference-between-psprites-and-state-sequences)
-- [PSprite manipulation](#psprite-manipulation)
-  * [Creating PSprites](#creating-psprites)
-    - [Native function](#native-function)
-    - [ZScript function](#zscript-function)
-    - [Layer numbers](#layer-numbers)
-    - [PSprite pointers](#psprite-pointers)
-    - [Independent overlay animation](#independent-overlay-animation)
-  * [Removing PSprites](#removing-psprites)
-    - [Native function](#native-function-1)
-    - [ZScript method](#zscript-method)
-  * [PSprite flags](#psprite-flags)
-  * [PSprite properties](#psprite-properties)
-    - [Native property-altering functions](#native-property-altering-functions)
-    - [Internal properties](#internal-properties)
-  * [Checking PSprite state](#checking-psprite-state)
-  * [PSprite offsets](#psprite-offsets)
-    - [Native offset functions](#native-offset-functions)
-    - [Internal offset values](#internal-offset-values)
-  * [Overlay scale, rotate and pivot](#overlay-scale--rotate-and-pivot)
-  * [Overlay translation](#overlay-translation)
-- [Akimbo weapons](#akimbo-weapons)
-  * [Classic dual weapon](#classic-dual-weapon)
-  * [Independent dual weapons activated with Fire/Alt Fire keys](#independent-dual-weapons-activated-with-fire-alt-fire-keys)
+- [Weapons, overlays and PSprite](#weapons--overlays-and-psprite)
+  * [Table of Contents](#table-of-contents)
+  * [Overview](#overview)
+  * [Basic weapon states and flow](#basic-weapon-states-and-flow)
+  * [Basic weapon functions](#basic-weapon-functions)
+    + [A_WeaponReady](#a-weaponready)
+    + [Weapon attack functions](#weapon-attack-functions)
+      - [**A_FireBullets**](#--a-firebullets--)
+      - [A_FireProjectile](#a-fireprojectile)
+      - [A_CustomPunch](#a-custompunch)
+      - [A_RailAttack](#a-railattack)
+    + [A_ReFire](#a-refire)
+    + [Hitscan puffs](#hitscan-puffs)
+    + [Other useful functions](#other-useful-functions)
+  * [Handling data from weapons](#handling-data-from-weapons)
+    + [Accessing data from weapon states](#accessing-data-from-weapon-states)
+    + [Accessing data from the weapon's virtual functions](#accessing-data-from-the-weapon-s-virtual-functions)
+    + [Checking current weapon](#checking-current-weapon)
+    + [When to use Tick()](#when-to-use-tick--)
+  * [Action functions](#action-functions)
+  * [PSprite and overlays](#psprite-and-overlays)
+    + [Differences between PSprites and actor sprites](#differences-between-psprites-and-actor-sprites)
+    + [Difference between PSprites and state sequences](#difference-between-psprites-and-state-sequences)
+  * [PSprite manipulation](#psprite-manipulation)
+    + [Creating PSprites](#creating-psprites)
+      * [Native function](#native-function)
+      * [ZScript function](#zscript-function)
+      * [Layer numbers](#layer-numbers)
+      * [PSprite pointers](#psprite-pointers)
+      * [Independent overlay animation](#independent-overlay-animation)
+    + [Removing PSprites](#removing-psprites)
+      * [Native function](#native-function-1)
+      * [ZScript method](#zscript-method)
+    + [PSprite flags](#psprite-flags)
+    + [PSprite properties](#psprite-properties)
+      * [Native property-altering functions](#native-property-altering-functions)
+      * [Internal properties](#internal-properties)
+    + [Checking PSprite state](#checking-psprite-state)
+    + [PSprite offsets](#psprite-offsets)
+      * [Native offset functions](#native-offset-functions)
+      * [Internal offset values](#internal-offset-values)
+    + [Overlay scale, rotation and pivot](#overlay-scale--rotation-and-pivot)
+    + [Overlay translation](#overlay-translation)
+  * [Akimbo weapons](#akimbo-weapons)
+    + [Classic dual weapon](#classic-dual-weapon)
+    + [Independent dual weapons activated with Fire/Alt Fire keys](#independent-dual-weapons-activated-with-fire-alt-fire-keys)
+  * [Creating PSprite animations with CustomInventory](#creating-psprite-animations-with-custominventory)
 
 ## Overview
 
@@ -49,12 +64,261 @@ Weapons (i.e. classes that inherit from the base `Weapon` class) feature a numbe
 
 Here's a brief overview of their features:
 
+* `Weapon` is a subclass of [`Inventory`](12.1_Inventory.md) (the full inheritance chain is `Actor`>`Inventory`>`StateProvider`>`Weapon`), and thus they have access to all Inventory functions and virtual functions.
 * `Weapon` and `CustomInventory` are the only two classes that inherit from an internal `StateProvider` class, which allows them to draw sprite animations on the screen. The sprites drawn on the screen are handled by a separate special class called `PSprite` (short for "player sprite").
 * PSprite is a special internal class whose main purpose is to handle on-screen sprite drawing. PSprites hold various properties of those sprite layers, such as duration in tics, position on the screen, and so on.
 * On-screen sprites can be drawn in multiple layers. The main layer is layer 1, also defined as `PSP_Weapon` (PSP_Weapon is just an alias of number 1). New layers can be drawn above and below it. A separate PSprite class instance is be created to handle each layer.
 * Most weapon functions, such as `A_FireBullets`, `A_WeaponReady` and other functions that are called from the States block, despite being defined in the weapon, are actually called and executed by the [player pawn](https://zdoom.org/wiki/Classes:PlayerPawn) carrying that weapon, rather than the weapon itself. For example, when you call `A_FireProjectile` from the weapon, it's the player pawn that spawns the projectile in the world.
   * For this reason monster attack functions, such as `A_SpawnProjectile`, can't be used in weapons, and vice versa.
 * Functions that can be called from weapon states are always [action functions](09_Custom_functions.md#action-functions). Custom functions also have to be defined as action functions.
+
+## Basic weapon states and flow
+
+Weapons are actors, so they utilize the `Default` block and the `States` block in a similar manner to actors. However, only the `Spawn` state sequence defines how the weapon looks in the world, as a pickup. The other state sequences define the on-screen animation of the weapon, and they're handled by a separate class, `PSprite` (which will be covered in more detail later in the chapter).
+
+Weapons are also items (they're based on the `Inventory` class), which means they can be placed in the world, dropped by enemies, and picked up by the player to be added to their inventory. Starting weapons (given to the player at the start of the game) are defined in the `PlayerPawn`, through their [`Player.StartItem` property](https://zdoom.org/wiki/Classes:PlayerPawn#Player.StartItem).
+
+Weapons come with a number of [unique properties](https://zdoom.org/wiki/Actor_properties#Weapon) and [unique flags](https://zdoom.org/wiki/Actor_flags#Weapons), and they also utilize unique basic state sequences:
+
+* `Select`: Used when the weapon is selected and starts moving from the bottom of the screen. Normally, [`A_Raise`](https://zdoom.org/wiki/A_Raise) is called to raise the weapon over several tics, but it's not compulsory. It's possible to jump straight to `Ready` from this state. Otherwise, `A_Raise` will automatically jump to `Ready` as soon as the vertical position of the weapon's sprite reaches the value contained in the `WEAPONTOP` global constant (which is equal to 32).
+
+* `Deselect`: Used when another weapon is about to be selected, and the current weapon has to be moved away from the screen before that happens. The deselection animation is played with the function [`A_Lower`](https://zdoom.org/wiki/A_Lower). The weapon can only be deselected if it was ready for deselection, which requires calling `A_WeaponReady`.
+
+* `Ready`: Entered after the weapon has been selected and raised. To make the weapon actually ready to be fired or deselected, the [`A_WeaponReady`](https://zdoom.org/wiki/A_WeaponReady) function has to be called.
+
+* `Fire`: Entered when the player presses the primary attack button while the weapon was ready to fire (which requires calling `A_WeaponReady`).
+
+* `AltFire`: Entered when the player presses the alternative attack button while the weapon was ready to fire (which requires calling `A_WeaponReady`).
+
+* `Hold`: If anywhere in the `Fire` sequence the [`A_ReFire`](https://zdoom.org/wiki/A_ReFire) function is called and the player is holding the attack button, the animation will move to the `Hold` sequence and will continue animating in that sequence. It can be used in order to create a weapon that has a different animation for the first shot and for all the subsequent shots, as long as the player is holding the attack button.
+  
+  * If this state sequence is not provided, calling `A_ReFire` will simply make the animation jump back to the beginning of `Fire` if the player is holding the attack button.
+
+* `AltHold`: Functions the same way as `Hold`, but is used when calling `A_ReFire` from the `AltFire` sequence.
+  
+  * If this state sequence is not provided, calling `A_ReFire` inside `AltFire` will simply make the animation jump back to the beginning of `AltFire` if the player is holding the attack button. Alternative attack will never use the regular `Hold` sequence.
+
+* `Reload`: Entered when the player presses Reload while the weapon was ready to reload, which requires calling `A_WeaponReady(WRF_ALLOWRELOAD)`. The actual reload logic has to be fully coded by the author, there's no built-in system for reloading.
+
+* `Zoom`: Entered when the player presses Zoom while the weapon was ready to zoom, which requires calling `A_WeaponReady(WRF_ALLOWZOOM)`.
+
+* `User1`, `User2`, `User3` and `User4`: These are empty state sequences that can be utilized by the authors to define any kind of extra state sequences that can be called as long as `A_WeaponReady(WRF_ALLOWUSER#)` is called, where `#` is a number between 1 and 4. Effectively, they allow creating extra attacks for the weapon. These state sequences are attached to empty "user" inputs (the corresponding console commands are, respectively, `+user1`, `+user2`, `+user3` and `+user4`). These inputs are not used for anything in GZDoom by default, so you can attach custom actions to them and give them names by [creating a keysection in the KEYCONF lump](https://zdoom.org/wiki/Adding_keysections), and then calling `A_WeaponReady` with the necessary flag. So, for example, if you call `A_WeaponReady(WRF_ALLOWUSER1)`, and the player presses the button bound to `+user1`, the weapon will enter its `User1` state sequence.
+
+* `Flash`: This state sequence is entered on a separae sprite layer whenever `A_GunFlash` function is called in Fire/Hold. If this happens, the sprites in the `Flash` state sequences will be drawn and animated above the weapon, on the layer 1000. This is what vanilla Doom weapons use to draw muzzle flashes, so that the muzzle flash can be drawn fullbright while the rest of the weapon isn't. Vanilla Doom weapons also use `A_Light2` and `A_Light1` functions that illuminate *the whole level* to create the impression of the weapon illuminating your surroundings. Note, `A_Light0` has to be called after either of those to reset the effect, otherwise the light level of the whole map will remain permanently raised.
+  
+  * It's not a requirement to use this method to create muzzle flashes in your weapons. Nowadays, with a higher flexibility in the number of layers you can create, and with the access to dynamic light, using `A_GunFlash` or `A_Light#` functions doesn't yield the best visual results.
+
+* `AltFlash`: Functions the same way as `Flash` but is used when `A_GunFlash` is called from AltFire/AltHold.
+
+* `Lightdone`: This state sequence is defined in the base `Weapon` class and doesn't need to be overridden in your weapons. All it does is call `A_Light0` and then destroy the current layer (it's meant to only be used by the gun flash layer, not the main weapon layer). Normally, weapons that utilize the `Flash`/`AltFlash` sequences and call `A_Light2` or `A_Light1`, end with `goto Lightdone` in order to reset the illumination effect. However, it's not a requirement; you can also simply call `A_Light0` manually and then `stop`.
+
+As an example of a simple weapon, let's take a look at the Doom Pistol:
+
+```csharp
+// The base class for all Doom weapons is DoomWeapon.
+// DoomWeapon is directly based on Weapon; the only thing
+// it defines is Weapon.Kickback of 100. You don't have
+// to base your custom weapons on it.
+class Pistol : DoomWeapon
+{
+     Default
+    {
+        // Determines the order of this weapon when
+        // the player runs out of ammo and a new weapon
+        // has to be selected. The higher this number,
+        // the lower will be its priority during automatic
+        // selection:
+        Weapon.SelectionOrder 1900
+        // Determines how much ammo the weapon consumes
+        // during primary attack:
+        Weapon.AmmoUse 1
+        // Determines how much ammo the weapon gives to
+        // the player when they pick it up. If the weapon
+        // is dropped by an enemy, this amount will be
+        // halved. Pistol doesn't appear as a pickup in
+        // vanilla Doom maps but can be placed in custom
+        // maps:
+        Weapon.AmmoGive 20
+        // Contains the name of the ammo class utilized
+        // for the primary attack of this weapon:
+        Weapon.AmmoType "Clip"
+        // Contains a string printed when the player
+        // kills another player with this weapon in deathmatch:
+        Obituary "$OB_MPPISTOL"
+        // This flag marks this weapon as weak. This means,
+        // as soon as the player picks up another weapon
+        // without this flag, it'll be selected instead
+        // of this one:
+        +WEAPON.WIMPY_WEAPON
+        // The pickup message is printed when the item
+        // is picked up:
+        Inventory.Pickupmessage "$PICKUP_PISTOL_DROPPED"
+        // Internal name of this object. Can be different
+        // from class name, and can be localized with
+        // the LANGUAGE lump:
+        Tag "$TAG_PISTOL"
+    }
+    States
+    {
+    Ready:
+        PISG A 1 A_WeaponReady; // makes the weapon ready to fire and deselect
+        Loop;
+    Deselect:
+        PISG A 1 A_Lower; // lowers the weapon on the screen
+        Loop;
+    Select:
+        PISG A 1 A_Raise; // raises the weapon on the screen
+        Loop;
+    Fire:
+        PISG A 4;
+        // Most vanilla weapons utilize custom attack functions
+        // similar to vanilla Doom. For example, A_FirePistol
+        // combines A_FireBullets, A_GunFlash and A_StartSound:
+        PISG B 6 A_FirePistol;
+        PISG C 4;
+        // If the player is still holding the attack button,
+        // PISGB won't be shown, and instead the animation
+        // will jump back to the start of Fire. Thus, tapping
+        // attack button will produce longer fire animations
+        // than holding it:
+        PISG B 5 A_ReFire;
+        Goto Ready;
+    Flash:
+        // This illuminates the whole level slightly:
+        PISF A 7 Bright A_Light1;
+        // As mentioned above, the LightDone sequence calls 
+        // A_Light0 to reset illumination and destroy this layer:
+        Goto LightDone;
+    // While in vanilla Doom the Pistol doesn't exist as a pickup,
+    // it does in GZDoom. GZDoom also comes with a pickup sprite
+    // for it, which didn't exist in the original Doom. This
+    // allows authors to place pistol pickups in their maps, have
+    // custom enemies drop the Pistol, or summon it via the console:
+     Spawn:
+        PIST A -1;
+        Stop;
+    }
+}
+```
+
+It's worth noting at this point that the weapons from vanilla games (Doom, Heretic, Hexen, etc.) are largely not very good examples of how to make your own weapons. While they provide the basics, such as the use of states, their behavior is usually rather simplistic and limited to highly specific functions that don't offer any flexibility. For example, when you decide to make your own pistol for your project, it's unlikely you'll be using `A_FirePistol`, because you'll want your own firing sound, your own damage/spread values, and so on. At the same time, you'll likely be using many other functions to make your weapons look and feel better. As such, it's important to familiarize yourself with various weapon functions rather than rely on the code provided by the vanilla weapons.
+
+## Basic weapon functions
+
+All weapon functions are [documented on ZDoom Wiki](https://zdoom.org/wiki/Category:Decorate_Weapon_functions), so I'm not going to provide detailed descriptions of each and every one. Instead, I'll point out the ones you'll need to pay most attention to and will utilize most often.
+
+### A_WeaponReady
+
+```csharp
+A_WeaponReady(int flags)
+```
+
+[`A_WeaponReady`](https://zdoom.org/wiki/A_WeaponReady) is normally called in the `Ready` state sequence, and it's what allows the weapon to perform its various functions. What behavior it enables is determined by the value of the `flags` argument, which may contain various flags; several flags can be combined with the `|` character. By default calling this function allows the player to use fire, altfire and to switch to another weapon. In addition to that, as soon as this function is called, the weapon sprite will bob (if the player is moving), unless the `WRF_NOBOB` flag is used. 
+
+Calling this function will also immediately reset the calling layer's offset to their default values, which is `0` for X and `WEAPONTOP` (aka `32`) for Y. As such, if the weapon's sprite was moved prior to that with `A_WeaponOffset` or `A_OverlayOffset`, calling `A_WeaponReady` will reset those offsets.
+
+Various behaviors can be selectively enabled or disabled with the help of flags. For example, if you're going to create a reloading system for your weapon, you will need to call `A_WeaponReady(WRF_ALLOWRELOAD)` in order for the weapon to recognize when the Reload key is pressed and move to the `Reload` state sequence. Same goes for Zoom and User1–4 keys.
+
+Internally, `A_WeaponReady` modifies the value of the `weaponstate` field on the `PlayerInfo` struct of its user player by calling various functions on the relevant `PlayerPawn` actor. For example, the `WF_WEAPONBOBBING` internal flag is added to the field whenever the weapon is allowed to bob (which normally happens when `A_WeaponReady` is called; by default weapons don't bob while firing). The full list of these internal weapon state flags is defined in GZDoom, in the `constant.zs` file (see [here](https://github.com/ZDoom/gzdoom/blob/62f37079a7834b813f251818d1db6c80e644d209/wadsrc/static/zscript/constants.zs#L1167-L1181)).
+
+### Weapon attack functions
+
+[Weapon attack functions](https://zdoom.org/wiki/Category:Decorate_Weapon_attack_functions) are the various customizable attack functions which you'll be mostly using in your custom weapons. All of these functions are defined in the `StateProvider` class (see [on GitHub](https://github.com/ZDoom/gzdoom/blob/master/wadsrc/static/zscript/actors/inventory/stateprovider.zs)).
+
+#### **A_FireBullets**
+
+```csharp
+A_FireBullets (double spread_xy, double spread_z, int numbullets, int damageperbullet , class<Actor> pufftype = "BulletPuff" , int flags = FBF_USEAMMO , double range = 0 , class<Actor> missile = null , double spawnheight = 32 , double spawnofs_xy = 0)
+```
+
+[`A_FireBullets`](https://zdoom.org/wiki/A_FireBullets) is used to perform **hitscan attacks**—i.e., attacks that instantly deal damage at the specified point. This is how bullet attacks were created in the original games and a lot of modern games still use this method. The attack supports custom spread values, a custom damage value, an ability to spawn a puff (which by default is spawned when the attack hits level geometry rather than another actor) and a few other features.
+
+Using the `missile` argument of this function you can also spawn a projectile that will fly towards the point the hitscan hit. This can be utilized, for example, to create bullet tracers, by sending some kind of a glowing, purely visual (non-damaging) projectile towards the impact point of the bullet.
+
+Note that by default the first bullet fired by the weapon will ignore its spread arguments and will instead be fired with perfect accuracy. To be more precise, this isn't really about the "first bullet," but rather this will be true until the weapon calls `A_ReFire` for the first time. That's why tap-firing the Pistol and the Chaingun in Doom produces perfectly accurate shots. This perfect accuracy is disabled if there are several bullets fired (`numbullets` is above 1), like with the Shotgun, or if the value of `numbullets` is negative (so, for example, using `-1` instead of `1` will still cause the function to fire a single hitscan, but it will never be perfectly accurate).
+
+#### A_FireProjectile
+
+```csharp
+action Actor, Actor A_FireProjectile(class<Actor> missiletype, double angle = 0, bool useammo = true, double spawnofs_xy = 0, double spawnheight = 0, int flags = 0, double pitch = 0)
+```
+
+[`A_FireProjectile`](https://zdoom.org/wiki/A_FireProjectile) is the basic function used to fire projectiles. Projectiles are separate actors that use the `speed` property to determine their movement speed, and `damage` to determine how much damage they will deal to the actor they hit. 
+
+Note that `A_FireProjectile` returns two actor pointers. They both point to the projectile, but the difference is that the first pointer will only be created for projectiles that actually managed to enter their Spawn state sequence before they hit something. This doesn't always happen: if a projectile is fired into an enemy or level geometry at a point-blank range, it'll immediately enter its Death state sequence (and deal damage); in this case the first pointer will be null. The second pointer, however, will always be returned. As such, if you want to fire a projectile and then do something with it, you will need to utilize ZScript syntas for functions with multiple returns:
+
+```csharp
+Actor p1, p2; //creates two Actor variables named p1 and p2
+[p1, p2] = A_FireProjectile(...); //... implies that you will provide your own arguments
+
+// you can now use the p2 pointer to the projectile, which is guaranteed to exist
+```
+
+#### A_CustomPunch
+
+```csharp
+action void A_CustomPunch(int damage, bool norandom = false, int flags = CPF_USEAMMO, class<Actor> pufftype = "BulletPuff", double range = 0, double lifesteal = 0, int lifestealmax = 0, class<BasicArmorBonus> armorbonustype = "ArmorBonus", sound MeleeSound = 0, sound MissSound = "")
+```
+
+[`A_CustomPunch`](https://zdoom.org/wiki/A_CustomPunch) is the base function for all sorts of melee attacks. In essense, it's a hitscan attack with a limited range (customizable with the `range` argument). It features some optional additional mechanics, like health stealing, armor stealing, as well as `meleesound` and `misssound` arguments to play sounds when the attack hits something or misses.
+
+#### A_RailAttack
+
+```csharp
+action void A_RailAttack(int damage, int spawnofs_xy = 0, bool useammo = true, color color1 = 0, color color2 = 0, int flags = 0, double maxdiff = 0, class<Actor> pufftype = "BulletPuff", double spread_xy = 0, double spread_z = 0, double range = 0, int duration = 0, double sparsity = 1.0, double driftspeed = 1.0, class<Actor> spawnclass = "none", double spawnofs_z = 0, int spiraloffset = 270, int limit = 0)
+```
+
+[`A_RailAttack`](https://zdoom.org/wiki/A_RailAttack) is, essentially, another hitscan attack, much like `A_FireBullets`, but it also comes with built-in behavior that creates a trail of particles (which are very cheap, non-actor effects in GZDoom) from the shooter towards the point where the rail ends. Instead of particles, custom visual actors can be used by passing the necessary class name to the `spawnclass` argument (be careful with this feature, however, since it instantly creates a large number of actors which can easily result in a FPS drop, *especially* if multiple rails are fired in quick succession and the actors in question take a while to disappear).
+
+This attack also pierces enemies by default (this behavior can be disabled with the `RGF_NOPIERCING` flag), which can't be achieved with `A_FireBullets`.
+
+### A_ReFire
+
+[`A_ReFire`](https://zdoom.org/wiki/A_ReFire) is commonly used in Fire or AltFire sequences and does two things:
+
+1. It'll perform a state jump if the player is holding the attack button with the following rules:
+   
+   - If called in Fire, will jump to the Hold state sequence, if present, otherwise will jump back to the beginning of Fire.
+   - If called in AltFire, will jump to the AltHold state sequence, if present, otherwise will jump back to the beginning of AltFire.
+   - The function checks for the primary attack button when called in Fire/Hold, and for the alternative attack button when called in AltFire/AltHold; thus it cannot "link" the attacks and won't let you refire from primary into alternative and vice versa.
+
+2. Every time it's called, it'll increment the `refire` field on the `PlayerInfo` struct of the firing player.
+
+While functioning similarly to a state jump with extra steps, the last part is especially important: as noted earlier in the [`A_FireBullets`](#A_FireBullets) section, by default `A_FireBullets`, when firing only one bullet, will fire it with perfectly accuracy while the value of `player.refire` is 0, and only once it's incremented through the `A_ReFire` call the spread will be utilized. 
+
+The value of `player.refire` is reset to 0 only when `A_WeaponReady` is called.
+
+However, `A_ReFire` can backfire (pun intended) if the weapon for some reason gets deselected after refiring (for example, if [`A_CheckReload`](https://zdoom.org/wiki/A_CheckReload) is called in the Hold sequence and the weapon deselects because it's out of ammo). Since `A_WeaponReady` doesn't get called in this case, the deselected weapon will be stuck as "ready to refire," and the next time it's selected and the player presses the attack button, it'll immediately jump to Hold instead of Fire (also, the "perfect accuracy on first shot" rule of `A_FireBullets` won't be applied either, since `player.refire` won't be 0).
+
+### Hitscan puffs
+
+*TBD*
+
+### Other useful functions
+
+You can freely call most of Actor functions from weapon states, and there are plenty of those you'll be using quite often:
+
+* [`A_StartSound`](https://zdoom.org/wiki/A_StartSound) is used to play sounds, which you'll, obviously, be doing often in your weapons. The sounds will be emitted from your PlayerPawn. Note, by default this function uses the CHAN_BODY channel to play sound, which is the same channel used for other actor sound (for example, the PlayerPawn pain and death sounds). If you don't want them to interfere, use either CHAN_WEAPON, or any free channel (the number of channels isn't limited).
+  
+  * [`A_StopSound`](https://zdoom.org/wiki/A_StopSound) can be used to interrupt a sound playing on a channel.
+
+* [`A_Quake`](https://zdoom.org/wiki/A_Quake) or [`A_QuakeEx`](https://zdoom.org/wiki/A_QuakeEx) will create a quake around the PlayerPawn and may be useful to create slight shaking of the screen, although the same effect may be achieved by other means.
+
+* [`A_SetAngle`](https://zdoom.org/wiki/A_SetAngle) and [`A_SetPitch`](https://zdoom.org/wiki/A_SetPitch) can be called to modify the PlayerPawn angle and pitch, for example to create a recoil effect (the `angle` and `pitch` fields can also be modified directly, but these functions can do that with sub-tic interpolation for a slightly smoother experience). Be careful, however, because most values that aren't very small can be very disorienting. 
+  
+  * Regarding `A_SetPitch`: remember that **some players don't use free mouselook** and rely on vertical autoaiming, so changing their pitch will forever raise their camera. Best practice here is to check `if (Level.IsFreelookAllowed() && CVar.GetCVar('freelook', player)` — this check will only return true if the MAPINFO for the current map allows freelook *and* the player using the gun has freelook enabled.
+
+* [`A_SetBlend`](https://zdoom.org/wiki/A_SetBlend) can be used to temporarily tint the player's screen to a specific color, which can be useful for various visual effects.
+
+* [`A_AttachLight`](https://zdoom.org/wiki/A_AttachLight) and [`A_AttachLightDef`](https://zdoom.org/wiki/A_AttachLightDef) can be used to attach a dynamic light to the PlayerPawn. These functions can illuminate the surroundings in an arguably more realistic manner than `A_Light1` and the related functions.
+  
+  * If you want the light to appear at the same height as your weapon rather than your feet, for the `ofs` argument use `(0, 0, player.viewHeight)` to place it at the view height of the player, or `(0, 0, height * 0.5)` to simply place it in the middle of the PlayerPawn.
+  
+  * [`A_RemoveLight`](https://zdoom.org/wiki/A_RemoveLight) will be necessary to remove the light afterwards, otherwise it'll still around.
+
+* [`LineTrace`](https://zdoom.org/wiki/LineTrace) is a generally very useful utility function, and it can be useful for weapons as well: for example, you can use it to detect if a player is aiming at something specific.
+  
+  * If you want to fire a `LineTrace` using *precisely* the attack height of the player (which isn't the same as their viewheight, or center of the screen, or the center of the player pawn), use the following as the `offsetz` argument: `height * 0.5 - floorclip + player.mo.AttackZOffset*player.crouchFactor`.
 
 ## Handling data from weapons
 
