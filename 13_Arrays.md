@@ -352,6 +352,8 @@ Fixed-size arrays are similar to dynamic arrays in the sense that their contents
 
 Linked lists are somewhat similar to arrays but are used much more rarely. The main reason for this is that you can't define custom linked lists in ZScript. There are several places where they're used and exposed to ZScript, but those linked lists themselves are defined in the C++ side of the engine.
 
+In essence, linked lists are similar to arrays, except an array lets you access each element individually, with a numeric index. A linked list is structured in such a way that each element of the list has a *pointer* to the next element in the list. As a result, there are no indexes/numbers, instead you just get a pointer to an element of the list and keep iterating as long as there's a valid pointer from the current element to the next one.
+
 The most common linked list you might come across is inventory — not the `Inventory` class (the base class for all items), but the actual inventory of an actor. An inventory is a linked lists containing pointers to all items the actor is carrying. The inventory linked list is defined in the base `Actor` class as `native Inventory inv`; here `inv` is the name of the list, while `Inventory` is the data type. `Native`, as usual, points to the fact that this variable is defined and filled in C++, but ZScript can still read the data in it.
 
 The basics of a linked list, using inventory as an example, work like this:

@@ -1,6 +1,6 @@
 🟢 [<<< BACK TO START](README.md)
 
-🔵 [<< Previous: Arrays](13_Arrays.md)
+🔵 [<< Previous: Arrays and linked lists](13_Arrays.md)
 
 ---
 
@@ -172,4 +172,4 @@ The use of constants is a matter of convenience; technically, you could just use
 
 🟢 [<<< BACK TO START](README.md)
 
-🔵 [<< Previous: Arrays](13_Arrays.md)
+🔵 [<< Previous: Arrays and linked lists](13_Arrays.md)

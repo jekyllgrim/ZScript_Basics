@@ -1,6 +1,6 @@
 🟢 [<<< BACK TO START](README.md)
 
-🔵 [<< Previous: Inventory](12.1_Inventory.md) 🔵 [>> Next: Arrays](13_Arrays.md)
+🔵 [<< Previous: Inventory](12.1_Inventory.md) 🔵 [>> Next: Arrays and linked lists](13_Arrays.md)
 
 ------
 
@@ -10,53 +10,51 @@
 
 ## Table of Contents
 
-- [Weapons, overlays and PSprite](#weapons--overlays-and-psprite)
-  * [Table of Contents](#table-of-contents)
-  * [Overview](#overview)
-  * [Basic weapon states and flow](#basic-weapon-states-and-flow)
-  * [Basic weapon functions](#basic-weapon-functions)
-    + [A_WeaponReady](#a-weaponready)
-    + [Weapon attack functions](#weapon-attack-functions)
-      - [**A_FireBullets**](#--a-firebullets--)
-      - [A_FireProjectile](#a-fireprojectile)
-      - [A_CustomPunch](#a-custompunch)
-      - [A_RailAttack](#a-railattack)
-    + [A_ReFire](#a-refire)
-    + [Hitscan puffs](#hitscan-puffs)
-    + [Other useful functions](#other-useful-functions)
-  * [Handling data from weapons](#handling-data-from-weapons)
-    + [Accessing data from weapon states](#accessing-data-from-weapon-states)
-    + [Accessing data from the weapon's virtual functions](#accessing-data-from-the-weapon-s-virtual-functions)
-    + [Checking current weapon](#checking-current-weapon)
-    + [When to use Tick()](#when-to-use-tick--)
-  * [Action functions](#action-functions)
-  * [PSprite and overlays](#psprite-and-overlays)
-    + [Differences between PSprites and actor sprites](#differences-between-psprites-and-actor-sprites)
-    + [Difference between PSprites and state sequences](#difference-between-psprites-and-state-sequences)
-  * [PSprite manipulation](#psprite-manipulation)
-    + [Creating PSprites](#creating-psprites)
-      * [Native function](#native-function)
-      * [ZScript function](#zscript-function)
-      * [Layer numbers](#layer-numbers)
-      * [PSprite pointers](#psprite-pointers)
-      * [Independent overlay animation](#independent-overlay-animation)
-    + [Removing PSprites](#removing-psprites)
-      * [Native function](#native-function-1)
-      * [ZScript method](#zscript-method)
-    + [PSprite flags](#psprite-flags)
-    + [PSprite properties](#psprite-properties)
-      * [Native property-altering functions](#native-property-altering-functions)
-      * [Internal properties](#internal-properties)
-    + [Checking PSprite state](#checking-psprite-state)
-    + [PSprite offsets](#psprite-offsets)
-      * [Native offset functions](#native-offset-functions)
-      * [Internal offset values](#internal-offset-values)
-    + [Overlay scale, rotation and pivot](#overlay-scale--rotation-and-pivot)
-    + [Overlay translation](#overlay-translation)
-  * [Akimbo weapons](#akimbo-weapons)
-    + [Classic dual weapon](#classic-dual-weapon)
-    + [Independent dual weapons activated with Fire/Alt Fire keys](#independent-dual-weapons-activated-with-fire-alt-fire-keys)
-  * [Creating PSprite animations with CustomInventory](#creating-psprite-animations-with-custominventory)
+* [Overview](#overview)
+* [Basic weapon states and flow](#basic-weapon-states-and-flow)
+* [Basic weapon functions](#basic-weapon-functions)
+  + [A_WeaponReady](#a-weaponready)
+  + [Weapon attack functions](#weapon-attack-functions)
+    - [A_FireBullets](#--a-firebullets--)
+    - [A_FireProjectile](#a-fireprojectile)
+    - [A_CustomPunch](#a-custompunch)
+    - [A_RailAttack](#a-railattack)
+  + [A_ReFire](#a-refire)
+  + [Hitscan puffs](#hitscan-puffs)
+  + [Other useful functions](#other-useful-functions)
+* [Handling data from weapons](#handling-data-from-weapons)
+  + [Accessing data from weapon states](#accessing-data-from-weapon-states)
+  + [Accessing data from the weapon's virtual functions](#accessing-data-from-the-weapon-s-virtual-functions)
+  + [Checking current weapon](#checking-current-weapon)
+  + [When to use Tick()](#when-to-use-tick--)
+* [Action functions](#action-functions)
+* [PSprite and overlays](#psprite-and-overlays)
+  + [Differences between PSprites and actor sprites](#differences-between-psprites-and-actor-sprites)
+  + [Difference between PSprites and state sequences](#difference-between-psprites-and-state-sequences)
+* [PSprite manipulation](#psprite-manipulation)
+  + [Creating PSprites](#creating-psprites)
+    * [Native function](#native-function)
+    * [ZScript function](#zscript-function)
+    * [Layer numbers](#layer-numbers)
+    * [PSprite pointers](#psprite-pointers)
+    * [Independent overlay animation](#independent-overlay-animation)
+  + [Removing PSprites](#removing-psprites)
+    * [Native function](#native-function-1)
+    * [ZScript method](#zscript-method)
+  + [PSprite flags](#psprite-flags)
+  + [PSprite properties](#psprite-properties)
+    * [Native property-altering functions](#native-property-altering-functions)
+    * [Internal properties](#internal-properties)
+  + [Checking PSprite state](#checking-psprite-state)
+  + [PSprite offsets](#psprite-offsets)
+    * [Native offset functions](#native-offset-functions)
+    * [Internal offset values](#internal-offset-values)
+  + [Overlay scale, rotation and pivot](#overlay-scale--rotation-and-pivot)
+  + [Overlay translation](#overlay-translation)
+* [Akimbo weapons](#akimbo-weapons)
+  + [Classic dual weapon](#classic-dual-weapon)
+  + [Independent dual weapons activated with Fire/Alt Fire keys](#independent-dual-weapons-activated-with-fire-alt-fire-keys)
+* [Creating PSprite animations with CustomInventory](#creating-psprite-animations-with-custominventory)
 
 ## Overview
 
@@ -225,7 +223,7 @@ Internally, `A_WeaponReady` modifies the value of the `weaponstate` field on the
 
 [Weapon attack functions](https://zdoom.org/wiki/Category:Decorate_Weapon_attack_functions) are the various customizable attack functions which you'll be mostly using in your custom weapons. All of these functions are defined in the `StateProvider` class (see [on GitHub](https://github.com/ZDoom/gzdoom/blob/master/wadsrc/static/zscript/actors/inventory/stateprovider.zs)).
 
-#### **A_FireBullets**
+#### A_FireBullets
 
 ```csharp
 A_FireBullets (double spread_xy, double spread_z, int numbullets, int damageperbullet , class<Actor> pufftype = "BulletPuff" , int flags = FBF_USEAMMO , double range = 0 , class<Actor> missile = null , double spawnheight = 32 , double spawnofs_xy = 0)
@@ -292,7 +290,54 @@ However, `A_ReFire` can backfire (pun intended) if the weapon for some reason ge
 
 ### Hitscan puffs
 
-*TBD*
+[Puffs](https://zdoom.org/wiki/Puff) are actors spawned by hitscan attacks (such as `A_FireBullets` , `A_RailAttack` and `A_CustomPunch`) at the point of impact, such as a puff of smoke spawned by bullet weapons in Doom when hitting a wall. Normally puffs only spawn on surfaces and non-bleeding actors (actors with the `NOBLOOD` flag), but they can be made to spawn on actors as well.
+
+The default puff actor used in Doom is [`BulletPuff`](https://zdoom.org/wiki/Classes:BulletPuff), and this is what most hitscan functions will use by default. However, making new puffs doesn't require inheriting from `BulletPuff`; puffs are just actors and can be based on the `Actor` class directly.
+
+The use of puffs is [fully documented on ZDoom Wiki](https://zdoom.org/wiki/Puff), so I'll only note the main functions puffs perform:
+
+1. Puffs can enter [different state sequences](https://zdoom.org/wiki/Puff#Puff_usage_and_behavior) when they hit something (a bleeding actor, a non-bleeding actor, level geometry). This can be used to make the puff play different animations or even spawn some extra actors (such as sparks, debris, etc.) in different situations. Note, if you want special behavior when the attack hits a bleeding actor, the puff will need the [`PUFFONACTORS`](https://zdoom.org/wiki/Actor_flags#PUFFONACTORS) flag, otherwise it won't spawn on an actor.
+
+2. If you want to give your hitscan attack a custom [damagetype](https://zdoom.org/wiki/Actor_properties#DamageType), you can do that by defining this propery on the attack's puff.
+
+3. If your puff uses the [`PUFFGETSOWNER`](https://zdoom.org/wiki/Actor_flags#PUFFGETSOWNER) flag, its `target` pointer will point to the attacking player. This can be used to perform something on the player when the puff spawns. For example, this puff will give the player ammo for their current weapon whenever it hits a monster:
+   
+   ```csharp
+   class AmmoRewardPuff : Bulletpuff
+   {
+       Default
+       {
+           +PUFFONACTORS
+           +PUFFGETSOWNER
+       }
+   
+       States
+       {
+       Spawn:
+           TNT1 A 1 NoDelay
+           {
+               if (target && target.player)
+               {
+                   let weap = target.player.readyweapon;
+                   if (weap)
+                   {
+                       if (weap.ammotype1)
+                       {
+                           target.GiveInventory(weap.ammotype1, weap.ammogive1);
+                       }
+                       if (weap.ammotype2)
+                       {
+                           target.GiveInventory(weap.ammotype1, weap.ammogive2);
+                       }
+                   }
+               }
+           }
+           stop;
+       Crash:
+           goto super::Spawn;
+       }
+   }
+   ```
 
 ### Other useful functions
 
@@ -2152,7 +2197,7 @@ class ColorfulPlasmaball : Plasmaball replaces Plasmaball
 }
 ```
 
-This orb will replace the vanilla Plasmaball (do remember that you can handle replacements not only with a `replaces` keyword but also [with an event handler](11_Event_Handlers.md#actor-replacement-via-event-handlers)). It uses a static array (these will be covered in detail in the [Arrays](13_Arrays.md) chapter) to hold a list of translation names and picks one randomly when the orb is spawned. After that it finds the Flash PSprite on the shooter's weapon and sets its translation to the same value.
+This orb will replace the vanilla Plasmaball (do remember that you can handle replacements not only with a `replaces` keyword but also [with an event handler](11_Event_Handlers.md#actor-replacement-via-event-handlers)). It uses a static array (these will be covered in detail in the [Arrays and linked lists](13_Arrays.md) chapter) to hold a list of translation names and picks one randomly when the orb is spawned. After that it finds the Flash PSprite on the shooter's weapon and sets its translation to the same value.
 
 Basically this is the inverse of the earlier method.
 
@@ -2530,4 +2575,6 @@ As you can see, this is very similar to our previous example, except we're drawi
 
 🟢 [<<< BACK TO START](README.md)
 
-🔵 [<< Previous: Inventory](12.1_Inventory.md)        🔵 [>> Next: Arrays](13_Arrays.md)
+🔵 [<< Previous: Inventory](12.1_Inventory.md)        🔵 [>> Next: Arrays and linked lists](13_Arrays.md)
+
+
