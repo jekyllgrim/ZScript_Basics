@@ -1417,7 +1417,7 @@ There are some basic rules to take into account when using it:
 
 * By default, overlays automatically follow the offets of the main weapon layer, meaning `A_OverlayOffset`'s offsets will be added on top of PSP_Weapon's offsets. This also means that by default `A_WeaponOffset` will not only move the main layer, but also all overlays. This behavior can be changed by setting `PSPF_AddWeapon` flag to false by calling `A_OverlayFlags` on the relevant layer. 
 
-* Note that the base offsets of the PSP_Weapon layer of a ready-to-fire weapon is not (0, 0) but (0, 32). The first number is horizontal offset (from left to right), while the second one is vertical offset (from top to bottom—i.e. positive numbers will move it further *down*). Don't ask why the numbers work like that, it's some kind of a legacy decision. What's important is that PSP_Weapon's base offsets are (0, 32), but since overlays are attached on top of the main layer by default, their offsets are (0, 0). If you set `PSPF_AddWeapon` flag of an overlay to `false`, the sprite will be immediately moved up 32 pixels, since it'll become detached from the weapon. If you want to line it up with PSP_Weapon at that point, you'll have to call `A_OverlayOffset(<layer>, 0, 32)` first.
+* Note that the base offsets of the PSP_Weapon layer of a ready-to-fire weapon is not (0, 0) but (0, WEAPONTOP) (where `WEAPONTOP` is equal to 32). The first number is horizontal offset (from left to right), while the second one is vertical offset (from top to bottom—i.e. positive numbers will move it further *down*). Don't ask why the numbers work like that, it's some kind of a legacy decision. What's important is that PSP_Weapon's base offsets are (0, 32), but since overlays are attached on top of the main layer by default, their offsets are (0, 0). If you set `PSPF_AddWeapon` flag of an overlay to `false`, the sprite will be immediately moved up `WEAPONTOP` (32) pixels, since it'll become detached from the weapon. If you want to line it up with PSP_Weapon at that point, you'll have to call `A_OverlayOffset(<layer>, 0, WEAPONTOP)` first.
 
 * Another thing to keep in mind is that PSP_Weapon layer will also bob while the weapon is calling `A_WeaponReady` and the player is moving. Overlays will follow the same bob by default (this can be changed by setting `PSPF_AddBob` flag to false). Bob and offsets are separate and unrelated values.
 
@@ -1452,7 +1452,7 @@ class PistolAngled : Pistol
         PGUN A 3 A_WeaponOffset(2,34);
         PGUN A 5
         {
-            A_WeaponOffset(0,32);
+            A_WeaponOffset(0, WEAPONTOP);
             A_ReFire();
         }
         goto Ready;
@@ -1513,7 +1513,7 @@ class PistolAngled : Pistol
             // Restore the base offsets before making the weapon
             // ready for refiring. Apply interpolation so that
             // the offsets are restored smoothly:
-            A_WeaponOffset(0, 32, WOF_INTERPOLATE);
+            A_WeaponOffset(0, WEAPONTOP, WOF_INTERPOLATE);
             A_ReFire();
         }
         goto Ready;
@@ -1567,7 +1567,7 @@ class PistolAngled : Pistol
         PGUN CBA 3 A_WeaponOffset(-3, -3, WOF_ADD);
         PGUN A 5
         {
-            A_WeaponOffset(0, 32, WOF_INTERPOLATE);
+            A_WeaponOffset(0, WEAPONTOP, WOF_INTERPOLATE);
             A_ReFire();
         }
         goto Ready;
@@ -1660,7 +1660,7 @@ class PistolAngledFist : Pistol
         PGUN CBA 3 A_WeaponOffset(-3, -3, WOF_ADD);
         PGUN A 5
         {
-            A_WeaponOffset(0,32, WOF_INTERPOLATE);
+            A_WeaponOffset(0, WEAPONTOP, WOF_INTERPOLATE);
             A_ReFire();
         }
         goto Ready;
@@ -1750,7 +1750,7 @@ class PistolAngledFist : Pistol
         PGUN CBA 3 A_WeaponOffset(-3, -3, WOF_ADD);
         PGUN A 5
         {
-            A_WeaponOffset(0,32, WOF_INTERPOLATE);
+            A_WeaponOffset(0, WEAPONTOP, WOF_INTERPOLATE);
             A_ReFire();
         }
         goto Ready;
@@ -1875,7 +1875,7 @@ class PistolAngled : Pistol
         PGUN CBA 3 A_WeaponOffset(-3, -3, WOF_ADD);
         PGUN A 5
         {
-            A_WeaponOffset(0,32, WOF_INTERPOLATE);
+            A_WeaponOffset(0, WEAPONTOP, WOF_INTERPOLATE);
             A_ReFire();
         }
         goto Ready;
@@ -1940,7 +1940,7 @@ class PistolAngled : Pistol
         PGUN CBA 3 A_WeaponOffset(-3, -3, WOF_ADD);
         PGUN A 5
         {
-            A_WeaponOffset(0,32, WOF_INTERPOLATE);
+            A_WeaponOffset(0, WEAPONTOP, WOF_INTERPOLATE);
             A_ReFire();
         }
         goto Ready;
@@ -2045,7 +2045,7 @@ class PistolAngled : Pistol
             A_OverlayRotate(OverlayID(), 0, WOF_INTERPOLATE);
             // Reset the scale the same way:        
             A_OverlayScale(OverlayID(), 1, 1, WOF_INTERPOLATE);
-            A_WeaponOffset(0,32, WOF_INTERPOLATE);
+            A_WeaponOffset(0, WEAPONTOP, WOF_INTERPOLATE);
             A_ReFire();
         }
         goto Ready;
@@ -2569,12 +2569,173 @@ As you can see, this is very similar to our previous example, except we're drawi
 
 ## Creating PSprite animations with CustomInventory
 
-*TBD*
+As mentioned earlier, the CustomInventory class is unique in that it's the only other class besides Weapon that inherits from StateProvider and is thus technically capable of drawing PSprites. 
+
+There are two main applications where using CustomInventory like this would make sense:
+
+1. creating items with on-screen effects that would work better as a PSprite rather than a HUD animation;
+
+2. creating universal "side" weapons that aren't attached to any weapon class, like a quick kick (similar to Might Boot in *Duke Nukem 3D*).
+
+The 2nd example is a pretty common idea that authors want to implement, and it can be done fairly easily with CustomInventory.
+
+Before we delve into it, there are a couple of important points to keep in mind:
+
+* CustomInventory needs a `Use` state sequence, otherwise it can't exist properly. However, the `Use` sequence (as well as the `Pickup` sequence) cannot draw anything directly: the sprites and frame durations specified in them are completely ignored. Thus, we'll need to drawn an overlay, and it's that overlay that will perform the attack and animations.
+* We also need to make sure that the item doesn't get removed once that sequence is entered, so the `Use` sequence has to end with the `fail` operator (not `stop`).
+* We have two ways to initiate the animation: either by using the item (with a console command `use <itemname>`) or via `player.cmd.buttons` and dedicating a specific button to our quick attack.
+
+With those in mind, here's a simple example of a quick punch attack:
+
+```csharp
+class QuickPunchController : CustomInventory
+{
+    // We'll draw the punch animation on layer -100,
+    // so it's placed under weapons. If you use
+    // lower layers in your weapons, don't forget to
+    // take that into account:
+    const PUNCHLAYER = -100;
+
+    Default
+    {
+        // These flags make sure the item can't be
+        // taken away:
+        +INVENTORY.UNDROPPABLE
+        +INVENTORY.UNTOSSABLE
+        +INVENTORY.PERSISTENTPOWER
+    }
+
+    States 
+    {
+    Use:
+        TNT1 A 0 
+        {
+            // First, check if the punch layer already
+            // exists:
+            let psp = player.FindPSprite(PUNCHLAYER);
+            // Only when it doesn't exist, create it:
+            if (!psp)
+            {
+                A_Overlay(PUNCHLAYER, "DoPunch");
+            }
+        }
+        // This makes sure the control item isn't  taken away:
+        fail;
+    DoPunch:
+        // Don't forget to set the Y offset to WEAPONTOP
+        // so the sprite doesn't float above the screen edge,
+        // since this isn't a weapon and overlays aren't
+        // affected by the standard weapon offsets.
+        // I'm also shifting it 20 pixels to the left:
+        TNT1 A 0 A_OverlayOffset(OverlayID(), -20, WEAPONTOP);
+        PUNG B 4;
+        PUNG C 4 A_Punch;
+        PUNG D 5;
+        PUNG C 4;
+        PUNG B 5;
+        stop;
+    }
+}
+
+
+```
+
+To make this item actually work, we'll need two things:
+
+1. make sure the player has it (obviously), e.g. by giving it with the `Player.StartItem` property in our custom playerclass, or with an event handler's `PlayerSpawned` event;
+
+2. make sure the player has as the command `use QuickPunchController` bound to a key.
+
+The latter can be done by [adding a weapon section in the KEYCONF lump](https://zdoom.org/wiki/CCMDs:Customization#weaponsection), such as:
+
+```csharp
+// The name in quotation marks is a display name that will
+// create a new section under the Options > Customize Controls
+// menu in GZDoom.
+// The name after it is an internal name that will be
+// written in the player's .ini file:
+WeaponSection "My mod bindings" myModBindings
+// "Quick Punch" is a display name for the command,
+// and "use QuickPunchController" is the actual
+// console command:
+AddMenuKey "Quick Punch" "use QuickPunchController"
+```
+
+If you would prefer to use a different method of activation, such as a +user# key, you can use a similar approach, but an overlay will have to be running constantly. The item will need the `AUTOACTIVATE` flag, so that Use is called automatically, and a separate "Ready" state sequence:
+
+```csharp
+class QuickPunchController : CustomInventory
+{
+    const PUNCHLAYER = -100;
+
+    Default
+    {
+        +INVENTORY.UNDROPPABLE
+        +INVENTORY.UNTOSSABLE
+        +INVENTORY.PERSISTENTPOWER
+        +INVENTORY.AUTOACTIVATE //Use is called automatically
+    }
+
+    States 
+    {
+    Use:
+        TNT1 A 0 
+        {
+            // We're passing 'true' to the last argument, so
+            // that the layer doesn't get overridden if for
+            // some reason the item is used again:
+            A_Overlay(PUNCHLAYER, "ReadyPunch", true);
+        }
+        fail;
+    ReadyPunch:
+        TNT1 A 1
+        {
+            // Check if +user1 is pressed:
+            if (player.cmd.buttons & BT_USER1)
+            {
+                // move to DoPunch if so:
+                return ResolveState("DoPunch");
+            }
+            // Otherwise loop this layer
+            return ResolveState(null);
+        }
+        loop;
+    DoPunch:
+        TNT1 A 0 A_OverlayOffset(OverlayID(), -20, WEAPONTOP);
+        PUNG B 4;
+        PUNG C 4 A_Punch;
+        PUNG D 5;
+        PUNG C 4;
+        PUNG B 5;
+        goto ReadyPunch; //Note that we go back to ready from here
+    }
+}
+```
+
+This way our item begins functioning almost like a weapon, with its own versions of the "Ready" and "Fire" state sequences.
+
+You could also add a pseudo `A_ReFire` to the punching animation:
+
+```csharp
+    DoPunch:
+        TNT1 A 0 A_OverlayOffset(OverlayID(), -20, WEAPONTOP);
+        PUNG B 4;
+        PUNG C 4 A_Punch;
+        PUNG D 5;
+        PUNG C 4;
+        PUNG B 5
+        {
+            if (playuer.cmd.buttons & BT_USER1 && player.oldbuttons & BT_USER1)
+            {
+                return ResolveState("DoPunch");
+            }
+            return ResolveState(null);
+        }
+        goto ReadyPunch;
+```
 
 ------
 
 🟢 [<<< BACK TO START](README.md)
 
 🔵 [<< Previous: Inventory](12.1_Inventory.md)        🔵 [>> Next: Arrays and linked lists](13_Arrays.md)
-
-

@@ -153,7 +153,7 @@ Very often, when creating their first custom classes, new modders resort to name
 To make a good naming convention, note the following:
 
 * A class name should be descriptive for *you*, not for the player. Players never see class names; they either see pickup messages or tags, which are defined via properties (and, ideally, via the LANGUAGE lump). Class names are a technical thing and they should be convenient for you. For instance, if you have a custom strong powerup in your mod, don't name the class `HugeFrigginPowerup`; rather use something descriptive, such as `Regen_Speed_Powerup`.
-* It's common practice to use the same prefixes for all your classes within a project. Often those prefixes match the name of the project (for example, `D4D_Shotgun` for a Shotgun in the [Doom 4 Doom](https://github.com/MajorCooke/Doom4Doom) mod) or are initials of the author (`MK_Matrix4` for a special math class by [Marisa Kirisame](https://doomwiki.org/wiki/Marisa_Kirisame)).
+* It's common practice to use the same prefixes for all your classes within a project. Often those prefixes match the name of the project (for example, `D4D_Shotgun` for a Shotgun in the [Doom 4 Doom](https://github.com/MajorCooke/Doom4Doom) mod) or are initials of the author (for example, I often use `JGP_` for Jekyll Grim Payne in the classes in my public libraries, like [GZUnmaker](https://github.com/jekyllgrim/GZUnmaker/blob/main/UnmZScript/unmaker.zs)).
 
 ## Using GitHub
 
@@ -169,5 +169,3 @@ A good number of well-known mods use GitHub because of the obvious benefits:
 ---
 
 🟢 [<<< BACK TO START](README.md)
-
-
