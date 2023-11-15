@@ -4,8 +4,6 @@
 
 ------
 
-*This chapter is a work in progress. To be revised/completed.*
-
 # Weapons, overlays and PSprite
 
 ## Table of Contents
@@ -2725,12 +2723,12 @@ You could also add a pseudo `A_ReFire` to the punching animation:
         PUNG C 4;
         PUNG B 5
         {
-            if (playuer.cmd.buttons & BT_USER1 && player.oldbuttons & BT_USER1)
+            if (player.cmd.buttons & BT_USER1 && player.oldbuttons & BT_USER1)
             {
                 return ResolveState("DoPunch");
             }
             return ResolveState(null);
-        }
+        }
         goto ReadyPunch;
 ```
 

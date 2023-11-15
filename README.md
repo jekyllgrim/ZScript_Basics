@@ -44,7 +44,7 @@ This guide is a beginner-friendly introduction to ZScript, a primary coding lang
 
 13. [Inventory](12.1_Inventory.md)
 
-14. [Weapons, PSprite and overlays](12_Weapons_Overlays_PSprite.md) (WIP)
+14. [Weapons, PSprite and overlays](12_Weapons_Overlays_PSprite.md)
 
 15. [Arrays and linked lists](13_Arrays.md)
 
