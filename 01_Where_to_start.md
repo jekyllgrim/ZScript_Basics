@@ -35,10 +35,10 @@ A more powerful option for an editor is [Visual Studio Code](https://code.visual
 Put the following line at the top of your `zscript.zs` file:
 
 ```csharp
-version "4.9.1"
+version "4.10.0"
 ```
 
-Where instead of `4.9.1` use the desired GZDoom version. This will tell the engine that the code shouldn't compile on an earlier version of GZDoom. Without this some features may not be available, and it may not be immediately obvious to players of your mods that they're trying to run them on an outdated version of GZDoom. 
+Where instead of `4.10.0` use the desired GZDoom version. This will tell the engine that the code shouldn't compile on an earlier version of GZDoom. Without this some features may not be available, and it may not be immediately obvious to players of your mods that they're trying to run them on an outdated version of GZDoom. 
 
 There's rarely ever a good reason to *not* use the latest version of GZDoom, so just try to use the latest one.
 
@@ -47,7 +47,7 @@ There's rarely ever a good reason to *not* use the latest version of GZDoom, so 
 While you *can* start coding inside that `zscript.zs` file, it's preferable to instead create another subfolder (such as "MyMod_Scripts" where "MyMod" is the name of your mod) and split your code into various files, such as `weapons.zs`, `monsters.zs` and so on. (This is just an example; you can use any naming convention that works for you, such as having a separate file for each weapon, each monster, etc.) To do that, you'll then need to use `#include` command in your root `zscript.zs` file to make sure those files are compiled. For example:
 
 ```csharp
-version "4.6.1"
+version "4.10.0"
 
 #include "MyMod_Scripts/constants.zs"
 #include "MyMod_Scripts/player.zs"
