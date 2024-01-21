@@ -160,6 +160,12 @@ Basic arithmetic operations like addition, subtraction, multiplication, division
   
     (`steps--` is the same as doing `steps = steps - 1`)
 
+- `**` - takes the value to the specified **power**:
+  
+  ```csharp
+  int i = 2 ** 8; // i = 256 because 2 to the power of 8 is 256
+  ```
+
 ### Note on placement of increment/decrement operators
 
 Operators of incrementation can be placed both after and before a value. So, both `value++` and `++value` are correct. The difference only occurs if you perform multiple operations, such as incrementing and checking the value at the same time. For example:
@@ -511,6 +517,39 @@ What it means, always put the most important and the simplest check first, becau
   ```csharp
   if (!master && target))
   // This will true if the calling actor does NOT have a master but does have a target
+  ```
+
+* `?` — a ternary operator
+  
+  This operator can be used as a short version of an IF/ELSE block:
+  
+  
+  
+  ```csharp
+  int foo = <condition>? 5 : 10; // if condition is true, foo = 5, otherwise foo = 10
+  
+  ```
+  
+  Note, a ternary operator can only be used if both possible values are explicitly of the same type. For example, it's not possible to combine a string and a name value, both have to be either strings, or names:
+  
+  ```csharp
+  // We can't use "none" because double quotes would turn 
+  // it into a string, whereas GetClassName returns a name:
+  name clsname = target != null? target.GetClassName() : 'none'; 
+  
+  // Conversely, we can't use GetClassName directly here, 
+  // because it returns a name, not a string:
+  string clsnameStr = target != null? ""..target.GetClassName() : "None";
+  ```
+  
+  For [actor pointers](08_Pointers_and_casting.md), `null` needs to be explicitly cast as Actor:
+  
+  ```csharp
+  // This sets the foo pointer to the target pointer, if it's not null;
+  // otherwise it sets to null. Note that we need to use Actor(null),
+  // because just null won't be recognized as a null actor pointer:
+  
+  Actor foo = target != null? target : Actor(null);
   ```
 
 All logical operators can be combined with the help of parentheses:
