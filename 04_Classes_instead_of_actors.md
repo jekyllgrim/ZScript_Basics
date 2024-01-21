@@ -1,6 +1,6 @@
 🟢 [<<< BACK TO START](README.md)
 
-🔵 [<< Previous: Why ZScript?](Why_ZScript.md)        🔵 [>> Next: How to see your classes in the game](05_How_to_see_your_classes.md)
+🔵 [<< Previous: Why ZScript?](01_Where_to_start.md)        🔵 [>> Next: How to see your classes in the game](05_How_to_see_your_classes.md)
 
 ------
 
@@ -98,4 +98,4 @@ Knowing just these points, you can already start coding in ZScript. Next, we del
 
 🟢 [<<< BACK TO START](README.md)
 
-🔵 [<< Previous: Why ZScript?](Why_ZScript.md)        🔵 [>> Next: How to see your classes in the game](05_How_to_see_your_classes.md)
+🔵 [<< Previous: Why ZScript?](01_Where_to_start.md)        🔵 [>> Next: How to see your classes in the game](05_How_to_see_your_classes.md)

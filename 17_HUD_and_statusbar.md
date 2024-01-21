@@ -1,6 +1,6 @@
 🟢 [<<< BACK TO START](README.md)
 
-🔵 [Constants](14_Constants.md)
+🔵 [<< Previous: Constants](14_Constants.md) 🔵 [>> Next: Appendix 1: Flow Control](17_HUD_and_statusbar.md)
 
 ------
 
@@ -577,6 +577,6 @@ void NoAspectDrawImage(String texture, Vector2 pos, int flags = 0, double Alpha 
 
 ------
 
-🟢 [<<< BACK TO START](README.md)
+🟢 README.md
 
-🔵 [Constants](14_Constants.md)
+🔵 [<< Previous: Constants](14_Constants.md)
