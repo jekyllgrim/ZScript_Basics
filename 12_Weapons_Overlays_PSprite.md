@@ -2659,7 +2659,13 @@ WeaponSection "My mod bindings" myModBindings
 AddMenuKey "Quick Punch" "use QuickPunchController"
 ```
 
-If you would prefer to use a different method of activation, such as a +user# key, you can use a similar approach, but an overlay will have to be running constantly. The item will need the `AUTOACTIVATE` flag, so that Use is called automatically, and a separate "Ready" state sequence:
+If you would prefer to use a different method of activation, such as a +user# key, you can use a similar approach, but there's a new set of prerequisites:
+
+1. A separate overlay will have to be running constantly. 
+
+2. The item will need the `AUTOACTIVATE` flag, so that Use is called automatically, and a separate "Ready" state sequence. 
+
+3. In addition to all of that, it'll need special handling to make sure the overlay doesn't stop existing between maps (because that's what normally happens with PSprite layers created from CustomInventory), which requires fairly weird shenanigans in the `DoEffect` override, as shown below:
 
 ```csharp
 class QuickPunchController : CustomInventory
@@ -2673,6 +2679,36 @@ class QuickPunchController : CustomInventory
         +INVENTORY.PERSISTENTPOWER
         +INVENTORY.AUTOACTIVATE //Use is called automatically
     }
+
+	// The DoEffect override makes sure the ready layer actually
+	// keeps existing between maps:
+	override void DoEffect()
+	{
+		super.DoEffect();
+		if (!owner || !owner.player)
+		{
+			return;
+		}
+		// Check if punch layer exists:
+		let psp = owner.player.FindPSprite(PUNCHLAYER);
+		// If not, create it:
+		if (!psp)
+		{
+			psp = owner.player.GetPSprite(PUNCHLAYER);
+			// Caller must be set manually to this item,
+			// otherwise PSprite won't function correctly
+			// because of some weird internal assumptions
+			// that it must be attached to a weapon:
+			psp.caller = self;
+			// These f lags must be unset manually, because
+			// if created this way, the layer sets them to
+			// true, as if it was created from a weapon:
+			psp.bAddBob = false;
+			psp.bAddWeapon = false;
+			// Set the layer to the ReadyPunch sequence:
+			psp.SetState(ResolveState("ReadyPunch"));
+		}
+	}
 
     States 
     {
