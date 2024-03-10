@@ -558,14 +558,14 @@ class Pistol : DoomWeapon //DoomWeapon is a base class based on Weapon. It only 
 {
      Default
     {
-        Weapon.SelectionOrder 1900 //defines the priority of selecting this weapons when others run out of ammo
-        Weapon.AmmoUse 1 //how much ammo it uses per shot
-        Weapon.AmmoGive 20 //how much ammo the weapon gives you when you get it
-        Weapon.AmmoType "Clip" //the class name of the ammo type used by the weapon
-        Obituary "$OB_MPPISTOL" //a message printed on the screen when one player kills another in multiplayer
+        Weapon.SelectionOrder 1900; //defines the priority of selecting this weapons when others run out of ammo
+        Weapon.AmmoUse 1; //how much ammo it uses per shot
+        Weapon.AmmoGive 20; //how much ammo the weapon gives you when you get it
+        Weapon.AmmoType "Clip"; //the class name of the ammo type used by the weapon
+        Obituary "$OB_MPPISTOL"; //a message printed on the screen when one player kills another in multiplayer
         +WEAPON.WIMPY_WEAPON //defines the weapon as "weak" (switch to another as soon as possible)
-        Inventory.Pickupmessage "$PICKUP_PISTOL_DROPPED" //the message printed on the screen when picking this up
-        Tag "$TAG_PISTOL" //name of the weapon
+        Inventory.Pickupmessage "$PICKUP_PISTOL_DROPPED"; //the message printed on the screen when picking this up
+        Tag "$TAG_PISTOL"; //name of the weapon
     }
     States
     {
