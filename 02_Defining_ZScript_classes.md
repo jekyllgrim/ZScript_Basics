@@ -26,7 +26,7 @@
 
 ZScript is an [object-oriented](https://en.wikipedia.org/wiki/Object-oriented_programming) coding language, which means that all of the code that is executed at runtime (during the game) must be defined within an object (the most common object being a Class). This is different from [ACS](https://zdoom.org/wiki/ACS) (another GZDoom coding language, used to script map events), which is a list of scripts that define various events that happen in order; ACS scripts are not bound to a specific object.
 
-Some of the common ZScript base class types are `Actor`, as well as `Inventory` and `Weapon` that are based on `Actor`. Almost all objects that can be spawned in the map are based on the `Actor` class and therefore are referred to as "actors."
+Some of the common ZScript base class types are `Actor`, as well as `Inventory` and `Weapon` that are based on `Actor`. Almost all objects that can be spawned in the map are based on the `Actor` class and therefore are referred to as "actors." ZScript, however, is not limited to objects that can be spawned in the map; there are also many other classes that can perform operations and/or handle some data which are not actors (more on that later in the guide).
 
 Once you have a mod folder/archive and your base zscript file set up, [as described in the previous chapter](01_Where_to_start.md), you can start defining some classes. One of the easiest methods of designing classes is looking at how it's done in other mods, or just looking at the existing GZDoom classes. GZDoom's main file `gzdoom.pk3`, which can be found in the GZDoom root folder, contains all class definitions for Doom, Heretic, Hexen, Strife and Chex Quest games. You can also find the definitions for the base classes on [GZDoom github](https://github.com/coelckers/gzdoom/tree/master/wadsrc/static/zscript/). Note that you never need to (and **shouldn't**) copy those classes into your code; you can just inherit from them or design your own code similarly.
 
@@ -62,18 +62,20 @@ The basic actor definition would look as follows:
 ```csharp
 class MyClassName : Actor 
 {
-    // The Default block contains states and properties that determine
-    // the default values the actor uses upon spawning:
+    // The Default block contains flags and properties that
+    // determine the default values the actor uses upon spawning:
     Default
     {        
         +FLAGNAME //an example of how a flag is set (semicolon at the end is optional)
-        property value; //an example of a property and a value (semicolon is required)
+        property value; //an example of a property and a value (semicolon is required!)
     }
-    // States keyword begins a block of states that define the actor's 
-    // animation and behavior:
+
+    // States keyword begins a block of states that define
+    // the actor's animation and behavior:
     States 
     {
-    // When spawned in the world, actors enter their Spawn sequence:
+    // When spawned in the world, actors automatically
+    // enter their Spawn sequence:
     Spawn:
         FRAM A 1; //an example of a sprite name and sprite duration
         loop; //this will loop the Spawn state
@@ -83,8 +85,8 @@ class MyClassName : Actor
 
 The basic rules for defining your classes are:
 
-* Don't use the same names as the existing classes (for example, don't try to code a custom actor named `Zombieman`, give it a different name).
-* To make the actors appear in the game, you either need to create a custom map and place them there manually, or they need to replace existing actors. The [How to see your classes in the game](05_How_to_see_your_classes.md) chapter explains how this works.
+* Don't use the same names as the existing classes (for example, don't try to code a custom actor named `Zombieman`, because an actor with that name is already defined in GZDoom to use in Doom games; give your class a different name).
+* To make the actors appear in the game, you either need to create a custom map and place them there manually, or they need to replace existing actors. The [How to see your classes in the game](05_How_to_see_your_classes.md) chapter will explain how this works.
 * If you're unfamiliar with sprite naming in GZDoom, check the [Sprite page on ZDoom wiki](https://zdoom.org/wiki/Sprite).
 
 ## Actor structure
@@ -137,7 +139,7 @@ class MyActorName : Actor
         // You can add more behavior here.
     }
 
-    // The keyword States begings a states block that
+    // The States keyword begings a states block that
     // defines the actor's animation states and
     // related behavior:
     States
@@ -146,12 +148,14 @@ class MyActorName : Actor
     // by default when they spawn:
     Spawn:
         TROO ABCD 1; //display TROOA, TROOB, TROOC and TROOD sprites, each for 1 tic
-        loop; //loop the state sequence
+        loop; //loop the Spawn state sequence
     }
 }
 ```
 
 ## Actor properties and flags
+
+> *Note*: The Default block that lets you define properties and flags only exists for classes based on `Actor`, i.e. the things that can be spawned in the map and display animations, play sounds, etc. (such as monsters, weapons, props). Non-Actor classes don't have defaults.
 
 [Actor properties](https://zdoom.org/wiki/Actor_properties) are a list of properties that an actor has by default. There are hundreds of properties that can be used on actors, such as `health`, `scale`, `speed` and others. All properties take a value after them, e.g. `health 100` will set the actor's default health.
 
@@ -189,7 +193,7 @@ ZScript also features two flag combos: `Monster` and `Projectile`. These can be 
 
 The `States` keyword defines a states block of the actor where you can use predefined [actor states](https://zdoom.org/wiki/Actor_states) as well as add your own states. States are used by a state machine that displays specific frames and executes attached functions at runtime. Adding custom state sequences is also possible.
 
-> Note: states only exists for actors, i.e. classes based on the `Actor` class directly or through inheritance. Other classes, such as menus, HUD, event handlers or anything else not based on `Actor` do not support state animations (even though many of them can draw images on the player's screen by other means, such as varios UI classes).
+> *Note*: Just like the Default block described above, the States block and animation states exist only for classes based on `Actor`. Actor is the only class type in the game that can utilize a state machine and display animations in the world. There are other means to animate things (for example, some textures on the map can be animated, like the lava/acid textures; the player's HUD can be animated), but those animations are not done through actors and don't rely on any sort of states.
 
 To control the states, you need to be aware of state flow control, which is described on the wiki, as well as in this guide: see [Flow Control: State Control](A1_Flow_Control.md#state-control). **Don't worry if some of this is confusing at first**; if you're not familiar with states, you'll likely need to keep that page open and check it frequently while coding until you get used to it.
 
