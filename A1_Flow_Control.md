@@ -12,7 +12,7 @@ This chapter will also cover flow control in **actor states**, which work simila
 
 - [Operators and operands](#operators-and-operands)
   * [Arithmetic operators](#arithmetic-operators)
-    + [Note on placement of increment/decrement operators](#note-on-placement-of-increment-decrement-operators)
+    + [Note on placement of increment/decrement operators](#note-on-placement-of-incrementdecrement-operators)
   * [Assignment operators](#assignment-operators)
   * [Relational operators](#relational-operators)
   * [Logical operators](#logical-operators)
@@ -35,10 +35,10 @@ This chapter will also cover flow control in **actor states**, which work simila
   * [loop](#loop)
   * [wait](#wait)
   * [goto](#goto)
-    + [Using `goto` and inheritance](#using--goto--and-inheritance)
-    + [Using `goto` with offset](#using--goto--with-offset)
+    + [Using goto and inheritance](#using-goto-and-inheritance)
+    + [Using goto with offset](#using-goto-with-offset)
   * [fail](#fail)
-  * [Fall-through (no operator)](#fall-through--no-operator-)
+  * [Fall-through (no operator)](#fall-through-no-operator)
   * [State jumps](#state-jumps)
     + [Dynamic and static jumps](#dynamic-and-static-jumps)
     + [Jumps in anonymous functions](#jumps-in-anonymous-functions)
@@ -522,35 +522,33 @@ What it means, always put the most important and the simplest check first, becau
 * `?` — a ternary operator
   
   This operator can be used as a short version of an IF/ELSE block:
-  
-  
-  
-  ```csharp
-  int foo = <condition>? 5 : 10; // if condition is true, foo = 5, otherwise foo = 10
-  
-  ```
-  
+
+```csharp
+int foo = <condition>? 5 : 10; // if condition is true, foo = 5, otherwise foo = 10
+
+```
+
   Note, a ternary operator can only be used if both possible values are explicitly of the same type. For example, it's not possible to combine a string and a name value, both have to be either strings, or names:
-  
-  ```csharp
-  // We can't use "none" because double quotes would turn 
-  // it into a string, whereas GetClassName returns a name:
-  name clsname = target != null? target.GetClassName() : 'none'; 
-  
-  // Conversely, we can't use GetClassName directly here, 
-  // because it returns a name, not a string:
-  string clsnameStr = target != null? ""..target.GetClassName() : "None";
-  ```
-  
+
+```csharp
+// We can't use "none" because double quotes would turn 
+// it into a string, whereas GetClassName returns a name:
+name clsname = target != null? target.GetClassName() : 'none'; 
+
+// Conversely, we can't use GetClassName directly here, 
+// because it returns a name, not a string:
+string clsnameStr = target != null? ""..target.GetClassName() : "None";
+```
+
   For [actor pointers](08_Pointers_and_casting.md), `null` needs to be explicitly cast as Actor:
-  
-  ```csharp
-  // This sets the foo pointer to the target pointer, if it's not null;
-  // otherwise it sets to null. Note that we need to use Actor(null),
-  // because just null won't be recognized as a null actor pointer:
-  
-  Actor foo = target != null? target : Actor(null);
-  ```
+
+```csharp
+// This sets the foo pointer to the target pointer, if it's not null;
+// otherwise it sets to null. Note that we need to use Actor(null),
+// because just null won't be recognized as a null actor pointer:
+
+Actor foo = target != null? target : Actor(null);
+```
 
 All logical operators can be combined with the help of parentheses:
 
@@ -1402,7 +1400,7 @@ class ZombieTrapper : Zombieman
 }
 ```
 
-### Using `goto` and inheritance
+### Using goto and inheritance
 
 It's important to remember that `goto` performs the jump *within the actor*, it's unaffected by inheritance. `Goto Label` in the parent actor will always jump to the `Label` sequence inside that actor, even if the child actor defines the same state label:
 
@@ -1472,7 +1470,7 @@ TNT1 A 0
 
 The reverse, however, is not a problem: since child actors inherit all of their parents states, `goto` will enter a parent's state correctly. That's why you can create a monster replacement with only a `Missile` sequence that ends with `Goto See` and it'll use its parent's `See` sequence correctly.
 
-### Using `goto` with offset
+### Using goto with offset
 
 `Goto` supports offsets: `goto Label+#` will jump # frames from the beginning of the Label sequence. E.g.:
 
@@ -1526,7 +1524,7 @@ State jumps are cases when the execution of one state sequence stops and moves t
 
 Jumps can be dynamic and static. `Goto` is the only example of a static jump in ZScript. As for dynamic jumps, the most common example are the various `A_Jump*` functions in ZScript/Decorat (those include `A_JumpIf`, `A_JumpIfNoAmmo`, `A_JumpIfInventory` and [others](https://zdoom.org/wiki/Category:Decorate_Jump_functions)).
 
-As described in the [Using `goto` and inheritance](#using--goto--and-inheritance) section above, `goto` can't be properly inherited because it'll jump into a state in the original actor. That happens precisely because it's a static jump; you can create an inheritance-friendly state transition by using a dynamic jump instead:
+As described in the [Using goto and inheritance](#using-goto-and-inheritance) section above, `goto` can't be properly inherited because it'll jump into a state in the original actor. That happens precisely because it's a static jump; you can create an inheritance-friendly state transition by using a dynamic jump instead:
 
 ```csharp
 //static jump:
