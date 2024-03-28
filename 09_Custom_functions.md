@@ -24,9 +24,7 @@ type name (arguments)
 }
 ```
 
-Functions have to be defined inside a class, and by default only that class will be able to call them—this type of function is called a **method**. 
-
-Non-method functions are possible—those are known as **static functions** and they're described in a [later subsection](#Static-functions).
+Functions have to be defined inside a class, and by default only that class will be able to call them—this type of function is called a **method**. The only type of non-method functions is [anonymous  functions](06_Anonymous_functions.md).
 
 Let's revisit our **CacoSingleDad** for an actual example:
 
@@ -286,7 +284,7 @@ static void MyFunction()
 }
 ```
 
-Static functions are *not* **methods**, since they're not bound to the class they're defined it. However, static functions still have to be defined within a class, and to call them from another class, you'll have to use the original class's name as a prefix:
+Static functions are not bound to the class they're defined in, because they can be called anywhere. However, static functions still have to be defined within some class, and to call them from another class, you'll have to use the original class's name as a **prefix**:
 
 ```csharp
 class StaticFunctionContainer : Actor
