@@ -8,7 +8,7 @@
 
 ### Actor
 
-A base class in GZDoom. All classes that are based on `Actor` are also referred to as "actors." The absolute majority of objects that can be spawned in the game (such as monsters, weapons, decorations) are actors. The base `Actor` class contains all actor logic (such as gravity, velocity, collision) and all native actor functions.
+A base class in GZDoom (the inheritance chain is Object→Thinker→Actor). The classes based on `Actor` are also referred to as "actors." The absolute majority of objects that can be spawned in the game's world (such as monsters, weapons, decorations) are actors. The base `Actor` class contains all actor logic (such as gravity, velocity, collision) and all native actor functions.
 
 ### Anonymous function
 
@@ -74,17 +74,15 @@ A list of items (Inventory-derived classes) attached to a specific actor. A link
 
 ### Method
 
-A non-static function defined within a class. See: [Custom Functions](09_Custom_functions.md).
-
-Note, if a function is static, it's not considered a class method, since it doesn't have a concept of `self` and thus doesn't rely on any specific properties of the class where it's defined.
+A function defined within a class. See: [Custom Functions](09_Custom_functions.md). In ZScript, all functions are either methods, or anonymous.
 
 ### Property
 
-Properties are [variables](#variable) that were accessible in the Default block of an actor. When defined as a property, variables can be given default values with the help of the Default block. See: [Turning variables into actor properties](#turning-variables-into-actor-properties).
+Properties are [variables](#variable) that were made accessible in the Default block of an actor. When defined as a property, variables can be given default values with the help of the Default block. See: [Turning variables into actor properties](#turning-variables-into-actor-properties).
 
 ### Return value
 
-A value that can be obtained by calling a function. All functions that aren't void have a return value. 
+A value that can be obtained by calling a function. All functions that aren't `void` have a return value. 
 
 ### Scope
 
@@ -100,9 +98,9 @@ Not to be confused with a state label.
 
 ### State label
 
-A header for a series of states inside a States block. Headers can be obtained via `FindState()` and `ResolveState()`,  and jumped to with `goto`. State labels only exist in the uncompiled ZScript as a matter of convenience; internally states are just a list. If there's no `goto`, `loop` or another state control instruction at the end of a specific state sequence, the machine will just fall through to the next sequence.See: [State Control](A1_Flow_Control.md#state-control).
+A header for a series of states inside a States block. Headers can be obtained via `FindState()` and `ResolveState()`,  and jumped to with `goto`. State labels only exist in the uncompiled ZScript as a matter of convenience; internally states are just a list. If there's no `goto`, `loop` or another state control instruction at the end of a specific state sequence, the machine will just fall through to the next sequence. See: [State Control](A1_Flow_Control.md#state-control).
 
-State labels are often referred to as just "states", which is technically incorrect: for example, a "Spawn" state label is specifically the *name* "Spawn" given to the spawn sequence, whereas a "Spawn" state would be the first actual state of that sequence.
+State labels are often referred to as just "states", which is incorrect: for example, a "Spawn" state label is specifically the *name* "Spawn" given to the spawn sequence, whereas a "Spawn state" would be only the first actual state of that sequence.
 
 ### Value
 
