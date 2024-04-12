@@ -296,7 +296,7 @@ The use of puffs is [fully documented on ZDoom Wiki](https://zdoom.org/wiki/Puff
 
 1. Puffs can enter [different state sequences](https://zdoom.org/wiki/Puff#Puff_usage_and_behavior) when they hit something (a bleeding actor, a non-bleeding actor, level geometry). This can be used to make the puff play different animations or even spawn some extra actors (such as sparks, debris, etc.) in different situations. Note, if you want special behavior when the attack hits a bleeding actor, the puff will need the [`PUFFONACTORS`](https://zdoom.org/wiki/Actor_flags#PUFFONACTORS) flag, otherwise it won't spawn on an actor.
 
-2. If you want to give your hitscan attack a custom [damagetype](https://zdoom.org/wiki/Actor_properties#DamageType), you can do that by defining this propery on the attack's puff.
+2. If you want to give your hitscan attack a custom [damagetype](https://zdoom.org/wiki/Damage_types), you can do that by defining this propery on the attack's puff.
 
 3. If your puff uses the [`PUFFGETSOWNER`](https://zdoom.org/wiki/Actor_flags#PUFFGETSOWNER) flag, its `target` pointer will point to the attacking player. This can be used to perform something on the player when the puff spawns. For example, this puff will give the player ammo for their current weapon whenever it hits a monster:
    
@@ -399,7 +399,9 @@ class OverheatingPlasmaRifle : PlasmaRifle
             // While we're not firing, the heat will decay at the rate
             // of 1 per 10 tics (since the frame duration is 10 tics):
             if (invoker.heatCounter > 0)
+            {
                 invoker.heatCounter--;
+            }
         }
         loop;
     Fire:
@@ -407,7 +409,9 @@ class OverheatingPlasmaRifle : PlasmaRifle
         {
             // If we've gained too much heat, jump to Cooldown:
             if (invoker.heatCounter >= 40)
+            {
                 return ResolveState("Cooldown");
+            }
             // Otherwise accumulate heat and fire:
             invoker.heatCounter++;
             A_FirePlasma();
@@ -456,7 +460,9 @@ class OverheatingPlasmaRifle2 : PlasmaRifle
         {
             // No 'invoker' required here:
             if (heatCounter > 0)
+            {
                 heatCounter--;
+            }
         }
     }
 
@@ -467,7 +473,9 @@ class OverheatingPlasmaRifle2 : PlasmaRifle
         PLSG A 3 
         {
             if (invoker.heatCounter >= 40)
+            {
                 return ResolveState("Cooldown");
+            }
             invoker.heatCounter++;
             A_FirePlasma();
             return ResolveState(null);
@@ -498,7 +506,9 @@ class HealingPistol : Pistol
         super.DoEffect();
         // Null-check the owner pointer and call the code every 35 tics:
         if (owner && level.time % 35 == 0)
+        {
             owner.GiveBody(1); //heal 1 HP
+        }
     }
 }
 ```
@@ -523,14 +533,20 @@ class HealingPistol : Pistol
         super.DoEffect();
         // Null-check the owner and make sure it's a player:
         if (!owner || !owner.player)
+        {
             return;
+        }
         // Do nothing if the player has no weapon selected (e.g. is dead)
         // or the selected weapon is different from this one:
         if (!owner.player.ReadyWeapon || owner.player.ReadyWeapon != self)
+        {
             return;
+        }
         // Heal the owner once a second:
         if (level.time % 35 == 0)
+        {
             owner.GiveBody(1);
+        }
     }
 }
 ```
@@ -587,11 +603,15 @@ class RunawayShotgun : Shotgun
     {
         super.Tick();
         if (owner)
+        {
             return;
+        }
         // A_Chase required a valid target,
         // so find it first, if there isn't one:
         if (!target)
+        {
             LookForPlayers(true);
+        }
         A_Chase();
     }
 }
@@ -1126,7 +1146,7 @@ If you have a pointer to a PSprite instance, you can remove it in two ways: by m
 let psp = player.FindPSprite(PSP_Flash);
 if (psp)
 {
-    player.SetPSprite(PSP_Flash, "Null");
+    player.SetPSprite(PSP_Flash, ResolveState("Null"));
 }
 
 // Method #2:
@@ -1354,7 +1374,9 @@ class OverheatingPlasmaRifle3 : PlasmaRifle
         // And only after all of this we let the heat stacks
         // decay:
         if (heatCounter > 0)
+        {
             heatCounter--;
+        }
     }
 
     // The states block remains unchanged:
@@ -1364,7 +1386,9 @@ class OverheatingPlasmaRifle3 : PlasmaRifle
         PLSG A 3 
         {
             if (invoker.heatCounter >= 40)
+            {
                 return ResolveState("Cooldown");
+            }
             invoker.heatCounter++;
             A_FirePlasma();
             return ResolveState(null);
@@ -2680,35 +2704,35 @@ class QuickPunchController : CustomInventory
         +INVENTORY.AUTOACTIVATE //Use is called automatically
     }
 
-	// The DoEffect override makes sure the ready layer actually
-	// keeps existing between maps:
-	override void DoEffect()
-	{
-		super.DoEffect();
-		if (!owner || !owner.player)
-		{
-			return;
-		}
-		// Check if punch layer exists:
-		let psp = owner.player.FindPSprite(PUNCHLAYER);
-		// If not, create it:
-		if (!psp)
-		{
-			psp = owner.player.GetPSprite(PUNCHLAYER);
-			// Caller must be set manually to this item,
-			// otherwise PSprite won't function correctly
-			// because of some weird internal assumptions
-			// that it must be attached to a weapon:
-			psp.caller = self;
-			// These f lags must be unset manually, because
-			// if created this way, the layer sets them to
-			// true, as if it was created from a weapon:
-			psp.bAddBob = false;
-			psp.bAddWeapon = false;
-			// Set the layer to the ReadyPunch sequence:
-			psp.SetState(ResolveState("ReadyPunch"));
-		}
-	}
+    // The DoEffect override makes sure the ready layer actually
+    // keeps existing between maps:
+    override void DoEffect()
+    {
+        super.DoEffect();
+        if (!owner || !owner.player)
+        {
+            return;
+        }
+        // Check if punch layer exists:
+        let psp = owner.player.FindPSprite(PUNCHLAYER);
+        // If not, create it:
+        if (!psp)
+        {
+            psp = owner.player.GetPSprite(PUNCHLAYER);
+            // Caller must be set manually to this item,
+            // otherwise PSprite won't function correctly
+            // because of some weird internal assumptions
+            // that it must be attached to a weapon:
+            psp.caller = self;
+            // These f lags must be unset manually, because
+            // if created this way, the layer sets them to
+            // true, as if it was created from a weapon:
+            psp.bAddBob = false;
+            psp.bAddWeapon = false;
+            // Set the layer to the ReadyPunch sequence:
+            psp.SetState(ResolveState("ReadyPunch"));
+        }
+    }
 
     States 
     {
