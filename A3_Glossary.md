@@ -28,6 +28,12 @@ A type of [variable](#Variable) that can contain a list of values rather than a 
 
 A variable that is a part of a [function](#Function). Also known as **parameter**. Arguments of a function are defined in parentheses, right after the name of the function. Arguments can be optional (in which case they have a default value that will be used unless a different value is specified) or non-optional (they don't have a default value; the value has to be defined when the function is called). See: [Custom Functions](09_Custom_functions.md).
 
+### Bit field
+
+An [integer](#Integer) [variable](#Variable) that is designed to hold multiple values. The intended values are [flags](#Flag) where each flag corresponds to a specific bit value: 2, 4, 8, 16, and so on. This provides a unique opportunity to use a single integer variable to hold multiple values. For example, if the value of the field is 12, we know that it contains flags 8 and 4 because no other combination can result in the total number of 12.
+
+Bit fields are often used as [arguments](#Argument) in [functions](#Function). See: [Flow Control - Bitwise Operators](A1_Flow_Control.md#bitwise-operators).
+
 ### Boolean
 
 A [value](#Value) that can only be `true` or `false` (or, if expressed numerically, `1` and `0` respectively).
@@ -70,6 +76,10 @@ Aka crash, CTD. When GZDoom closes unexpectedly to a "Very Fatal Error" window s
 
 An [Actor](#actor)-specific block that contains [actor properties](#Property) and [flags](#Flag) that determine the actor's default behavior (i.e. the behavior it'll exhibit on spawning). The definition of the block begins with a `Default` header.
 
+### Double
+
+A double is a decimal [value](#Value), like 1.5, 7.842, and so on. A double is very similar to a float-point number, but the difference is that it has higher precision, which basically means that it can hold more numbers after the point.
+
 ### Enum
 
 A list of [constants](#constant) of the same type. See: [Constants and enums](14_Constants.md).
@@ -99,6 +109,10 @@ A set of instructions united under a single name that can be called by referenci
 ### Instance
 
 Very literally, an instance of an [object](#Object). For example, GZDoom comes with the code for the class called `DoomImp`. Each imp that spawns in the map and starts doing stuff is an **instance** of that class. Each instance of an object can be in different states (existing, destroyed, alive, dead, etc.) and be doing different things. See: [Pointers and casting](08_Pointers_and_casting.md).
+
+### Integer
+
+A [value](#Value) that contains a whole number without a decimal part, like 1, 2, 5, 100, etc. 
 
 ### Instantiation
 
@@ -166,7 +180,9 @@ Properties are [variables](#variable) that were made accessible in the [Default 
 
 ### Reference
 
-Similar to a [pointer](#Pointer), a reference is a way to pas a [value](#Value) indirectly. References are usually [arguments](#Argument) in [functios](#Function), and they can be defined with an `out` keyword. Compare:
+A concept similar to a [pointer](#Pointer), a reference is any case where code (be it ZScript or engine code) is accessing something not directly, but through some kind of reference. For example, the functions that play sounds, like `A_StartSound`, cannot use sound file names directly. Instead, they *refer to* a sound definition made in the SNDINFO lump. That is an example of a reference.
+
+On a purely coding level, a reference is also a way to pas a [value](#Value) indirectly. References are usually [arguments](#Argument) in [functios](#Function), and they can be defined with an `out` keyword. Compare:
 
 ```csharp
 // function that returns an int:
@@ -230,6 +246,10 @@ A piece of data, such as a number, a text string, a pointer, or any other possib
 ### Variable
 
 A piece of data of specific type, with a specific name. The value of that data can be not only read but also changed dynamically—hence it's "variable". Variables can be defined at the top of the class (or, more specifically, at any place in the class outside of any code block), which makes them a field (available anywhere within the class), or within a code block (which makes them a local variable, available only within that code block). See: [Variables and data types](07_Variables_and_data_types.md).
+
+### Vector
+
+In very simple terms, a vector is a line that points from one point in space to another point in space. In ZScript vectors are often used to express position and velocity of [actors](#Actor). The game's world has a point of origin with XYZ coordinates of (0, 0, 0), and every actor's position is offset from that point. Similarly, velocity is directed somewhere along those XYZ axes.
 
 ### Virtual function
 
