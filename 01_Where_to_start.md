@@ -49,10 +49,10 @@ You can use one of the following approaches to edit ZScript files:
 Put the following line at the top of your `zscript.zs` file:
 
 ```csharp
-version "4.9.1"
+version "4.11"
 ```
 
-Where instead of `4.9.1` use the desired GZDoom version. This will tell the engine that the code shouldn't compile on an earlier version of GZDoom. Without this some features may not be available, and it may not be immediately obvious to players of your mods that they're trying to run them on an outdated version of GZDoom. 
+Where instead of `4.11` use the desired GZDoom version. This will tell the engine that the code shouldn't compile on an earlier version of GZDoom. Without this some features may not be available, and it may not be immediately obvious to players of your mods that they're trying to run them on an outdated version of GZDoom. 
 
 There's rarely ever a good reason to *not* use the latest version of GZDoom, so just try to use the latest one.
 

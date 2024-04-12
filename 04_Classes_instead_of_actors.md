@@ -43,7 +43,7 @@ Actor MyActor
 //ZScript:
 
 //at the top of your main zscript file you need to declare version (once)
-version "4.2.4" 
+version "4.11" 
 
 class MyClass : Actor 
 {
