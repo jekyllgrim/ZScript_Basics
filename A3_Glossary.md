@@ -251,6 +251,8 @@ A piece of data of specific type, with a specific name. The value of that data c
 
 In very simple terms, a vector is a line that points from one point in space to another point in space. In ZScript vectors are often used to express position and velocity of [actors](#Actor). The game's world has a point of origin with XYZ coordinates of (0, 0, 0), and every actor's position is offset from that point. Similarly, velocity is directed somewhere along those XYZ axes.
 
+In ZScript most vectors are either 2-dimensional (only have X and Y components) or 3-dimensional (X, Y and Z).
+
 ### Virtual function
 
 AKA **virtual method**. A [function](#Function) [declared](#Declaration) as `virtual`. These functions can be overridden in classes based on the class where the function is [declared](#Declaration).
