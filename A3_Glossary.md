@@ -176,7 +176,7 @@ A [variable](#Variable) that points to another object—like an instance of anot
 
 ### Property
 
-Properties are [variables](#variable) that were made accessible in the [Default block](#Default block) of an [actor](#Actor). When defined as a property, variables can be given default values with the help of the Default block. See: [Turning variables into actor properties](#turning-variables-into-actor-properties).
+Properties are [variables](#variable) that were made accessible in the [Default block](#Default block) of an [actor](#Actor). When defined as a property, variables can be given default values with the help of the Default block. See: [Turning variables into actor properties](07_Variables_and_data_types.html#turning-variables-into-actor-properties).
 
 ### Reference
 
@@ -185,7 +185,9 @@ A concept similar to a [pointer](#Pointer), a reference is any case where code (
 On a purely coding level, a reference is also a way to pas a [value](#Value) indirectly. References are usually [arguments](#Argument) in [functios](#Function), and they can be defined with an `out` keyword. Compare:
 
 ```csharp
-// function that returns an int:
+// function that takes a double argument,
+// multiplies it by a random value, then
+// returns it:
 double RandomMultiply(double val)
 {
     return val * frandom(0, 10);
@@ -196,10 +198,11 @@ double baseval = 3.5;
 baseval = RandomMultiply(baseval);
 ```
 
-The same  can be done by passing a variable by reference:
+In this example we pass `baseval` to `RandomMultiply` which then returns a modifier value. But the same can be done by passing a variable by reference:
 
 ```csharp
-// function that modifies a value:
+// function that modifies a given value
+// and doesn't return anything:
 void RandomMultiply(out double val)
 {
     val *= frandom(0, 10);
@@ -219,7 +222,7 @@ A [value](#Value) that can be obtained by calling a [function](#Function). All f
 
 ### Scope
 
-A general [context](#Context) where a specific piece of data, object or function is defined and/or can be called. ZScript supports 3 scopes: `play` (used by any class that exists in the map, i.e. classes based on Thinker; stores and modifies data that exists in the playsim), `ui` (used by HUDs and menus; can read `play` data but not modify it) and `data` (used by default by all classes based on Object; is used to store readonly values). The `clearscope` access modifier defines the piece of data to be readable in all scopes.
+A general [context](#Context) where a specific piece of data, object or function is defined and/or can be called. ZScript supports 3 scopes: `play` (used by any class that exists in the map, i.e. classes based on `Thinker`; stores and modifies data that exists in the playsim), `ui` (used by HUDs and menus; can read `play` data but not modify it) and `data` (used by default by all classes based on Object; can be created and modified from either `play` or `ui` scopes, but itself cannot modify anything outside of `data` scope). The `clearscope` access modifier defines the piece of data to be readable in all scopes.
 
 In a narrower sense, "scope" can refer to the context within which specific data is available. For example, a [variable](#variable) defined at the top of a [class](#Class) (i.e. a [field](#Field)) can be described as a "class-scoped variable."
 
@@ -235,17 +238,17 @@ Not to be confused with a [state label](#State label).
 
 ### State label
 
-A header for a series of [states](#State) inside a States block. Headers can be obtained via `FindState()` and `ResolveState()`,  and jumped to with `goto`. State labels only exist in the uncompiled ZScript as a matter of convenience; internally states are just a list. If there's no `goto`, `loop` or another state control instruction at the end of a specific state sequence, the machine will just fall through to the next sequence. See: [State Control](A1_Flow_Control.md#state-control).
+A header for a series of [states](#State) inside a States block. State labels can converted to state pointers with `FindState()` and `ResolveState()`,  and jumped to with `goto`. If there's no `goto`, `loop` or another state control instruction at the end of a specific state sequence, the machine will just fall through to the next sequence. See: [State Control](A1_Flow_Control.md#state-control).
 
-State labels are often referred to as just "states", which is incorrect: for example, a "Spawn" state label is specifically the *name* "Spawn" given to the spawn sequence, whereas a "Spawn state" would be only the first actual state of that sequence.
+State labels are often referred to as just "states", which is incorrect: for example, a "Spawn" state label is specifically the *label* given to the spawn sequence, whereas a "Spawn state" would be only the first actual state of that sequence.
 
 ### Value
 
-A piece of data, such as a number, a text string, a pointer, or any other possible data type. Values can be obtained (e.g. via functions), stored (in variables) and manually set.
+A piece of data, such as a number, a text string, a [pointer](#Pointer), or any other possible data type. Values can be obtained (e.g. via functions), stored (in variables) and manually set.
 
 ### Variable
 
-A piece of data of specific type, with a specific name. The value of that data can be not only read but also changed dynamically—hence it's "variable". Variables can be defined at the top of the class (or, more specifically, at any place in the class outside of any code block), which makes them a field (available anywhere within the class), or within a code block (which makes them a local variable, available only within that code block). See: [Variables and data types](07_Variables_and_data_types.md).
+A piece of data of specific type, with a specific name. The [value](#Value) of that data can be not only read but also changed dynamically—hence it's "variable". Variables can be [declared](#Declaration) at the top of a [class](#Class) (or, more specifically, at any place in the class outside of any code block), which makes them a field (available anywhere within the class), or within a code block like an [anonymous function](#Anonymous function) (which makes them a local variable, available only within that code block). See: [Variables and data types](07_Variables_and_data_types.md).
 
 ### Vector
 
