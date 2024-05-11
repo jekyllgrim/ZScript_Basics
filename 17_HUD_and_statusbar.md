@@ -116,7 +116,7 @@ Gameinfo
 
 Note that GZDoom's alternative HUD can be enforced by the player if they set the `hud_althud_forceinternal` CVAR to `true`. 
 
-Alternative HUD is a regular HUD, also based on the `BaseStatusBar` class; [GZDoom's alternative HUD](https://github.com/coelckers/gzdoom/blob/master/wadsrc/static/zscript/ui/statusbar/alt_hud.zs) is simply designed differently from the classic HUD: it uses different scale and a bunch of custom functions for drawing.
+Alternative HUD is a different type of HUD based on a different class: `AltHud` rather than `BaseStatusBar`. [GZDoom's alternative HUD](https://github.com/coelckers/gzdoom/blob/master/wadsrc/static/zscript/ui/statusbar/alt_hud.zs) is designed very differently from the classic HUD: it uses different scale and a bunch of custom functions for drawing. It's [documented on ZDoom Wiki](https://zdoom.org/wiki/Classes:AltHUD) but is rarely used for custom HUDs due to its fairly low flexibility. Most authors leave the players with an option to use AltHUD if they like. Note that both of these HUDs are drawn **at the same time**, and the base HUD has to explicitly stop drawing itself if AltHUD is enabled (this is covered further in the chapter).
 
 ### Initialization
 
@@ -143,7 +143,9 @@ override void Draw(int state, double TicFrac)
 {
     super.Draw(state, TicFrac);
     if (state == HUD_None)
+    {
         return;
+    }
 
     // actual drawing stuff starts here
 }
