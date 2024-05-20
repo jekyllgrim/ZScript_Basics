@@ -662,8 +662,8 @@ class PistolWithReload : Pistol //it's based on the existing Pistol, so it inher
         // less than maximum:
         while (invoker.ammo2.amount > 0 && invoker.ammo1.amount < invoker.ammo1.maxamount) 
         {
-            TakeInventory(invoker.ammotype2, 1); //take 1 of AmmoType2
-            GiveInventory(invoker.ammotype1, 1); //give 1 of AmmoType1
+            invoker.ammo2.amount--; //take 1 of AmmoType2
+            invoker.ammo1.amount++; //give 1 of AmmoType1
         }
     }
 
