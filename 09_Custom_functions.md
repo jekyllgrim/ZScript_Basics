@@ -261,7 +261,7 @@ The concept of an action function is specific to ZDoom and can be confusing to e
 
 Both of those classes don't use their own states directly; instead a separate internal class `PSprite` handles drawing on-screen sprites. What's more, a weapon has to interact with both data defined in the weapon (such as its flags, ammotypes, etc.) and the data defined on its owner (such as checking the PlayerPawn's inventory for remaining ammo, getting its position, angle and pitch to determine the direction of the shooting, and so on).
 
-To be able to interact with that data properly, weapons interact with two pointers: `self` — which is *not* the weapon, but the PlayerPawn owner — and `invoker` — which refers to the weapon itself. When a function is defined as `action`, it gains the ability to utilize and differentiate between `self` and `invoker`. Non-action functions, on the other hand, don't recognize the `invoker` pointer at all.
+To be able to interact with that data properly, weapons interact with two pointers: `self` — which is *not* the weapon, but the PlayerPawn owner — and `invoker` — which refers to the weapon itself. When a function is defined as `action`, it gains the ability to utilize and differentiate between `self` and `invoker`. Non-action functions, on the other hand, consider `self` and `invoker` to be the same pointer.
 
 The use of these pointers and action functions will be covered in more detail in the [Weapons, overlays and PSprite](12_Weapons_Overlays_PSprite.md) chapter.
 

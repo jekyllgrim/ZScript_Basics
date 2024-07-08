@@ -663,15 +663,13 @@ As mentioned, the difference between action and non-action functions is how they
 
 **Action function:**
 
-* `invoker` — the caller of the function (for weapons it's the weapon itself)
-
 * `self` — the owner, cast as Actor
+
+* `invoker` — the caller of the function (for weapons it's the weapon itself). Note, `invoker.owner` will be the same thing as `self`.
 
 * `player` (or `self.player`) — the [PlayerInfo struct](12.0_Player.md) attached to the owner (as long as the owner is a player)
 
 * `player.mo` (or `self.player.mo`) — the owner, cast as PlayerPawn
-
-* `invoker.owner` — same thing as `self`, so using this is not really necessary
 
 **Regular function:**
 
@@ -683,7 +681,7 @@ As mentioned, the difference between action and non-action functions is how they
 
 * `owner.player.mo` (or `self.owner.player.mo`) — the owner, cast as PlayerPawn
 
-* ~~`invoker`~~ — this pointer isn't recognized
+* `invoker` — same as `self`
 
 ## PSprite and overlays
 
