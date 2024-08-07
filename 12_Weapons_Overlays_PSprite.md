@@ -2666,7 +2666,7 @@ To make this item actually work, we'll need two things:
 
 2. make sure the player has as the command `use QuickPunchController` bound to a key.
 
-The latter can be done by [adding a weapon section in the KEYCONF lump](https://zdoom.org/wiki/CCMDs:Customization#weaponsection), such as:
+The latter can be done by [adding a key section in the KEYCONF lump](https://zdoom.org/wiki/CCMDs:Customization#addkeysection), such as:
 
 ```csharp
 // The name in quotation marks is a display name that will
@@ -2674,7 +2674,7 @@ The latter can be done by [adding a weapon section in the KEYCONF lump](https://
 // menu in GZDoom.
 // The name after it is an internal name that will be
 // written in the player's .ini file:
-WeaponSection "My mod bindings" myModBindings
+AddKeySection "My mod bindings" myModBindings
 // "Quick Punch" is a display name for the command,
 // and "use QuickPunchController" is the actual
 // console command:
