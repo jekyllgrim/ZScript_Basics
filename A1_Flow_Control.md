@@ -930,9 +930,13 @@ You can insert randomization inside a switch block as well:
     {
     case 'Zombieman':
         if (frandom(0,10) > 8.5)
+        {
             e.Replacement = "Cyberdemon";
+        }
         else 
+        {
             e.Replacement = "MyZombieman";
+        }
         break;
     [...]
     }
@@ -1199,11 +1203,17 @@ bool playerIsTargeted;
 for (int i = 0; i < monsters.Size(); i++)
 {
     if (!monsters[i])
+    {
         continue; //do nothing if that item in the array is null
+    }
     if (!monsters[i].target)
+    {
         continue; //do nothing if the monster has no target
+    }
     if (!monsters.[i].target.player)
+    {
         continue; //do nothing if that monster's target isn't player
+    }
     playerIsTargeted = true; //OTHERWISE set the bool to true
 }
 ```
@@ -1217,7 +1227,9 @@ override void Tick()
 {
     super.Tick();
     if (isFrozen())
+    {
         return; //stop execution if the monster is frozen
+    }
     Warp(self,frandom(-1,1),frandom(-1,1),0); //this will make the monster constantly jitter slightly
 }
 ```
@@ -1231,9 +1243,13 @@ bool CheckAllPlayersHaveItem(Class<Inventory> item)
     for (int i = 0; i < MAXPLAYERS; i++)
     {
         if (!players[i] || !players[i].mo)
+        {
             continue; //do nothing if that player in the players array isn't valid and continue checking
+        }
         if (!players.[i].mo.FindInventory(item))
+        {
             return false; //if the player doesn't have the item, immediately return false
+        }
     }
     return true;
 }
@@ -1247,7 +1263,9 @@ Anonymous functions in actor states also have a return value—the next state to
 TNT1 A 0
 {
     if (CountInv("Clip") <= 0)
+    {
         return ResolveState("Reload"); //if no ammo, jump to Reload sequence
+    }
     return ResolveState(null); //otherwise, don't jump, move on to the next frame
 }
 ```
@@ -1616,7 +1634,7 @@ Fire:
     PISG A 1
     {
         //check if the amount of primary ammo is too low and jump to Reload if so:
-        if (ammo1.amount < ammouse1)
+        if (invoker.ammo1.amount < invoker.ammouse1)
         {
             return ResolveState("Reload");
         }
@@ -1658,6 +1676,21 @@ TNT1 A 0
     DoMoreStuff();
     return ResolveState(null); //proceed to next state
 }
+
+//This will work as well:
+TNT1 A 0
+{
+    if (condition == true)
+    {
+        return ResolveState("GoHere"); //jump if the condition is true
+    }
+    DoStuff();
+    DoMoreStuff();
+    return ResolveState("GoThere"); //jump to a different state
+}
+// Note that in this ^ version null is never returned, so
+// the execution will never move to the next state in the
+// sequence.
 ```
 
 In contrast to returning `A_Jump*` functions, this method allows using multiple conditions:
@@ -1667,9 +1700,13 @@ Death:
     TNT1 A 0
     {
         if (health <= -60)
+        {
             return FindState("XDeath");
+        }
         if (health <= -15)
+        {
             return FindState("Dismemberment");
+        }
         return null;
     }
     goto super::Death; //go to the original Death sequence
@@ -1713,24 +1750,33 @@ class HealingPistol : Pistol
     override void DoEffect()
     {
         super.DoEffect(); 
-        // Double-check the owner exists and is a player:
-        if (!owner || !owner.player)
+        // Double-check the owner exists, is a player,
+        // and is alive:
+        if (!owner || !owner.player || owner.health <= 0)
+        {
             return;
+        }
         // Do nothing if the currently selected weapon
         // is not this one:
         if (owner.player.readyweapon != self)
+        {
             return;
+        }
         // This effect should happen only once a second,
         // so we do nothing if this modulo expression
         // isn't equal to 0:
-        if (levle.time % 35 != 0)
+        if (level.time % TICRATE != 0)
+        {
             return;
+        }
         // Get a pointer to the main sprite layer:
         let psp = owner.player.FindPSprite(PSP_Weapon);
         // Null-check the pointer, then check its curstate
         // is in this weapon's Ready sequence
         if (psp && InStateSequence(psp.curstate, ResolveState("Ready")))
+        {
             owner.GiveBody(1); //heal 1 HP
+        }
     }
 }
 ```

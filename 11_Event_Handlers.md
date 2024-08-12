@@ -328,12 +328,11 @@ So, why do you want to use that instead of `replaces`? Primarily two reasons:
           let cls = e.Replacee.GetClassName();
           switch (cls)
           {
+          // Remember, if there's no break instruction, cases will just
+          // fall through from one to the next, so in this case all three
+          // enemies will be replaced with a Cacodemon:
           case 'Zombieman':
-              e.Replacement = "Cacodemon";
-              break;
           case 'DoomImp':
-              e.Replacement = "Cacodemon";
-              break;
           case 'ChaingunGuy':
               e.Replacement = "Cacodemon";
               break;
