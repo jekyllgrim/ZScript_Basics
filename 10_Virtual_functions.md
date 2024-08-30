@@ -222,18 +222,15 @@ There are many, many other virtual functions that you will need to override. And
 ```csharp
 class CustomProtection : Inventory 
 {
-    Default 
-    {
-        inventory.maxamount 1;
-    }
-
     override void ModifyDamage (int damage, Name damageType, out int newdamage, bool passive, Actor inflictor, Actor source, int flags) 
     {
         // First check that the passive argument is true,
         // which means it's modifying *incoming* damage.
         // If it's false, we stop here and do nothing else:
         if (!passive)
+        {
             return;
+        }
 
         // Check if the inflictor exists and has a MISSILE flag:
         if (inflictor && inflictor.bMISSILE) 
@@ -258,9 +255,9 @@ Notice that both `Tick()` and `PostBeginPlay()` are **void** functions (they hav
 
 A good example of that is `SpecialMissileHit()` — an integer function that is called by projectiles when they collide with an actor. When a projectile collides with an actor, it calls `SpecialMissileHit()`, which returns an integer number that tells the projectile what to do: 
 
-- `-1` (default) will make the projectile do what it would normally do in accordance with its properties and flags (i.e. explode, or die, or rip through if it has +RIPPER flag, etc.);
-- `1` will make the projectile unconditionally pass through the actor without colliding (+RIPPER or other flags aren't required for that; in fact, they are ignored in this case);
-- `0` will unconditionally destroy the projectile (remove it completely without doing anything else; it won't be put into its Death sequence either).
+- `MHIT_DEFAULT` (or `-1` in GZDoom versions before 4.12) will make the projectile do what it would normally do in accordance with its properties and flags (i.e. explode, or die, or rip through if it has +RIPPER flag, etc.);
+- `MHIT_PASS` (or `1` in pre-4.12) will make the projectile unconditionally pass through the actor without colliding (+RIPPER or other flags aren't required for that; in fact, they are ignored in this case);
+- `MHIT_DESTROY` (or `0` in pre-4.12) will unconditionally destroy the projectile (remove it completely without doing anything else; it won't be put into its Death sequence either).
 
 This function is used in Hexen by [MageStaffFX2](https://github.com/ZDoom/gzdoom/blob/master/wadsrc/static/zscript/actors/hexen/magestaff.zs#L220)—a homing projectile fired by Bloodscourge, the most powerful Mage weapon:
 
@@ -272,9 +269,9 @@ override int SpecialMissileHit (Actor victim)
     if (victim != target && !victim.player && !victim.bBoss)
     {
         victim.DamageMobj (self, target, 10, 'Fire');
-        return 1;    // Keep going
+        return MHIT_PASS;    // Keep going
     }
-    return -1;
+    return MHIT_DEFAULT;
 }
 ```
 
@@ -353,7 +350,7 @@ class RetaliatingZombieman : Zombieman
     {
         if (source)
         {
-            source.DamageMobj(self,self,damage,'normal'); //deals damage to whatever damaged it
+            source.DamageMobj(self, self, damage, 'normal'); //deals damage to whatever damaged it
         }
         return super.DamageMobj(inflictor, source, Damage, mod, flags, angle);        
     }    
@@ -369,11 +366,11 @@ Let's say you want to create a projectile that can pierce enemies and damage the
 ```csharp
 class PenetratingBullet : FastProjectile 
 {
-    actor hitvictim; //this custom pointer will store the last actor hit by the projectile
+    Actor hitvictim; //this custom pointer will store the last actor hit by the projectile
+
     Default 
     {
-        speed 85;    
-        damage 0; //we need this to be 0 since we'll be dealing damage manually
+        speed 85;
         radius 2;
         height 2;
         scale 0.2;
@@ -381,13 +378,14 @@ class PenetratingBullet : FastProjectile
     }    
     override int SpecialMissileHit(actor victim) 
     {
-        //check that the victim (the actor hit) is NOT the same as hitvictim (last actor hit):
-        if (victim && target && victim != target && victim != hitvictim) 
+        // check that the victim (the actor hit) is shootable
+        // and is NOT the same actor as hitvictim (last actor hit):
+        if (victim && victim.bSHOOTABLE && target && victim != target && victim != hitvictim)
         {    
-            victim.DamageMobj(self,target,10,'normal'); //deal exactly 10 damage to victim
+            victim.DamageMobj(self, target, 10, 'normal'); //deal exactly 10 damage to victim
             hitvictim = victim;            //store the vicitm we just damaged as 'hitvictim'
         }
-        return 1;                        //keep flying
+        return MHIT_PASS;                  //keep flying
     }
     States            //we're just reusing Rocket sprites
     {
@@ -405,24 +403,50 @@ Thanks to `SpecialMissileHit` we don't even need RIPPER. Instead of `10` you can
 
 Notice, that the `inflictor` in this case is `self` (the projectile itself), while the `source` is `target`— that is the projectile's `target`, which, as we remember is whoever shot the projectile.
 
+You can also add other conditions. For example, if you don't want to let this bullet penetrate actors with the DONTRIP flags, do this:
+
+```csharp
+    override int SpecialMissileHit(actor victim)
+    {
+        if (victim)
+        {    
+            // deal damage if applicable:
+            if (victim.bSHOOTABLE && target && victim != target && victim != hitvictim)
+            {
+                victim.DamageMobj(self, target, 10, 'normal');
+                hitvictim = victim;
+            }
+            // if victim has DONTRIP, use default 
+            // coollision rules (go to Death state):
+            if (victim.bDONTRIP)
+            {
+                return MHIT_DEFAULT;
+            }
+        }
+        // otherwise keep going:
+        return MHIT_PASS;
+    }
+```
+
 ## Common ZScript virtual functions
 
 A non-comprehensive of some of the most common virtual functions you'll be overriding in your mods:
 
 **Actor:**
 
-- `void Tick()` — Called by all actors every tic to handle collision, movement and everything else.
-- `void BeginPlay()` — Called after the actor is created, before any default properties are established. Can be used to set default values to custom variables. Do NOT destroy actors here!
-- `void PostBeginPlay()` — Called after the actor is been created but before the first tic is played or any state called. A good place to do stuff like spawning another accompanying actors nearby (e.g. a lamp and a light halo), and anything else you'd normally do in the first frame of Spawn.
-- `bool CanCollideWith (Actor other, bool passive)` — Called when two actors collide, depending on who ran into whom.
-- `int SpecialMissileHit (Actor victim)` — Called by projectiles whenever they collide with an actor (including the shooter of the projectile!).
+- [`int DamageMobj(Actor inflictor, Actor source, int damage, Name mod, int flags = 0, double angle = 0)`](https://zdoom.org/wiki/DamageMobj) — Called when the actor is about to receive damage.
+- [`void Tick()`](https://zdoom.org/wiki/Tick) — Called by all actors every tic to handle collision, movement and everything else.
+- [`void BeginPlay()`](https://zdoom.org/wiki/BeginPlay) — Called after the actor is created, before any default properties are established. Can be used to set default values to custom variables. Do NOT destroy actors here!
+- [`void PostBeginPlay()`](https://zdoom.org/wiki/PostBeginPlay) — Called after the actor is been created but before the first tic is played or any state called. A good place to do stuff like spawning another accompanying actors nearby (e.g. a lamp and a light halo), and anything else you'd normally do in the first frame of Spawn.
+- [`bool CanCollideWith (Actor other, bool passive)`](https://zdoom.org/wiki/CanCollideWith) — Called when two actors collide, depending on who ran into whom.
+- [`int SpecialMissileHit (Actor victim)`](https://zdoom.org/wiki/SpecialMissileHit) — Called by projectiles whenever they collide with an actor (including the shooter of the projectile!).
 
 **Inventory:**
 
-- `void DoEffect()` — Called every tic by inventory items that are inside an actor's inventory. Use it instead of Tick() to continuously do stuff on items.
-- `void AttachToOwner(Actor other)` — Called by items when they are placed in an actor's inventory. After this call the `other` (the actor the item gets attached to) becomes `owner`, and the item can use the `owner` pointer.
-- `void DetachFromOwner()` — Called anytime the item is fully removed from owner's inventory, whether by being tossed, destroyed or taken away entirely.
-- `void ModifyDamage (int damage, Name damageType, out int newdamage, bool passive, Actor inflictor = null, Actor source = null, int flags = 0)` — Called by items capable of modifying the owner's incoming damage, such as PowerProtection.
+- [`void DoEffect()`](https://zdoom.org/wiki/DoEffect) — Called every tic by inventory items that are inside an actor's inventory. Use it instead of Tick() to continuously do stuff on items.
+- [`void AttachToOwner(Actor other)`](https://zdoom.org/wiki/AttachToOwner) — Called by items when they are placed in an actor's inventory. After this call the `other` (the actor the item gets attached to) becomes `owner`, and the item can use the `owner` pointer.
+- [`void DetachFromOwner()`](https://zdoom.org/wiki/DetachFromOwner) — Called anytime the item is fully removed from owner's inventory, whether by being tossed, destroyed or taken away entirely.
+- [`void ModifyDamage (int damage, Name damageType, out int newdamage, bool passive, Actor inflictor = null, Actor source = null, int flags = 0)`](https://zdoom.org/wiki/ModifyDamage) — Called by items capable of modifying the owner's incoming damage, such as PowerProtection.
 
 A more detailed list can be found on the [ZDoom Wiki](https://zdoom.org/wiki/ZScript_virtual_functions#Actor).
 
