@@ -53,7 +53,9 @@ The alternative HUD, however, is a separate class that is drawn *on top* of the 
 
 ## Creating a HUD
 
-All HUDs have to be based on the [`BaseStatusBar`](https://zdoom.org/wiki/Classes:BaseStatusBar) class (you can find its source [on GZDoom's Github](https://github.com/coelckers/gzdoom/blob/517e803b3e43dd88b54a66f26f3cce5b6137ca19/wadsrc/static/zscript/ui/statusbar/statusbar.zs#L105)). Despite the name, it's *not* just for statusbars; this class is a base for all HUDs, including the alternative one.
+HUDs have to be based on the [BaseStatusBar](https://zdoom.org/wiki/Classes:BaseStatusBar) class (you can find its source [on GZDoom's Github](https://github.com/coelckers/gzdoom/blob/517e803b3e43dd88b54a66f26f3cce5b6137ca19/wadsrc/static/zscript/ui/statusbar/statusbar.zs#L105)). Despite the name, it's *not* just for statusbars, the fullscreen HUDs are also defined in it.
+
+Alt HUD replacements, however, have to be based on the [AltHUD](https://zdoom.org/wiki/Classes:AltHUD) class. This class is generally not particularly flexible, and thus mods rarely use it or try to override Alt HUD.
 
 If you only want to add minor changes to an existing HUD, you can inherit from one of the vanilla HUDs ([see GZDoom Github](https://github.com/coelckers/gzdoom/tree/master/wadsrc/static/zscript/ui/statusbar)), such as `DoomStatusBar`.
 
