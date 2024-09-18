@@ -230,6 +230,8 @@ However, it's perfectly possible to only use `BeginHUD()` and then just manually
 Note that often those functions are packed into other functions just for the sake of convenience. For example, if we look again at the `Draw()` call from DoomStatusBar:
 
 ```csharp
+class MyHUD : BaseStatusBar
+{
     override void Draw (int state, double TicFrac)
     {
         Super.Draw (state, TicFrac);
@@ -246,15 +248,16 @@ Note that often those functions are packed into other functions just for the sak
         }
     }
 
-    void DrawMainbar(TicFrac)
+    void DrawMainbar(double TicFrac)
     {
-        [...]
+        // custom code to draw something in statusbar mode
     }
 
     void DrawFullScreenStuff ()
     {
-        [...]
+        // custom code to draw something in fullscreen
     }
+}
 ```
 
 The `DrawMainBar()` and `DrawFullScreenStuff()` functions are not drawing functions like `DrawImage()`; instead they're simple void functions added to better structure the drawing. You don't *have* to do it — there's nothing stopping you from shoving everything inside different code blocks in `Draw()` — but it's recommended to do something similar just to keep things more sensible. Of course, it's up to you how to structure and name those functions.
