@@ -2,7 +2,11 @@
 
 This guide is a beginner-friendly introduction to ZScript, a primary coding language used to code gameplay, UI and menus in GZDoom source port.
 
-☕ Support me on Boosty: https://boosty.to/agent_ash
+☕ Support me:
+
+* Boosty: https://boosty.to/agent_ash (subscription, tips; accepts bank cards)
+
+* Hipolink: https://hipolink.me/agent_ash/tips (tips; accepts bank cards and PayPal)
 
 ## Important notes
 

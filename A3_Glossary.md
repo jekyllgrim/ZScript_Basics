@@ -86,7 +86,7 @@ A list of [constants](#constant) of the same type. See: [Constants and enums](14
 
 ### Event
 
-A [virtual function](#Virtual function) of an event handler class that is automatically triggered by specific things happening in the game (such as the map being loaded, the player connecting, an actor being spawned/damaged/destroyed/resurrected, and other). See: [Event Handlers](11_Event_Handlers.md).
+In the context of ZScript, an event is a [virtual function](#Virtual function) of an event handler class that is automatically triggered by specific things happening in the game (such as the map being loaded, the player connecting, an actor being spawned/damaged/destroyed/resurrected, and other). See: [Event Handlers](11_Event_Handlers.md).
 
 ### Field
 
@@ -110,13 +110,13 @@ A set of instructions united under a single name that can be called by referenci
 
 Very literally, an instance of an [object](#Object). For example, GZDoom comes with the code for the class called `DoomImp`. Each imp that spawns in the map and starts doing stuff is an **instance** of that class. Each instance of an object can be in different states (existing, destroyed, alive, dead, etc.) and be doing different things. See: [Pointers and casting](08_Pointers_and_casting.md).
 
-### Integer
-
-A [value](#Value) that contains a whole number without a decimal part, like 1, 2, 5, 100, etc. 
-
 ### Instantiation
 
 The process of creating an [instance](#Instance) of something. For example, [actors](#Actor) are instantiated by being spawned in the map. See: [Pointers and casting](08_Pointers_and_casting.md).
+
+### Integer
+
+A [value](#Value) that contains a whole number without a decimal part, like 1, 2, 5, 100, etc.
 
 ### Iteration
 
@@ -130,6 +130,10 @@ The process of going through a series of pieces of data, one by one, usually wit
 
 See: [Inventory](12.1_Inventory.md).
 
+### Immutable
+
+"Immutable" means "cannot be modified." Data that cannot be modified can be described as immutable. For example, [constants](#Constant) are immutable by definition.
+
 ### Linked list
 
 A simple data structure similar to [arrays](#Array). In contrast to arrays, elements of a linked list don't have indexes. Instead, each element has a [pointer](#Pointer) to the next element, so you can [iterate](#Iteration) over it to do something with its elements. See: [Arrays and linked lists](13_Arrays.md).
@@ -137,6 +141,10 @@ A simple data structure similar to [arrays](#Array). In contrast to arrays, elem
 ### Method
 
 A function defined within a class. See: [Custom Functions](09_Custom_functions.md). In ZScript, all functions are either methods, or anonymous functions.
+
+### Mutable
+
+"Mutable" means "can be modified." Data that can be modified (for example, a [variable](#Variable)) can be described as mutable. The opposite of "immutable".
 
 ### Nesting
 
@@ -241,6 +249,16 @@ Not to be confused with a [state label](#State label).
 A header for a series of [states](#State) inside a States block. State labels can converted to state pointers with `FindState()` and `ResolveState()`,  and jumped to with `goto`. If there's no `goto`, `loop` or another state control instruction at the end of a specific state sequence, the machine will just fall through to the next sequence. See: [State Control](A1_Flow_Control.md#state-control).
 
 State labels are often referred to as just "states", which is incorrect: for example, a "Spawn" state label is specifically the *label* given to the spawn sequence, whereas a "Spawn state" would be only the first actual state of that sequence.
+
+### Thinker
+
+A commonly used class in ZScript, the parent class of [Actor](#Actor) and many others. Classes based on the Thinker class are called "thinkers." A thinker is a class capable of "thinking," i.e. doing something on a regular basis. Most thinkers call their `Tick()` virtual function ever game tic to perform some kind of continuous operations. Aside from actors, things like moving floors/ceilings in Doom are also handled by special thinkers. You can learn more about thinkers on [ZDoom Wiki](https://zdoom.org/wiki/Classes:Thinker).
+
+### Tic
+
+A tic is a single unit of in-game time (this is not a GZDoom-specific term). GZDoom has a ticrate of 35, meaning there are 35 tics per second. This means that nothing in the gameplay can happen more frequently than 35 times per second (for example, a weapon cannot have a firerate above 35). All [Actor](#Actor) logic is based on tics.
+
+In contrast, things that happen in UI scope (such as drawing menus, the HUD, etc.) are not tied to tics. Everything that is drawn has to be drawn every frame, so it happens as frequently as possible, depending on the framerate the user is running GZDoom at. In vanilla Doom, the maximum framerate was the same as ticrate, but GZDoom has uncapped framerate.
 
 ### Value
 
