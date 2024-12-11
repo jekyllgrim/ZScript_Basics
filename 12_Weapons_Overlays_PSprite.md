@@ -349,7 +349,13 @@ You can freely call most of Actor functions from weapon states, and there are pl
 
 * [`A_SetAngle`](https://zdoom.org/wiki/A_SetAngle) and [`A_SetPitch`](https://zdoom.org/wiki/A_SetPitch) can be called to modify the PlayerPawn angle and pitch, for example to create a recoil effect (the `angle` and `pitch` fields can also be modified directly, but these functions can do that with sub-tic interpolation for a slightly smoother experience). Be careful, however, because most values that aren't very small can be very disorienting. 
   
-  * Regarding `A_SetPitch`: remember that **some players don't use free mouselook** and rely on vertical autoaiming, so changing their pitch will forever raise their camera. Best practice here is to check `if (Level.IsFreelookAllowed() && CVar.GetCVar('freelook', player)` — this check will only return true if the MAPINFO for the current map allows freelook *and* the player using the gun has freelook enabled.
+  * Regarding `A_SetPitch`: remember that **some players don't use free mouselook** and rely on vertical autoaiming, so changing their pitch will forever raise their camera. Best practice here is to check:
+    
+    ```cs
+    if (Level.IsFreelookAllowed() && CVar.GetCVar('freelook', player).GetBool() == true)    
+    ```
+    
+    This check will only return true if the MAPINFO for the current map allows freelook *and* the player using the gun has freelook enabled.
 
 * [`A_SetBlend`](https://zdoom.org/wiki/A_SetBlend) can be used to temporarily tint the player's screen to a specific color, which can be useful for various visual effects.
 
