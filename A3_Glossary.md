@@ -40,9 +40,11 @@ A [value](#Value) that can only be `true` or `false` (or, if expressed numerical
 
 ### Call
 
-To call: to execute something, like a [function](#Function). For example, monsters usually **call** the `A_Chase` function to walk around and chase their targets.
+*To call*: to execute something, like a [function](#Function). For example, monsters usually **call** the `A_Chase` function to walk around and chase their targets.
 
-The object: the object (such as a class, or an actor) that is **calling** a function. For example, when a Rocket hits something and calls `A_Explode` to deal radius damage, the Rocket is the **calling actor** in the context of that function.
+*A call:* the action of calling something, like a function.
+
+The *calling object*: the object (such as a class, or an actor) that is **calling** a function. For example, when a Rocket hits something and calls `A_Explode` to deal radius damage, the Rocket is the **calling actor** in the context of that function.
 
 ### Class
 
@@ -50,15 +52,15 @@ The main type of object in ZScript that can hold [fields](#Field) (class-scope v
 
 ### Code block
 
-A set of instructions (such as [function calls](#Function), [expressions](#Expression) or [declaration](#Declaration) of [variables](#Variable)) placed within a single pair of curly braces (`{ }`).
+A set of instructions (such as [function calls](#Function), [expressions](#Expression) or [declaration](#Declaration) of [variables](#Variable)) placed within a single pair of [curly braces](#Curly braces) (`{ }`).
 
 ### Constant
 
-A piece of data that has a fixed value that can't be changed at runtime. Constants are used to give fixed values a nice name. Common examples of constants are flags used as function arguments are names of sound channels (such as `CHAN_BODY`) or PSprite layer numbers (such as `PSP_Weapon`). Constants can be defined within a class or on their own. See: [Constants and enums](14_Constants.md).
+A piece of data that contains a fixed value that can't be changed at runtime; the opposite of a [variable](#Variable). Constants are used to give fixed values a nice name. Common examples of constants are flags used as function arguments are names of sound channels (such as `CHAN_BODY`) or PSprite layer numbers (such as `PSP_Weapon`). Constants can be defined within a class or on their own. See: [Constants and enums](14_Constants.md).
 
 ### Context
 
-The environment and circumstances in which something happens—for example, a specific piece of code is executed. The meaning is somewhat situational. For example, a virtual function, a weapon state, an event and such can be contexts, since they determine how specific things should be handled (e.g. the available pointers, how the code is executed, etc.).
+The environment and circumstances in which something happens—for example, a specific piece of code is executed. The meaning is somewhat situational. For example, a virtual function, a weapon state, an event and such are *[calling](#Call) contexts*, since they determine how specific things should be handled (e.g. the available [pointers](#Pointer), how the code is executed, etc.).
 
 ### Curly braces
 
@@ -70,7 +72,7 @@ Aka crash, CTD. When GZDoom closes unexpectedly to a "Very Fatal Error" window s
 
 ### Declaration
 
-"To declare" means to create or to define something, like a variable or a function. For example, if you do `int foo` in your code, this means a [variable](#Variable) `foo` is **declared**.
+*To declare* means to create or to define something, like a variable or a function. For example,`int foo` **declares** a [variable](#Variable) `foo`.
 
 ### Default block
 
@@ -86,7 +88,7 @@ A list of [constants](#constant) of the same type. See: [Constants and enums](14
 
 ### Event
 
-In the context of ZScript, an event is a [virtual function](#Virtual function) of an event handler class that is automatically triggered by specific things happening in the game (such as the map being loaded, the player connecting, an actor being spawned/damaged/destroyed/resurrected, and other). See: [Event Handlers](11_Event_Handlers.md).
+In the context of ZScript, an event is a [virtual function](#Virtual function) of an event handler class that is automatically triggered by specific things happening in the game (such as the map being loaded, the player connecting, an actor being spawned/damaged/destroyed/resurrected, and others). See: [Event Handlers](11_Event_Handlers.md).
 
 ### Field
 
@@ -94,17 +96,17 @@ A class-scope [variable](#variable) (a variable that is defined at the top of th
 
 ### Flag
 
-1. In an Actor: A type of a boolean Actor property that can be set or unset by using `+<FLAGNAME>` or `-<FLAGNAME>` in the actor's Default block or by setting `bFLAGNAME` to true or false on an actor pointer. Flags are internally defined as a bit field.
+1. In an Actor: A type of a [boolean](#Boolean) [Actor](#Actor) [property](#Property) that can be set or unset by using `+<FLAGNAME>` or `-<FLAGNAME>` in the actor's Default block or by setting `bFLAGNAME` to true or false on an actor pointer. Flags are internally defined as a bit field.
 
-2. In a function: A bitfield that functions as an argument of a function so that it can combine multiple values. The flags are integer numbers that normally receive "nice names" by being defined as constants. Flags can be set, unset and combined with bitwise operators. See: [Flow Control](A1_Flow_Control.md).
+2. In a function: A [bit field](#Bit field) that functions as an [argument](#Argument) of a [function](#Function) so that it can contain multiple values. The flags are integer numbers that normally receive "nice names" by being defined as [constants](#Constant). Flags can be set, unset and combined with bitwise operators. See: [Flow Control](A1_Flow_Control.md).
 
 ### Flow
 
-Flow is a generic term referring to code which describes the order in which certain things in the code are executed. Various statements (such as IF conditions) offer means to control the flow of the code. See [Flow Control](A1_Flow_Control.md).
+Flow is a generic coding term that describes the order in which certain things in the code are executed. Various statements (such as IF conditions) offer means to control the flow of the code. See [Flow Control](A1_Flow_Control.md).
 
 ### Function
 
-A set of instructions united under a single name that can be called by referencing that name. Functions support arguments that they can utilize. Functions can be of various types: regular, virtual, action, static. They can also be void or have a return value. See: [Custom Functions](09_Custom_functions.md).
+A set of instructions united under a single name that can be [called](#Call) by referencing that name. Functions support arguments that they can utilize. Functions can be of various types: regular, virtual, action, static. They can also be void or have a return value. See: [Custom Functions](09_Custom_functions.md).
 
 ### Instance
 
@@ -116,7 +118,7 @@ The process of creating an [instance](#Instance) of something. For example, [act
 
 ### Integer
 
-A [value](#Value) that contains a whole number without a decimal part, like 1, 2, 5, 100, etc.
+A [value](#Value) that contains a whole number without a decimal part, like 0, 5, 100, etc.
 
 ### Iteration
 
@@ -132,7 +134,7 @@ See: [Inventory](12.1_Inventory.md).
 
 ### Immutable
 
-"Immutable" means "cannot be modified." Data that cannot be modified can be described as immutable. For example, [constants](#Constant) are immutable by definition.
+"Immutable" means "cannot be modified." Data that cannot be modified can be described as immutable. For example, [constants](#Constant) are immutable by definition. Antonym: [mutable](#Mutable).
 
 ### Linked list
 
@@ -140,7 +142,7 @@ A simple data structure similar to [arrays](#Array). In contrast to arrays, elem
 
 ### Method
 
-A function defined within a class. See: [Custom Functions](09_Custom_functions.md). In ZScript, all functions are either methods, or anonymous functions.
+A function defined within a class. See: [Custom Functions](09_Custom_functions.md). In ZScript, all functions are either methods, or anonymous functions. Antonym: [immutable](#Immutable).
 
 ### Mutable
 
@@ -162,7 +164,7 @@ if (condition)
             ...
 ```
 
-A large number of nested blocks makes it harder to read the function and understand its intended flow. If that happens, it may be better to move some of the instructions into a separate dedicated function.
+A large number of nested blocks makes it harder to read the function and understand its intended [flow](#Flow). If that happens, it may be better to move some of the instructions into a separate dedicated function.
 
 ### Null-checking
 
@@ -170,7 +172,7 @@ The process of checking that something isn't null. Most of the time it looks lik
 
 ### Object
 
-In ZScript: the most basic class. All classes inherit from Object. If you create a new class without a parent, it'll be implicitly inherited from Object.
+In ZScript: the most basic [class](#Class). All classes inherit from Object. If you create a new class without a parent, it'll be implicitly inherited from Object.
 
 In a more general sense: any more or less clearly defined unit of data, such as a class, a struct, etc.
 
@@ -188,7 +190,7 @@ Properties are [variables](#variable) that were made accessible in the [Default 
 
 ### Reference
 
-A concept similar to a [pointer](#Pointer), a reference is any case where code (be it ZScript or engine code) is accessing something not directly, but through some kind of reference. For example, the functions that play sounds, like `A_StartSound`, cannot use sound file names directly. Instead, they *refer to* a sound definition made in the SNDINFO lump. That is an example of a reference.
+A concept similar to a [pointer](#Pointer), a reference is any case where code (be it ZScript or engine code) is accessing something not directly, but through some kind of reference. For example, the functions that play sounds, like `A_StartSound`, cannot use audio file names directly. Instead, they *refer to* a sound definition made in the SNDINFO lump. That is an example of a reference.
 
 On a purely coding level, a reference is also a way to pas a [value](#Value) indirectly. References are usually [arguments](#Argument) in [functios](#Function), and they can be defined with an `out` keyword. Compare:
 
@@ -246,9 +248,11 @@ Not to be confused with a [state label](#State label).
 
 ### State label
 
-A header for a series of [states](#State) inside a States block. State labels can converted to state pointers with `FindState()` and `ResolveState()`,  and jumped to with `goto`. If there's no `goto`, `loop` or another state control instruction at the end of a specific state sequence, the machine will just fall through to the next sequence. See: [State Control](A1_Flow_Control.md#state-control).
+A header for a series of [states](#State) inside a States block. State labels can converted to state pointers with `FindState()` and `ResolveState()`,  and jumped to with `goto`. If there's no `goto`, `loop` or another state control instruction at the end of a specific state sequence, the machine will just fall through to the next sequence.
 
 State labels are often referred to as just "states", which is incorrect: for example, a "Spawn" state label is specifically the *label* given to the spawn sequence, whereas a "Spawn state" would be only the first actual state of that sequence.
+
+See: [State Control](A1_Flow_Control.md#state-control).
 
 ### Thinker
 
