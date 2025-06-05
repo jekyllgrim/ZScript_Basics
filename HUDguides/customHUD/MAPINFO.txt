@@ -1,0 +1,4 @@
+GameInfo
+{
+	StatusBarClass = "MyFullscreenHUD"
+}
