@@ -10,42 +10,42 @@
 
 - [Overview](#overview)
 - [Creating a HUD](#creating-a-hud)
-   * [Add the HUD in MAPINFO](#add-the-hud-in-mapinfo)
-   * [Initialization](#initialization)
-   * [Structuring Draw()](#structuring-draw)
-      + [1. Super.Draw()](#1-superdraw)
-      + [2. Check HUD state](#2-check-hud-state)
-      + [3. Begin the HUD](#3-begin-the-hud)
-      + [4. Start drawing](#4-start-drawing)
+  * [Add the HUD in MAPINFO](#add-the-hud-in-mapinfo)
+  * [Initialization](#initialization)
+  * [Structuring Draw()](#structuring-draw)
+    + [1. Super.Draw()](#1-superdraw)
+    + [2. Check HUD state](#2-check-hud-state)
+    + [3. Begin the HUD](#3-begin-the-hud)
+    + [4. Start drawing](#4-start-drawing)
 - [Drawing in the HUD](#drawing-in-the-hud)
-   * [HUD element offsets](#hud-element-offsets)
-      + [Statusbar offsets](#statusbar-offsets)
-      + [Fullscreen offsets](#fullscreen-offsets)
-         - [Text offsets](#text-offsets)
-      + [HUD scaling](#hud-scaling)
-      + [HUD aspect ratio](#hud-aspect-ratio)
-   * [Drawing in the HUD](#drawing-in-the-hud-1)
-      + [Setting up a font](#setting-up-a-font)
-      + [DrawImage()](#drawimage)
-      + [DrawTexture()](#drawtexture)
-      + [DrawString()](#drawstring)
-      + [DrawInventoryIcon()](#drawinventoryicon)
-      + [Information functions](#information-functions)
-      + [Force 1:1 aspect ratio without disabling UI scaling](#force-11-aspect-ratio-without-disabling-ui-scaling)
+  * [HUD element offsets](#hud-element-offsets)
+    + [Statusbar offsets](#statusbar-offsets)
+    + [Fullscreen offsets](#fullscreen-offsets)
+      - [Text offsets](#text-offsets)
+    + [HUD scaling](#hud-scaling)
+    + [HUD aspect ratio](#hud-aspect-ratio)
+  * [Drawing in the HUD](#drawing-in-the-hud-1)
+    + [Setting up a font](#setting-up-a-font)
+    + [DrawImage()](#drawimage)
+    + [DrawTexture()](#drawtexture)
+    + [DrawString()](#drawstring)
+    + [DrawInventoryIcon()](#drawinventoryicon)
+    + [Information functions](#information-functions)
+    + [Force 1:1 aspect ratio without disabling UI scaling](#force-11-aspect-ratio-without-disabling-ui-scaling)
 - [Making your first HUD from A to Z](#making-your-first-hud-from-a-to-z)
-   * [Create a font](#create-a-font)
-   * [Draw health and armor indicator](#draw-health-and-armor-indicator)
-   * [Colorizing health numbers](#colorizing-health-numbers)
-   * [Colorizing armor numbers](#colorizing-armor-numbers)
-   * [Drawing current ammo and weapon](#drawing-current-ammo-and-weapon)
-   * [Colorizing ammo numbers](#colorizing-ammo-numbers)
-   * [Drawing keys](#drawing-keys)
+  * [Create a font](#create-a-font)
+  * [Draw health and armor indicator](#draw-health-and-armor-indicator)
+  * [Colorizing health numbers](#colorizing-health-numbers)
+  * [Colorizing armor numbers](#colorizing-armor-numbers)
+  * [Drawing current ammo and weapon](#drawing-current-ammo-and-weapon)
+  * [Colorizing ammo numbers](#colorizing-ammo-numbers)
+  * [Drawing keys](#drawing-keys)
 - [Advanced HUD systems](#advanced-hud-systems)
-   * [Drawing all possessed ammo](#drawing-all-possessed-ammo)
-   * [Multi-game compatibility](#multi-game-compatibility)
-   * [Drawing inventory bar](#drawing-inventory-bar)
-   * [Animated bars](#animated-bars)
-   * [Animated graphic indicators](#animated-graphic-indicators)
+  * [Drawing all possessed ammo](#drawing-all-possessed-ammo)
+  * [Multi-game compatibility](#multi-game-compatibility)
+  * [Drawing inventory bar](#drawing-inventory-bar)
+  * [Animated bars](#animated-bars)
+  * [Animated graphic indicators](#animated-graphic-indicators)
 
 ## Overview
 
@@ -2669,7 +2669,7 @@ Let's check what we got. Full health:
 
 Animated:
 
-![2025-06-05 16-02-21.mkv [optimize output image]](https://s3.ezgif.com/tmp/ezgif-3794692c2e9e67.gif)
+![](assets/ezgif-3dc4572e1218ce.gif)
 
 This looks very decent, but it's still missing colors. Wouldn't it be great if the color of the bar progressively changed to red?
 
@@ -2723,7 +2723,7 @@ void My_DrawHealthBar(Vector2 pos, int width, int height, int flags)
 
 This is the result:
 
-![2025-06-05 16-46-58.mkv [optimize output image]](https://s3.ezgif.com/tmp/ezgif-32fac60b08ab60.gif)
+![](assets/ezgif-3c4e1ab1eb4234.gif)
 
 > Important note: **red-green color blindness is the most common type of color blindness**. So, hardcoding those colors like that might not be a very good idea. You could possibly let the user modify them with custom CVARs, or just provide different values, such as light-blue to orange.
 
@@ -2817,7 +2817,7 @@ void My_DrawHealthBar(Vector2 pos, int width, int height, int flags)
 
 Let's check the result in-game (we're being shot by a Shotgun Guy here):
 
-![2025-06-05 17-46-26.mkv [optimize output image]](https://s6.ezgif.com/tmp/ezgif-6d94b5371d0918.gif)
+![](assets/ezgif-3f71ed6f9f38a7.gif)
 
 As you can see, the colorized bar moves instantly, while the lower bar is updated gradually.
 
@@ -2862,7 +2862,7 @@ That last bit might sound a bit confusing if you've never done something like th
 
 As an example of a basic programmatic animation, we'll create a weapon icon that rolls below the screen and then back when the weapon is cycled. This is the result we want to get:
 
-![2025-06-05 23-15-41.mkv [optimize output image]](https://s3.ezgif.com/tmp/ezgif-3cfb3f342f782a.gif)
+![](assets/ezgif-3cfb3f342f782a.gif)
 
 This system will require the following components:
 
@@ -3081,7 +3081,7 @@ We set the icon to be drawn in the bottom left corner, but pushed 144 units to t
 
 Finally, this is the result you'll see when you load the game:
 
-![2025-06-05 23-15-41.mkv [optimize output image]](https://s3.ezgif.com/tmp/ezgif-3cfb3f342f782a.gif)
+![](assets/ezgif-3cfb3f342f782a.gif)
 
 Once again, as a quick review:
 
