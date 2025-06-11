@@ -22,8 +22,6 @@ class MyFullscreenHUD : BaseStatusBar
 	// Compass:
 	double my_prevPlayerAngle;
 	double my_currPlayerAngle;
-	int my_prevLevelTime;
-	int my_currLevelTime;
 
 	override void Init()
 	{
@@ -103,13 +101,8 @@ class MyFullscreenHUD : BaseStatusBar
 		{
 			my_healthIntr.Update(CPlayer.mo.health);
 
-			if (Level.mapTime > my_currLevelTime)
-			{
-				my_prevPlayerAngle = my_currPlayerAngle;
-				my_currPlayerAngle = CPlayer.mo.angle;
-				my_prevLevelTime = my_currLevelTime;
-				my_currLevelTime = Level.mapTime;
-			}
+			my_prevPlayerAngle = my_currPlayerAngle;
+			my_currPlayerAngle = CPlayer.mo.angle;
 		}
 	}
 

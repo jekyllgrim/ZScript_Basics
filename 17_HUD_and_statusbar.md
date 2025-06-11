@@ -3342,10 +3342,6 @@ class MyFullscreenHUD : BaseStatusBar
     // and previous tics:
     double my_currPlayerAngle;
     double my_prevPlayerAngle;
-    // This will track level time, i.e. when we last
-    // updated player's angle:
-    int my_currLevelTime;
-    int my_prevLevelTime;
 
     // the rest of your HUD code
 }
@@ -3361,22 +3357,13 @@ override void Tick()
     // Make sure PlayerPawn exists first:
     if (CPlayer.mo)
     {
-        // Check if current level time is higher than
-        // last cached time:
-        if (Level.mapTime > my_currLevelTime)
-        {
-            // Order is important! Update prev values
-            // before current ones!
+		// Order is important! Update prev values
+		// before current ones!
 
-            // Set prev angle to currently tracked one:
-            my_prevPlayerAngle = my_currPlayerAngle;
-            // Set current angle to the actual current one:
-            my_currPlayerAngle = CPlayer.mo.angle;
-            // Set prev time to currently tracked one:
-            my_prevLevelTime = my_currLevelTime;
-            // Set current one to the actual current one:
-            my_currLevelTime = Level.mapTime;
-        }
+		// Set prev angle to currently tracked one:
+		my_prevPlayerAngle = my_currPlayerAngle;
+		// Set current angle to the actual current one:
+		my_currPlayerAngle = CPlayer.mo.angle;
     }
 }
 ```
