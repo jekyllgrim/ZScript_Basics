@@ -10,43 +10,49 @@
 
 - [Overview](#overview)
 - [Creating a HUD](#creating-a-hud)
-  * [Add the HUD in MAPINFO](#add-the-hud-in-mapinfo)
-  * [Initialization](#initialization)
-  * [Structuring Draw()](#structuring-draw)
-    + [1. Super.Draw()](#1-superdraw)
-    + [2. Check HUD state](#2-check-hud-state)
-    + [3. Begin the HUD](#3-begin-the-hud)
-    + [4. Start drawing](#4-start-drawing)
+   * [Add the HUD in MAPINFO](#add-the-hud-in-mapinfo)
+   * [Initialization](#initialization)
+   * [Structuring Draw()](#structuring-draw)
+      + [1. Super.Draw()](#1-superdraw)
+      + [2. Check HUD state](#2-check-hud-state)
+      + [3. Begin the HUD](#3-begin-the-hud)
+      + [4. Start drawing](#4-start-drawing)
 - [Drawing in the HUD](#drawing-in-the-hud)
-  * [HUD element offsets](#hud-element-offsets)
-    + [Statusbar offsets](#statusbar-offsets)
-    + [Fullscreen offsets](#fullscreen-offsets)
-      - [Text offsets](#text-offsets)
-    + [HUD scaling](#hud-scaling)
-    + [HUD aspect ratio](#hud-aspect-ratio)
-  * [Drawing in the HUD](#drawing-in-the-hud-1)
-    + [Setting up a font](#setting-up-a-font)
-    + [DrawImage()](#drawimage)
-    + [DrawTexture()](#drawtexture)
-    + [DrawString()](#drawstring)
-    + [DrawInventoryIcon()](#drawinventoryicon)
-    + [Information functions](#information-functions)
-    + [Force 1:1 aspect ratio without disabling UI scaling](#force-11-aspect-ratio-without-disabling-ui-scaling)
+   * [HUD element offsets](#hud-element-offsets)
+      + [Statusbar offsets](#statusbar-offsets)
+      + [Fullscreen offsets](#fullscreen-offsets)
+         - [Text offsets](#text-offsets)
+      + [HUD scaling](#hud-scaling)
+      + [HUD aspect ratio](#hud-aspect-ratio)
+   * [Drawing in the HUD](#drawing-in-the-hud-1)
+      + [Setting up a font](#setting-up-a-font)
+      + [DrawImage()](#drawimage)
+      + [DrawTexture()](#drawtexture)
+      + [DrawString()](#drawstring)
+      + [DrawInventoryIcon()](#drawinventoryicon)
+      + [Information functions](#information-functions)
+      + [Force 1:1 aspect ratio without disabling UI scaling](#force-11-aspect-ratio-without-disabling-ui-scaling)
 - [Making your first HUD from A to Z](#making-your-first-hud-from-a-to-z)
-  * [Create a font](#create-a-font)
-  * [Draw health and armor indicator](#draw-health-and-armor-indicator)
-  * [Colorizing health numbers](#colorizing-health-numbers)
-  * [Colorizing armor numbers](#colorizing-armor-numbers)
-  * [Drawing current ammo and weapon](#drawing-current-ammo-and-weapon)
-  * [Colorizing ammo numbers](#colorizing-ammo-numbers)
-  * [Drawing keys](#drawing-keys)
+   * [Defining fonts to use in your HUD](#defining-fonts-to-use-in-your-hud)
+   * [Drawing health and armor indicators](#drawing-health-and-armor-indicators)
+   * [Colorizing health numbers](#colorizing-health-numbers)
+   * [Colorizing armor numbers](#colorizing-armor-numbers)
+   * [Drawing current ammo and weapon](#drawing-current-ammo-and-weapon)
+   * [Colorizing ammo numbers](#colorizing-ammo-numbers)
+   * [Drawing keys](#drawing-keys)
 - [Advanced HUD systems](#advanced-hud-systems)
-  * [Drawing all possessed ammo](#drawing-all-possessed-ammo)
-  * [Multi-game compatibility](#multi-game-compatibility)
-  * [Drawing inventory bar](#drawing-inventory-bar)
-  * [Animated bars](#animated-bars)
-  * [Animated graphic indicators](#animated-graphic-indicators)
-
+   * [Drawing all possessed ammo](#drawing-all-possessed-ammo)
+   * [Multi-game compatibility](#multi-game-compatibility)
+   * [Drawing inventory bar](#drawing-inventory-bar)
+   * [Animated bars](#animated-bars)
+   * [Animated graphic indicators](#animated-graphic-indicators)
+   * [Smooth animation with delta time](#smooth-animation-with-delta-time)
+         - [Explanation of delta time](#explanation-of-delta-time)
+         - [Implementing delta time](#implementing-delta-time)
+   * [Interpolated animation with fractional tics](#interpolated-animation-with-fractional-tics)
+         - [Explanation of tic fraction](#explanation-of-tic-fraction)
+         - [Implementing tic fraction](#implementing-tic-fraction)
+		 
 ## Overview
 
 A HUD (heads-up display) is various information displayed on the player's screen, such as health, armor and ammo reserves. The aiming reticle and the pop-up messages are also a part of the HUD.
@@ -239,7 +245,7 @@ However, it's perfectly possible to only use `BeginHUD()` and then just manually
 
 #### 4. Start drawing
 
-`BaseStatusBar` comes with [many functions](https://zdoom.org/wiki/Classes:BaseStatusBar#Non-static), but the ones you'll be using most of all are, arguably, `DrawString()`, `DrawImage()` and `DrawInventoryIcon()`. 
+`BaseStatusBar` comes with [many functions](https://zdoom.org/wiki/Classes:BaseStatusBar#Non-static), but the ones you'll be using most of all are, arguably, `DrawString()`, `DrawImage()`, `DrawTexture()` and `DrawInventoryIcon()`. 
 
 Note that often those functions are packed into other functions just for the sake of convenience. For example, if we look again at the `Draw()` call from DoomStatusBar:
 
@@ -274,7 +280,7 @@ class MyHUD : BaseStatusBar
 }
 ```
 
-The `DrawMainBar()` and `DrawFullScreenStuff()` functions are not drawing functions like `DrawImage()`; instead they're simple void functions added to better structure the drawing. You don't *have* to do it — there's nothing stopping you from shoving everything inside different code blocks in `Draw()` — but it's recommended to do something similar just to keep things more sensible. Of course, it's up to you how to structure and name those functions.
+The `DrawMainBar()` and `DrawFullScreenStuff()` functions are not drawing functions like `DrawImage()`; instead they're simple *custom* void functions added to better structure the drawing. You don't *have* to do it — there's nothing stopping you from shoving everything inside different code blocks in `Draw()` — but it's recommended to do something similar just to keep things more sensible. Of course, it's up to you how to structure and name those functions.
 
 The actual drawing is covered in more detail in the next subchapter.
 
@@ -286,7 +292,7 @@ Once your HUD class and `Draw()` are set up correctly, you can actually start dr
 
 First, let's talk about how elements (such as images, strings, etc.) are placed on the HUD. Note, for the examples we'll be using `DrawImage()`, which is the simplest `BaseStatusBar` function that is designed to draw images.
 
-**All drawing functions have offsets that define where the element will be drawn.** For example, `DrawImage()`'s second argument is the offsets (as a `vector2` value):
+**All drawing functions have positions that define where the element will be drawn.** These positions are offsets from a certain drawing position (which by default is the top left corner of the screen). For example, `DrawImage()`'s second argument is the position/offsets (as a `vector2` value):
 
 ```csharp
 DrawImage("MEDIA0", (0, 0));
@@ -298,7 +304,7 @@ As noted before, statusbar and fullscreen HUDs treat offsets differently.
 
 #### Statusbar offsets
 
-Statusbar-type HUDs (prefaced with `BeginStatusBar()`) draw stuff in a box of specific size. Usually the elements are drawn with explicit offsets from the top left corner. For example, the Doom statusbar is drawn within a 320x200 box, and the bar graphic is drawn at `(0, 168)` since the bar is exactly 32 pixels tall, so it covers the 32 bottom pixels of the box (the graphic itself is drawn starting from its top-left corner).
+Statusbar-type HUDs (prefaced with `BeginStatusBar()`) draw stuff in a box of specific size. Usually the elements are drawn with explicit offsets from the top left corner. For example, the Doom statusbar is drawn within a 320x200 box, and the bar graphic is drawn at `(0, 168)` since the bar is exactly 32 pixels tall, so it covers the 32 bottom pixels of the box (the graphic itself is drawn starting from its top-left corner). Elements drawn in that statusbar are offset relative to the statusbar area, which is what `BeginStatusBar()` sets.
 
 When the user changes their HUD size using "User interface scale" GZDoom option, statusbars don't change their aspect ratio. For example, if you define a 320x200 statusbar but play on a 16:9 screen, you'll see empty space on the sides.
 
@@ -306,41 +312,41 @@ When the user changes their HUD size using "User interface scale" GZDoom option,
 
 In contrast, fullscreen HUDs (prefaced with `BeginHUD()`) are drawn along the whole screen, so `(0, 0)` points to the top left corner of the *screen* (by default), not a specific area. The size of the fullscreen HUD specified through `BeginHUD()` only defines the virtual canvas initially allocated for the HUD elements but does *not* actually correspond to screen resolution or aspect ratio. For example, if you define a 320x200 fullscreen HUD, the 320x200 area should be basically treated as a guide to how much space you have for your elements, which means the graphic elements should be initially designed with a 320x200 canvas in mind; however, it does *not* correspond to how much space you will actually have available: even when it's scaled up to the screen size, the width will likely be above 320 and the height will be above 200 due to aspect ratio and screen size.
 
-As such, explicit offsets like `(0, 168)`, **should never be used with fullscreen HUDs**. Instead, elements should be aligned against specific anchor points, such as screen corners and edges. This can be achieved with the use of the various DI_SCREEN* and DI_ITEM* flags. All of these flags can be seen can be found [in GZDoom GitHub repository](https://github.com/coelckers/gzdoom/blob/eb56eb380e5b35c9e1d4ba5323a4ec6a1dc0ae8c/wadsrc/static/zscript/engine/ui/statusbar/statusbarcore.zs#L27).
+As such, explicit offsets like `(0, 168)`, **should never be used with fullscreen HUDs**. Instead, elements should be aligned against specific anchor points, such as screen corners and edges. This can be achieved with the use of the various `DI_SCREEN*` and `DI_ITEM*` flags. All of these flags can be seen can be found [in GZDoom GitHub repository](https://github.com/coelckers/gzdoom/blob/eb56eb380e5b35c9e1d4ba5323a4ec6a1dc0ae8c/wadsrc/static/zscript/engine/ui/statusbar/statusbarcore.zs#L27), but they're also documented on specific function pages on the wiki, for example [`DrawImage()`](https://zdoom.org/wiki/DrawImage_(BaseStatusBar)).
 
-DI_SCREEN* flags define the starting point for the position coordinates. For example, `DI_SCREEN_LEFT_TOP` will define the left top corner as `(0, 0)`, while `DI_SCREEN_RIGHT_BOTTOM` will define right bottom as such. Note, it doesn't change the *direction* of the offsets: positive X is still down and positive Y is still right; it only changes the position of the starting point. This means that, if you use `DI_SCREEN_RIGHT_BOTTOM`, you basically have to use `(0, 0)` or negative values to go upward and leftward, since positive values will shift the element beyond the screen edges.
+`DI_SCREEN*` flags define the starting point for the position coordinates. For example, `DI_SCREEN_LEFT_TOP` will define the left top corner as `(0, 0)`, while `DI_SCREEN_RIGHT_BOTTOM` will define right bottom as such. Note, it doesn't change the *direction* of the offsets: positive X is still down and positive Y is still right; it only changes the position of the starting point. This means that, if you use `DI_SCREEN_RIGHT_BOTTOM`, you basically have to use `(0, 0)` or negative values to go upward and leftward, since positive values will shift the element beyond the screen edges.
 
-The flags can be combined using `|` to define both corner and edge offsets, e.g. `DI_SCREEN_LEFT|DI_SCREEN_TOP`. However, there are also pre-combined flags available, which are more commonly used; here's how they're positioned on the screen:
+The flags can be combined using `|` to define both corner and edge offsets, e.g. `DI_SCREEN_LEFT|DI_SCREEN_TOP`. However, there are also pre-combined flags available, which are more commonly used (such as `DI_SCREEN_LEFT_TOP`); here's how they're positioned on the screen:
 
 <img src="HUDguides/DI_SCREEN.png" title="" alt="DI_SCREEN" data-align="center">
 
-DI_ITEM* flags define where the HUD graphic itself will be placed relative to the specified coordinates. For example, with `DI_ITEM_LEFT_TOP` the anchor point will be placed at the top left corner of the image. Note, that **the graphic's own offsets are ignored when drawn on the HUD**, instead the DI_ITEM* flags define its relative position. This allows you to draw graphics on the screen, such as sprites, without worrying about their initial offsets.
+`DI_ITEM*` flags define where the HUD graphic itself will be placed relative to the specified coordinates. For example, with `DI_ITEM_LEFT_TOP` the anchor point will be placed at the top left corner of the image. Note, that **the graphic's own offsets are ignored when drawn on the HUD**, instead the `DI_ITEM*` flags define its relative position. This allows you to draw graphics on the screen, such as sprites, without worrying about their initial offsets.
 
-Similarly to DI_SCREEN* flags, DI_ITEM* flags can be combined, but there are also some combinatory flags already available. Here's how they define anchor points of an element:
+Similarly to `DI_SCREEN*` flags, `DI_ITEM*` flags can be combined, but there are also some combinatory flags already available. Here's how they define anchor points of an element:
 
 <img src="HUDguides/DI_ITEM.png" title="" alt="DI_ITEM" data-align="center">
 
-Combining DI_SCREEN* and DI_ITEM* flags, you can position graphics relative to screen corners, edges or center without worrying about the size of the image, or the screen. For example, let's say we want to draw a medikit sprite **at the center of the screen**:
+Combining `DI_SCREEN*` and `DI_ITEM*` flags, you can position graphics relative to screen corners, edges or center without worrying about the size of the image, or the screen. For example, let's say we want to draw a medikit sprite **at the center of the screen**:
 
 ```csharp
 DrawImage("MEDIA0", (0,0), DI_SCREEN_CENTER);
 ```
 
-Simply use `|` to append one of the DI_ITEM* flags, e.g.:
+Simply use `|` to append one of the `DI_ITEM*` flags, e.g.:
 
 ```csharp
 DrawImage("MEDIA0", (0,0), DI_SCREEN_CENTER|DI_ITEM_LEFT_TOP);
 ```
 
-The GIF below demonstrates how the different DI_ITEM* flags will move the image relative to its origin point (the origin is marked with a red circle):
+The GIF below demonstrates how the different `DI_ITEM*` flags will move the image relative to its origin point (the origin is marked with a red circle):
 
 <img src="HUDguides/item_flags.gif" title="" alt="DI_ITEM flags" data-align="center">
 
 To reiterate:
 
-* The offsets (`(0, 0)` in this example) and the DI_SCREEN* flags define the *position of the origin point*.
+* The offsets (`(0, 0)` in this example) and the `DI_SCREEN*` flags define the *position of the origin point*.
 
-* The DI_ITEM* flags define the *position of the image relative to the specified origin point*.
+* The `DI_ITEM*` flags define the *position of the image relative to the specified origin point*.
 
 Using this knowledge, you can draw an image **at the top left corne**r:
 
@@ -380,7 +386,7 @@ Note, scaling of a specific HUD element is unrelated to the HUD's own scale, whi
 
 ##### Text offsets
 
-If you're drawing text or numbers, e.g. with `DrawString()`, DI_ITEM* flags are not applicable. Instead you'll need [DI_TEXT* flags](https://github.com/coelckers/gzdoom/blob/14fc2a011ed77cffc68f8599285e5228e03d9f01/wadsrc/static/zscript/engine/ui/statusbar/statusbarcore.zs#L75).
+If you're drawing text or numbers, e.g. with `DrawString()`, `DI_ITEM*` flags are not applicable. Instead you'll need [DI_TEXT* flags](https://github.com/coelckers/gzdoom/blob/14fc2a011ed77cffc68f8599285e5228e03d9f01/wadsrc/static/zscript/engine/ui/statusbar/statusbarcore.zs#L75).
 
 The principle is the same, except the only flags are `DI_TEXT_ALIGN_LEFT`, `DI_TEXT_ALIGN_RIGHT` and `DI_TEXT_ALIGN_CENTER`. By using them you'll define where the text is placed on the screen. For example:
 
@@ -422,17 +428,17 @@ However, if you define a 320x200 HUD and then try to achieve the same with expli
 DrawImage("MEDIA", (0,292));
 ```
 
-...this will break immediately when the player decides to use non-default UI scale, since the 292 position will be moved around relative to the scaling options. That's why using DI_SCREEN* and DI_ITEM* flags, as described in the previous section, is so important.
+...this will break immediately when the player decides to use non-default UI scale, since the 292 position will be moved around relative to the scaling options. That's why using `DI_SCREEN*` and `DI_ITEM*` flags, as described in the previous section, is so important.
 
 It is also possible to disable the option to scale the HUD completely by setting the `forceScaled` argument of the `BeginHUD()` and/or `BeginStatusBar()` to `true`, however, this basically robs the user of a feature they may find useful without a good reason, so I do not recommend doing that.
 
 #### HUD aspect ratio
 
-As you probably know, [all of Doom graphics is vertically stretched by the factor of 1.2](https://zdoom.org/wiki/Aspect_ratio_correction). HUDs are not an exception: HUD graphics are also vertically stretched by default. At the moment of writing this, the only way to disable that behavior for HUDs is to set the `forceScaled` argument of the `BeginHUD()` and/or `BeginStatusBar()` to `true`, however that also disables the ability for the user to change the size of the HUD, which is usually undesirable.
+As you might know, [all of Doom graphics is vertically stretched by the factor of 1.2](https://zdoom.org/wiki/Aspect_ratio_correction). HUDs are not an exception: they are also vertically stretched by default. At the moment of writing this, the only way to disable that behavior for HUDs is to set the `forceScaled` argument of the `BeginHUD()` and/or `BeginStatusBar()` to `true`, however that also disables the ability for the user to change the size of the HUD, which is usually undesirable.
 
 HUD aspect ratio is controlled by the `hud_aspectscale` console command: when set to true (default), the HUD graphics will be stretched.
 
-Most of the time you don't need to worry about, unles your HUD features circular elements, because those will be stretched or squished when the user switched to the other aspect ratio than the one the images were authored for.
+Most of the time you don't need to worry about this, unles your HUD features circular elements, because those will be stretched or squished when the user switched to the other aspect ratio than the one the images were authored for.
 
 ### Drawing in the HUD
 
@@ -453,7 +459,7 @@ class MyHUD : BaseStatusBar
     override void Init()
     {
         super.Init();
-        Font fnt = "MYHUDFNT"; //obtain the font named "MYHUDFNT"
+        Font fnt = "Indexfont"; //obtain the font named "Indexfont"
         mIndexFont = HUDFont.Create(fnt); //create the font and cache it to mIndexFont
     }
 }    
@@ -481,11 +487,11 @@ As you can see by the `native` keyword, this function is defined in C++. The arg
 
 * `vector2 pos` — the position where the element will be drawn. See notes on the offsets above to learn how the position works with various offsets. Note that the graphic's offsets set via SLADE are ignored and do not affect its placement.
 
-* `int flags` — a bit field for flags, such as DI_SCREEN* and DI_ITEM* flags.
+* `int flags` — a bit field for flags, such as `DI_SCREEN*` and `DI_ITEM*` flags.
 
 * `double alpha` — the translucency of the element, from 0.0 to 1.0.
 
-* `vector2 box` — allows defining a fixed area within which the element is drawn. This can be used to crop images, for example: e.g. if you use a 48x32 image but define the box argument as `(12, 12)`, the image will be cropped to a 12x12 square. The default value is `(-1, -1)`, which means the box's size will be equal to the size of the element.
+* `vector2 box` — allows defining a fixed-size area, and if the image's pixel dimensions are higher than it, it'll be automatically scaled to fit within that box. For example, if you use a 48x32 image but define the box argument as `(12, 12)`, the image will be scaled to fit 12x12 square (while still keeping its original aspect ratio). The default value is `(-1, -1)`, which means the box's size will be equal to the size of the image.
 
 * `vector2 scale` — the individual scale of the element (independent from the general HUD scale); works pretty much like, for example, actor scale. Note, this is relative scale, e.g. at `(2, 2)` the element will appear x2 larger than it normally would.
 
@@ -495,7 +501,24 @@ As you can see by the `native` keyword, this function is defined in C++. The arg
 void DrawTexture(TextureID texture, Vector2 pos, int flags = 0, double Alpha = 1., Vector2 box = (-1, -1), Vector2 scale = (1, 1))
 ```
 
-This function is largely identical to `DrawImage()`, with the exception of the first argument: instead of taking the name of a graphic as a `string`, it takes a `TextureID`-type argument. `TextureID` is a special [data type](07_Variables_and_data_types.md) that contains a reference to a texture, but not the actual texture name.
+This function is largely identical to `DrawImage()`, with the exception of the first argument: instead of taking the name of a graphic as a `string`, it takes a `TextureID`-type argument. `TextureID` is a special [data type](07_Variables_and_data_types.md) that contains a reference to a texture, but not the actual texture name. TextureID can be obtained with the following syntax:
+
+```csharp
+TextureID tex = TexMan.CheckForTexture("BAL1A0"); // get a textureID for BAL1A0, the Imp's fireball graphic
+```
+
+The management of TextureID data type is relegated to a dedicated struct, [TexMan](https://zdoom.org/wiki/Structs:TexMan) (the name stands for "texture manager"). This struct contains methods to obtain a TextureID (`CheckForTexture()`), obtain a *name* of a texture for a given TextureID (`GetName()`), getting its size (`GetScaledSize()`) and others.
+
+At the same time, TextureID is also [a separate struct](https://zdoom.org/wiki/Structs:TextureID) which defines methods for checking if an obtained texture is valid and existing. Primarily you will be using `IsValid()` to check that the TextureID you obtained is valid. `IsValid()` in that sense is an analog of `!= null` for class instances. E.g.:
+
+```csharp
+TextureID tex = TexMan.CheckForTexture("MYTEX");
+// Only draw the texture if it's a valid texture:
+if (tex.IsValid())
+{
+    DrawTexture(tex, (0, 0), DI_SCREEN_CENTER|DI_ITEM_CENTER);
+}
+```
 
 #### DrawString()
 
@@ -505,19 +528,19 @@ void DrawString(HUDFont font, String string, Vector2 pos, int flags = 0, int tra
 
 This function draws a string of text. Note, it needs a HUDFont font to be set up before it can be used. The argumenst are:
 
-* `HUDFont font` — the name of the field that contains the font.
+* `HUDFont font` — pointer to a HUDFont instances you've created earlier with `HUDFont.Create()`.
 
-* `String string` — the actual text to be displayed. Instead of writing the text literally, if you're using the [LANGUAGE lump](https://zdoom.org/wiki/LANGUAGE), you can pass `StringTable.Localize("$LANGUAGECODE")` to display the correct string as defined in LANGUAGE.
+* `String string` — the actual text to be displayed. Instead of writing the text literally, if you're using the [LANGUAGE lump](https://zdoom.org/wiki/LANGUAGE), you can pass `StringTable.Localize("$LANGUAGECODE")` to display the correct string as defined in LANGUAGE. You can also use various [String](https://zdoom.org/wiki/String) methods, such as `String.Format()` to format your string with numeric variables, color codes, etc.
 
 * `Vector2 pos` — the position of the text element, just like in `DrawImage()`.
 
 * `int flags` — a bit field for flags, such as `DI_TEXT_ALIGN_LEFT`, `DI_TEXT_ALIGN_RIGHT` and `DI_TEXT_ALIGN_CENTER` (determine how the text will be aligned relative to the specified position), as well as the DI_SCREEN* flags mentioned earlier.
 
-* `int translation` — the color translation applied to the font. Note, fonts are always translated via IDs that can be found [on GZDoom GitHub](https://github.com/ZDoom/gzdoom/blob/6489f5ebf0a1d05355eebc8718c5adf0709790c3/src/common/fonts/v_font.h#L47), for example `Font.CR_Red`, `Font.CR_White`, etc. The default value, `Font.CR_UNTRANSLATED`, means the color of the font graphics will be used as is.
+* `int translation` — the color translation applied to the font. Note, this isn't a traditional color translation defined in the TRNSLATE lump, but rather a specific [Font color code](https://zdoom.org/wiki/Structs:Font#Font_colors), for example `Font.CR_Red`, `Font.CR_White`, etc. The default value, `Font.CR_UNTRANSLATED`, means the color of the font graphics will be used as is.
 
 * `double alpha` — the translucency of the element, from 0.0 to 1.0.
 
-* `int wrapwidth` — defines the length of the string in pixels at which it should wrap and start a new line ***(further testing needed)***. The default value is `-1` whip disables wrapping.
+* `int wrapwidth` — defines the length of the string in pixels at which it should wrap and start a new line. The default value is `-1` which disables wrapping.
 
 * `int linespacing` — defines the spacing between lines if the text is wrapped.
 
@@ -529,7 +552,7 @@ This function draws a string of text. Note, it needs a HUDFont font to be set up
 void DrawInventoryIcon(Inventory item, Vector2 pos, int flags = 0, double alpha = 1.0, Vector2 boxsize = (-1, -1), Vector2 scale = (1.,1.))
 ```
 
-This function is largely similar to `DrawImage()` but instead it draws the inventory icon defined in a specific `Inventory` class (retrieving it from the item's `Inventory.Icon` property). You need to pass a pointer to an inventory item to make it work, e.g.:
+This function is largely similar to `DrawImage()` but instead it takes a pointer to a specific `Inventory` class instance and obtains its icon. If the icon can't be found, it'll automatically try to obtain its Spawn state sprite, and it can optionally read Ready or Fire state sprites (which can be used for weapons), e.g.:
 
 ```csharp
 let arm = CPlayer.mo.FindInventory("BasicArmor"); //a pointer to the class that handles armor
@@ -555,20 +578,13 @@ These are just some of the examples, but many more can be found on [ZDoom Wiki](
 
 #### Force 1:1 aspect ratio without disabling UI scaling
 
-If you're determined to create a HUD that supports UI scaling, yet looks identical regardless of aspect ratio, it's actually possible. You will have to check the valuie of the `hud_aspectscale` CCMD and then multiply Y position and size of all elements by 0.8333... in order to counter aspect ratio changes. This can be achieved with a wrapper function. For example, for `DrawImage()` it'd look like this:
+If you're determined to create a HUD that supports UI scaling, yet looks identical regardless of aspect ratio, it's actually possible. You will have to check the value of the `hud_aspectscale` CVar and then divide Y position and Y size of all elements by 1.2 in order to counter aspect ratio changes. This can be achieved with a wrapper function. For example, for `DrawImage()` it'd look like this:
 
 ```csharp
 // As with all constants, this constant can be 
-// defined anywhere. We're using this value becase
-// we want to counter the x1.2 stretch, and
-// 1.2 multiplied by this is roughtly equal to 1:
-const ASPECTBLOCK = 0.833333333;
-
-// This is used to cache the console variable, since
-// calling GetCVar is actually an expensive operation,
-// and you definitely don't want to do that every frame.
-// This must be defined in your HUD class:
-transient CVar aspectScale;
+// defined anywhere. It matches the default aspect
+// correction value, which is 1.2:
+const ASPECTBLOCK = 1.2;
 
 // This wrapper function works just like DrawImage,
 // except images drawn with it will always look as if
@@ -576,19 +592,14 @@ transient CVar aspectScale;
 // arguments as the regular DrawImage():
 void NoAspectDrawImage(String texture, Vector2 pos, int flags = 0, double Alpha = 1., Vector2 box = (-1, -1), Vector2 scale = (1, 1)) 
 {
-    // Cache the CVar the first time this is called:
-    if (!aspectScale)
+    // Check the value of the CVar (since it's a nosave CVar,
+    // we can check its value directly, without CVar.GetCVar):
+    if (hud_aspectscale == true) 
     {
-        aspectScale = CVar.GetCvar('hud_aspectscale',CPlayer);
-    }
-
-    // Now check the value of the CVar:
-    if (aspectScale.GetBool() == true) 
-    {
-        // If it's true, multiply Y scale and position
-        // by 0.83... so that it remains virtually the same:
-        scale.y *= ASPECTBLOCK;
-        pos.y *= ASPECTBLOCK;
+        // If it's true, modify vertical scale and position
+        // so it counteracts aspect scaling:
+        scale.y /= ASPECTBLOCK;
+        pos.y /= ASPECTBLOCK;
     }
     // Use the final values to draw the actual image:
     DrawImage(texture, pos, flags, Alpha, box, scale);
@@ -666,7 +677,7 @@ You can test this now: this HUD shows nothing because it doesn't call any drawin
 
 **Note:** for readability and to make sure we don't overlap with any variables or functions that are already defined in BaseStatusBar, we'll be prefixing *all* of our variables and functions with `my_` (you can use a different custom prefix, of course).
 
-### Create a font
+### Defining fonts to use in your HUD
 
 First, we need to add a font, because we will, of course, need to draw things in the HUD. Doom comes with several fonts: SmallFont, NewSmallFont, ConsoleFont, NewConsoleFont and BigFont. Doom also supports BigUpper, which is a version of the classic Doom font that also supports lowercase letters (vanilla big font is uppercase-only). We'll be using BigFont here, so let's start by creating a HUDFont for BigFont.
 
@@ -720,7 +731,7 @@ class MyFullscreenHUD : BaseStatusBar
 
 Great, now we have a font that can be used by the `DrawString()` function—we'll just pass `my_BigFont` to it to draw text.
 
-### Draw health and armor indicator
+### Drawing health and armor indicators
 
 Now we'll want to create a health and armor indicator. It'll consist of 4 elements: two icons (one for armor, one for health) and two numbers.
 
@@ -3048,6 +3059,7 @@ Great, we have the information now, and now it's time to actually draw things. W
         boxsize: box
     );
 }
+```
 
 To quickly break down how it works:
 
@@ -3093,13 +3105,362 @@ Once again, as a quick review:
 
 Using the same approach, you can just as easily make things gradually fade in/out (by modifying their alpha), scale up and down, move across the screen, and so on.
 
-### High-framerate animation with delta time
+### Smooth animation with delta time
 
-TBA
+We've already talked about how the key aspect of animating something is making sure that the timer for your animation updates at fixed intervals. At the same time, updating them per tic can look rather twitchy, since 35 times per second is not a lot.
+
+There's a method that lets you achieve fixed frequency while having that frequency being higher than 35 Hz. This method can also be used to still update something at 35 Hz *but* make it appear smoother. This is achieved with **delta time**.
+
+##### Explanation of delta time
+
+Let's imagine we want to update a value like the position of a moving icon from the example above, but we want it to move smoothly. If we do this from `Tick()`, the value will only be updated 35 times per second, which isn't a lot. At the same time, we can't just increment/decrement it in `Draw()`, because `Draw()` is called every time GZDoom outputs a frame, which is both a very high value, and a *fluctuating* value (both between different users, and between different moments in the game, since framerate is not fixed).
+
+The solution here is to actually update our timer value every frame (so, from `Draw()`), but change *how much* we update it. I.e. instead of reducing our timer by 1 every frame, we'll reduce by a smaller value, calculated every frame, to account for the fact that the number of frames per second is not fixed. That's where delta time comes into play.
+
+Delta time is a value in a 0.0-1.0 range that we will be calculating and then reading every frame, and every frame it'll tell us where this frame lies between our desired frequency points. For instance, let's assume GZDoom is running at 200 frames per second, and we have a timer that should be incremented 35 times per second, each time by 1. Instead of incrementing it by 1 every tic, we will increment it by roughly 0.175 every frame, or, expressed differently, it'll be incremented by `1.0 * deltaTime`, where `deltaTime` will be the *exact* multiplier we need that is calcualted irrespective of the *actual* framerate (which can be different from 200).
+
+##### Implementing delta time
+
+Calculating and using delta time requires the following:
+
+* all of our timers will have to be `double`s rather than `int`s, since they will be incremented by values smaller than 1;
+
+* we will need `MSTimeF()`, which is a special UI-scoped function that gets us time in *milliseconds* since engine startup;
+
+* by tracking and caching MSTimeF from previous frame, and comparing it to MSTimeF from *current* frame, we will be able to calculate delta time for the current frame.
+
+First, we will need to add new fields and one new constant to our HUD:
+
+```csharp
+class MyFullscreenHUD : BaseStatusBar
+{
+    // This will be used in delta time calculation.
+    // to determine that the target update frequency
+    // is still equal to TICRATE, i.e. 35:
+    const MY_DELTAFREQ = 1000.0 / TICRATE;
+    // This will store MSTimeF from the previous frame:
+    double my_prevMSTimeF;
+    // This will contain our delta time for this frame:
+    double my_deltaTime;
+
+    // The rest of the HUD code
+}
+```
+
+After that, we will implement a separate function that updates delta time:
+
+```csharp
+void My_UpdateDeltaTime()
+{
+    // First, get the current MSTimeF:
+    double curMSTimeF = MSTimeF();
+    // If previous MSTimeF hasn't been set yet,
+    // set it to current here:
+    if (my_prevMSTimeF == 0)
+    {
+        my_prevMSTimeF = curMSTimeF;
+    }
+
+    // Get the difference between current MSTimeF
+    // and MSTimeF from previous frame that we
+    // cache in the 'my_prevMSTimeF' field:
+    double msdiff = curMSTimeF - my_prevMSTimeF;
+    // Calculate delta time based on the MSTimeF
+    // difference and target frequency:
+    my_deltaTime = msdiff / MY_DELTAFREQ;
+    // Cache the current MSTimeF:
+    my_prevMSTimeF = curMSTimeF;
+}
+```
+
+Now, this function has to run in our `Draw()` override unconditionally all the time:
+
+```csharp
+override void Draw(int state, double TicFrac)
+{
+    Super.Draw(state, TicFrac);
+    if (state == HUD_None || state == HUD_AltHUD)
+    {
+        return;
+    }
+
+    BeginHUD();
+    // Update delta time first:
+    My_UpdateDeltaTime();
+
+    // the rest of our Draw() override
+}
+```
+
+And this is it. Now, all we need to do is convert our timers to `double`s, move them to `Draw()` and multiply all incrementation by `my_deltaTime`.
+
+Let's use our weapon icon animation discussed in the section above. Previously we declared this field as a timer:
+
+```csharp
+int my_WeaponSwapTics;
+```
+
+We now need to change it to a `double`:
+
+```csharp
+double my_WeaponSwapTics;
+```
+
+Next, we will need to modify our functions. Previously we had `My_UpdateWeaponSwapTics()` in `Tick()` and `My_DrawWeaponIcon()` in `Draw()`, but now both things are going to happen in `Draw()`, so there's no reason to split the functions.
+
+So, we will *remove* `My_UpdateWeaponSwapTics()` and move most of its contents to `My_DrawWeaponIcon()` instead, with one simple change:
+
+```csharp
+void My_DrawWeaponIcon(Vector2 pos, int flags, Vector2 box)
+{
+    // As before, start by drawing everything:
+    Weapon selected = CPlayer.readyWeapon;
+    if (!selected) return; // Do nothing if no weapon is selected
+
+    double vertOfs = 0;
+    if (my_WeaponSwapTics > 0)
+    {
+        if (my_WeaponSwapTics >= MY_WEAPONSWAPTIME * 0.5)
+        {
+            vertOfs = box.y * My_Math.LinearMap(my_WeaponSwapTics, MY_WEAPONSWAPTIME, MY_WEAPONSWAPTIME * 0.5, 0.0, 1.0, true);
+        }
+        else
+        {
+            vertOfs = box.y * My_Math.LinearMap(my_WeaponSwapTics, MY_WEAPONSWAPTIME * 0.5, 0, 1.0, 0.0, true);
+        }
+    }
+    Fill(0xffcccc00, pos.x - 1, pos.y + vertOfs - 1, box.x + 2, box.y + 2, flags);
+    DrawInventoryIcon(selected,
+        pos + box*0.5 + (0, vertOfs),
+        flags|DI_ITEM_CENTER,
+        boxsize: box
+    );
+
+    // And this part is what we previously had in My_UpdateWeaponTics():
+    Weapon pending = CPlayer.pendingWeapon;
+    if (!my_currentWeapon)
+    {
+        my_currentWeapon = selected;
+    }
+    else if (pending && pending != WP_NOCHANGE && pending != my_currentWeapon)
+    {
+        my_currentWeapon = pending;
+        my_WeaponSwapTics = MY_WEAPONSWAPTIME;
+    }
+    else if (my_WeaponSwapTics > 0)
+    {
+        // Here's the change: instead of subtracting 1, we are now
+        // subtracting 1 multiplied by delta time:
+        my_WeaponSwapTics -= 1.0 * my_deltaTime;
+    }
+}
+```
+
+Now, just make sure this is called in `Draw()` after updating delta time:
+
+```csharp
+override void Draw(int state, double TicFrac)
+{
+    Super.Draw(state, TicFrac);
+    if (state == HUD_None || state == HUD_AltHUD)
+    {
+        return;
+    }
+
+    BeginHUD();
+    // Update delta time first:
+    My_UpdateDeltaTime();
+    // Draw weapon icon (using delta time):
+    My_DrawWeaponIcon((-144, -24), DI_SCREEN_RIGHT_BOTTOM, (32, 24));
+
+    // the rest of our Draw() override
+}
+```
+
+The rest of the HUD code stays the same, except don't forget to *remove* `My_UpdateWeaponSwapTics()` from your `Tick()` override, since we are no longer using that function.
+
+And this is it. Now, thanks to delta time, `my_WeaponSwapTics` (which is now a `double`) will be updated every frame, each time to a different value, so it's not affected by the game's framerate.
+
+Unfortunately, I can't put a GIF here that would show you the result, because GIFs' framerate is too low to see the difference, but trust me, it's *very* noticeable in-game: the icon will roll with the same speed, but it'll happen much more smoothly.
 
 ### Interpolated animation with fractional tics
 
-TBA
+We've talked about interpolating a value that is supposed to change at a fixed pace. But there are cases where you don't actually care about the pace, and instead you simply want to interpolate whenever possible. This is where fractional tics come into play.
+
+##### Explanation of tic fraction
+
+For example, imagine you have something like a compass in your HUD: an element that rotates relative to player's facing angle, to show where they're facing on the map. The key value in an element like this is going to be `CPlayer.mo.angle`, which is our global facing angle. But there's one problem with it: while the engine itself has subtic interpolation (and thus, rotating the camera feels smooth), the actual `angle` value only updates with the engine's ticrate (i.e. 35 times per second), and even if we try to read it every frame, from our HUD's `Draw()`, the value will still only update 35 times per second. This means that our rotating element won't update particularly smoothly.
+
+The solution here is to introduce *our own* subtic interpolation. How do we do that? Well, actually, it's a fairly simple process, and it goes like this:
+
+* cache the player's `angle` from previous tic in a variable;
+
+* whenever `angle` changes, compare the new value (from the current tic) with the value from the previous tic we've cached;
+
+* when drawing our rotating element, don't pass the `angle` directly, but rather pass an intermediary `angle` between the value from the current tic and the value from the previous tic.
+
+So, how do we get that intermediary angle value? Well, we've already determined that we're going to do this in `Draw()`. This means that our code will be executed multiple times per tic (since, of course, framerate is normally much higher than ticrate). All we need to know is *how far* a specific frame is from the beginning of the current game tic. And, thankfully, that value is already directly available in `Draw()`: it's the function's `TicFrac` argument, which indeed stands for "tic fraction."
+
+At this point you probably realize we're dealing with a situation similar to delta time from the previous section, which is true, because both cases are about subtic inteprolation. However, there's a key difference: delta time is used when we need to update a value so it reaches a next value over a specific amount of time (for example, we need it to increase by 1.0 over exactly 1 tic). Here, however, we already *know* both values (it's the angle value during the previous tic and angle during the current tic), we're not updating anything; all we need is to get the interpolated value between them for the current frame, and to do this each frame all we need is the distance (i.e. the fraction of a tic) between them.
+
+Thus, all we need is this:
+
+```
+interpolatedValue = previousValue + (currentValue - previousValue) * fraction
+```
+
+i.e., in our case, angle from previous tic plus the difference between angle from current tic and angle from previous tic multiplied by tic fraction. This is what is called linear interpolation, aka "lerp".
+
+Alternative, often-cited version of the smae formula is:
+
+```
+interpolatedValue = (previousValue * (1.0 - fraction)) + (currentValue * fraction)
+```
+
+but there's no functional difference between them (the second one may be impercetably more computationally expensive due to having two multiplications vs one, but may be a little more stable in terms of float-point precision, but this is something you'll likely never have to worry about in modding).
+
+##### Implementing tic fraction
+
+We'll start with the compass itself. Since this is a very simple example, we'll just create a simple 128x128px image:
+
+![](HUDguides/customHUD/graphics/myHudCompass.png)
+
+(This image is included with this example guide, you can find it [here](HUDguides/customHUD/graphics)).
+
+We will be using [`DrawImageRotated()`](https://zdoom.org/wiki/DrawImageRotated) to draw this image. This function is similar to `DrawImage()` but it can also rotate the provided graphic. *However*, there are some important notes about it:
+
+* `DrawImageRotated()` is one of the few BaseStatusBar functions that DO care about the graphic's offsets as set in SLADE, and it ignores `DI_ITEM*` flags. This function specifically rotates the image around its (0, 0) position, so, since we want to rotate it around its center, we need to set its offsets in slade to half of its dimensions, i.e. -64, -64 (because this is a 128x128px image).
+
+* This function's `scale` argument is also unique in that it uses inverse scale: i.e. `(0.25, 0.25)` scale is 4 times *larger*, while `(4, 4)` is 4 times *smaller*.
+
+Now, we will need to add a few more fields into our HUD:
+
+```csharp
+class MyFullscreenHUD : BaseStatusBar
+{
+    // This will track player's angle from current
+    // and previous tics:
+    double my_currPlayerAngle;
+    double my_prevPlayerAngle;
+    // This will track level time, i.e. when we last
+    // updated player's angle:
+    int my_currLevelTime;
+    int my_prevLevelTime;
+
+    // the rest of your HUD code
+}
+```
+
+We will need to update those fields in your HUD's `Tick()` (NOT `Draw()`!), so add them there:
+
+```csharp
+override void Tick()
+{
+    Super.Tick();
+
+    // Make sure PlayerPawn exists first:
+    if (CPlayer.mo)
+    {
+        // Check if current level time is higher than
+        // last cached time:
+        if (Level.mapTime > my_currLevelTime)
+        {
+            // Order is important! Update prev values
+            // before current ones!
+
+            // Set prev angle to currently tracked one:
+            my_prevPlayerAngle = my_currPlayerAngle;
+            // Set current angle to the actual current one:
+            my_currPlayerAngle = CPlayer.mo.angle;
+            // Set prev time to currently tracked one:
+            my_prevLevelTime = my_currLevelTime;
+            // Set current one to the actual current one:
+            my_currLevelTime = Level.mapTime;
+        }
+    }
+}
+```
+
+With that, we can finally make our compass-drawing function. Like our other custom functions, it'll have `pos` and `flags` arguments, but also `TicFrac` argument, where we will pass `TicFrac` from our HUD's `Draw()` override:
+
+```csharp
+void My_DrawCompass(Vector2 pos, int flags, double TicFrac)
+{
+    // Calcualte the interpolated angle, interpolating lienarly
+    // from previous angle to current angle by tic fraction:
+    double lerpedAngle = my_prevPlayerAngle + (my_currPlayerAngle - my_prevPlayerAngle) * TicFrac;
+    // And to project it to the screen, so the top is up,
+    // and rotate it so N points to the north of the map,
+    // we need to negate it and add 90:
+    double pAngle = -lerpedAngle + 90;
+
+    // Finally, draw the rotated graphic, using 'pAngle'
+    // for the rotation:
+    DrawImageRotated("graphics/myHudCompass.png",
+        pos,
+        flags,
+        pAngle,
+        scale: (4, 4)
+    );
+}
+```
+
+Finally, add it to `Draw()`:
+
+```csharp
+override void Draw(int state, double TicFrac)
+{
+    Super.Draw(state, TicFrac);
+    if (state == HUD_None || state == HUD_AltHUD)
+    {
+        return;
+    }
+
+    BeginHUD();
+
+    // Other Draw() functions
+
+    // Draw at the top center of the screen, offset 20px down,
+    // so it's close to the top edge:
+    My_DrawCompass((0,20), DI_SCREEN_CENTER_TOP, TicFrac);
+
+    // Other Draw() functions
+}
+```
+
+And with that we're done! The vertical offset will need to be adjusted if you decide to change the `scale` value of `DrawImageRotated()`, but you get the idea. 
+
+This compass will rotate very smoothly, updating with every frame. The last thing you might want to do, though, is disable aspect ratio correction for this element, as described [earlier in the guide](#force-11-aspect-ratio-without-disabling-ui-scaling). Since this element is circular, it looks rather bad when stretched to due to aspect scaling, so you can modify it like this:
+
+```csharp
+void My_DrawCompass(Vector2 pos, int flags, double TicFrac)
+{
+    double lerpedAngle = my_prevPlayerAngle + (my_currPlayerAngle - my_prevPlayerAngle) * TicFrac;
+    double pAngle = -lerpedAngle + 90;
+
+    // Start with a base scale of (4, 4):
+    Vector2 cScale = (4, 4);
+    // Check if player's HUD is being aspect-corrected:
+    if (hud_aspectscale == true)
+    {
+        // If so, divide Y position by 1.2:
+        pos.y /= 1.2;
+        // ...and multiply Y scale by 1.2 (we need multiplication
+        // instead of division because DrawImageRotated uses 
+        // inverse scaling):
+        cScale.y *= 1.2;
+    }
+
+    DrawImageRotated("graphics/myHudCompass.png",
+        pos,
+        flags,
+        pAngle,
+        scale: cScale
+    );
+}
+```
+
+This will force the compass to be drawn always circular.
 
 ------
 

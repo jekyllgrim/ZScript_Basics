@@ -11,8 +11,19 @@ class MyFullscreenHUD : BaseStatusBar
 	LinearValueInterpolator my_healthIntr;
 	
 	const MY_WEAPONSWAPTIME = 20;
-	int my_WeaponSwapTics;
+	double my_WeaponSwapTics;
 	Weapon my_currentWeapon;
+
+	// Delta time:
+	double my_prevMSTimeF;
+	double my_deltaTime;
+	const MY_DELTAFREQ = 1000.0 / TICRATE;
+
+	// Compass:
+	double my_prevPlayerAngle;
+	double my_currPlayerAngle;
+	int my_prevLevelTime;
+	int my_currLevelTime;
 
 	override void Init()
 	{
@@ -46,6 +57,8 @@ class MyFullscreenHUD : BaseStatusBar
 		}
 
 		BeginHUD();
+		// Update delta time first:
+		My_UpdateDeltaTime();
 		// Draw health and armor:
 		My_DrawHealthArmor((4, 0), DI_SCREEN_LEFT_BOTTOM);
 		// Draw current ammo:
@@ -78,6 +91,8 @@ class MyFullscreenHUD : BaseStatusBar
 				);
 			}
 		}
+
+		My_DrawCompass((0,20), DI_SCREEN_CENTER_TOP, TicFrac);
 	}
 
 	override void Tick()
@@ -87,30 +102,28 @@ class MyFullscreenHUD : BaseStatusBar
 		if (CPlayer.mo)
 		{
 			my_healthIntr.Update(CPlayer.mo.health);
-			My_UpdateWeaponSwapTics();
+
+			if (Level.mapTime > my_currLevelTime)
+			{
+				my_prevPlayerAngle = my_currPlayerAngle;
+				my_currPlayerAngle = CPlayer.mo.angle;
+				my_prevLevelTime = my_currLevelTime;
+				my_currLevelTime = Level.mapTime;
+			}
 		}
 	}
 
-	void My_UpdateWeaponSwapTics()
+	void My_UpdateDeltaTime()
 	{
-		Weapon selected = CPlayer.readyWeapon;
-		Weapon pending = CPlayer.pendingWeapon;
+		double curMSTimeF = MSTimeF();
+		if (my_prevMSTimeF == 0)
+		{
+			my_prevMSTimeF = curMSTimeF;
+		}
 
-		if (!selected) return;
-
-		if (!my_currentWeapon)
-		{
-			my_currentWeapon = selected;
-		}
-		else if (pending && pending != WP_NOCHANGE && pending != my_currentWeapon)
-		{
-			my_currentWeapon = pending;
-			my_WeaponSwapTics = MY_WEAPONSWAPTIME;
-		}
-		else if (my_WeaponSwapTics > 0)
-		{
-			my_WeaponSwapTics--;
-		}
+		double msdiff = curMSTimeF - my_prevMSTimeF;
+		my_deltaTime = msdiff / MY_DELTAFREQ;
+		my_prevMSTimeF = curMSTimeF;
 	}
 
 	void My_DrawWeaponIcon(Vector2 pos, int flags, Vector2 box)
@@ -136,6 +149,21 @@ class MyFullscreenHUD : BaseStatusBar
 			flags|DI_ITEM_CENTER,
 			boxsize: box
 		);
+
+		Weapon pending = CPlayer.pendingWeapon;
+		if (!my_currentWeapon)
+		{
+			my_currentWeapon = selected;
+		}
+		else if (pending && pending != WP_NOCHANGE && pending != my_currentWeapon)
+		{
+			my_currentWeapon = pending;
+			my_WeaponSwapTics = MY_WEAPONSWAPTIME;
+		}
+		else if (my_WeaponSwapTics > 0)
+		{
+			my_WeaponSwapTics -= 1.0 * my_deltaTime;
+		}
 	}
 
 	Color My_GetInterColor(Color from, Color to, double distance)
@@ -536,6 +564,26 @@ class MyFullscreenHUD : BaseStatusBar
 			);
 			pos.y += iconSize.y;
 		}
+	}
+
+	void My_DrawCompass(Vector2 pos, int flags, double TicFrac)
+	{
+		double lerpedAngle = my_prevPlayerAngle + (my_currPlayerAngle - my_prevPlayerAngle) * TicFrac;
+		double pAngle = -lerpedAngle + 90;
+
+		Vector2 cScale = (4, 4);
+		if (hud_aspectscale == true)
+		{
+			cScale.y *= 1.2;
+			pos.y /= 1.2;
+		}
+
+		DrawImageRotated("graphics/myHudCompass.png",
+			pos,
+			flags,
+			pAngle,
+			scale: cScale
+		);
 	}
 }
 
