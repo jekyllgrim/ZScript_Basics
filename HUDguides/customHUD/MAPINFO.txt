@@ -1,4 +1,5 @@
 GameInfo
 {
 	StatusBarClass = "MyFullscreenHUD"
+	AddEventHandlers = "My_HudHandler"
 }

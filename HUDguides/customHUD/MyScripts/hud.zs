@@ -7,8 +7,9 @@ class MyFullscreenHUD : BaseStatusBar
 	array< class<Ammo> > my_ammoToDisplay;
 	
 	InventoryBarState my_invbar;
+	double my_invbarSelectOfsX;
 	
-	LinearValueInterpolator my_healthIntr;
+	My_LinearValueInterpolatorUI my_healthIntr;
 	
 	const MY_WEAPONSWAPTIME = 20;
 	double my_WeaponSwapTics;
@@ -28,10 +29,11 @@ class MyFullscreenHUD : BaseStatusBar
 		Super.Init();
 
 		// Make health bar interpolator:
-		my_healthIntr = LinearValueInterpolator.Create(100, 1);
+		my_healthIntr = My_LinearValueInterpolatorUI.Create(100, 1);
 
 		// Make inventory bar:
 		my_invbar = InventoryBarState.Create();
+		my_invbarSelectOfsX = my_invbar.selectofs.x;
 
 		// Make font:
 		Font f = Font.FindFont('BigFont');
@@ -58,7 +60,11 @@ class MyFullscreenHUD : BaseStatusBar
 		// Update delta time first:
 		My_UpdateDeltaTime();
 		// Draw health and armor:
-		My_DrawHealthArmor((4, 0), DI_SCREEN_LEFT_BOTTOM);
+		if (CPlayer.mo)
+		{
+			my_healthIntr.Update(CPlayer.mo.health, my_deltaTime);
+			My_DrawHealthArmor((4, 0), DI_SCREEN_LEFT_BOTTOM);
+		}
 		// Draw current ammo:
 		My_DrawCurrentAmmo((-4, 0), DI_SCREEN_RIGHT_BOTTOM);
 		// Draw weapon icon:
@@ -88,6 +94,15 @@ class MyFullscreenHUD : BaseStatusBar
 					scale: (0.5, 0.5)
 				);
 			}
+
+			if (my_invbar.selectofs.x > my_invbarSelectOfsX)
+			{
+				my_invbar.selectofs.x -= min(2.0 * TicFrac, abs(my_invbar.selectofs.x) - abs(my_invbarSelectOfsX));
+			}
+			else if (my_invbar.selectofs.x < my_invbarSelectOfsX)
+			{
+				my_invbar.selectofs.x += min(2.0 * TicFrac, abs(my_invbar.selectofs.x) - abs(my_invbarSelectOfsX));
+			}
 		}
 
 		My_DrawCompass((0,20), DI_SCREEN_CENTER_TOP, TicFrac);
@@ -99,8 +114,6 @@ class MyFullscreenHUD : BaseStatusBar
 
 		if (CPlayer.mo)
 		{
-			my_healthIntr.Update(CPlayer.mo.health);
-
 			my_prevPlayerAngle = my_currPlayerAngle;
 			my_currPlayerAngle = CPlayer.mo.angle;
 		}
@@ -187,10 +200,10 @@ class MyFullscreenHUD : BaseStatusBar
 		if (health > 0)
 		{
 			double maxHealth = CPlayer.mo.GetMaxHealth();
-			double interFrac = my_healthIntr.GetValue () / maxHealth;
+			double interFrac = clamp(my_healthIntr.GetValue () / maxHealth, 0.0, 1.0);
 			Fill(0xffcccccc, pos.x, pos.y, int(round( width * interFrac )), height, flags);
 
-			double frac = health / maxhealth;
+			double frac = clamp(health / maxhealth, 0.0, 1.0);
 			Color healthColor = My_GetInterColor(0xffff0000, 0xff00ff00, frac);
 			width = int(round( width * frac ));
 			Fill(healthColor, pos.x, pos.y, width, height, flags);
@@ -578,6 +591,20 @@ class MyFullscreenHUD : BaseStatusBar
 			scale: cScale
 		);
 	}
+
+	void My_CycleInvBarRight()
+	{
+		if (!my_invbar) return;
+
+		my_invbar.selectofs.x -= my_invbar.boxsize.x;
+	}
+
+	void My_CycleInvBarLeft()
+	{
+		if (!my_invbar) return;
+
+		my_invbar.selectofs.x += my_invbar.boxsize.x;
+	}
 }
 
 class My_Math
@@ -597,5 +624,69 @@ class My_Math
 			d = Clamp(d, truemin, truemax);
 		}
 		return d;
+	}
+}
+
+class My_HudHandler : EventHandler
+{
+	override bool InputProcess (InputEvent e)
+	{
+		if (e.Type != InputEvent.Type_KeyDown)
+		{
+			return false;
+		}
+
+		let myhud = MyFullscreenHUD(statusbar);
+		if (!myhud) return false;
+
+		array<int> buttons;
+		Bindings.GetAllKeysForCommand(buttons, "invnext");
+		if(buttons.Find(e.keyScan) != buttons.Size())
+		{
+			myhud.My_CycleInvBarRight();
+		}
+		buttons.Clear();
+		Bindings.GetAllKeysForCommand(buttons, "invprev");
+		if(buttons.Find(e.keyScan) != buttons.Size())
+		{
+			myhud.My_CycleInvBarLeft();
+		}
+		return false;
+	}
+}
+
+class My_LinearValueInterpolatorUI : Object
+{
+	double mCurrentValue;
+	double mMaxChange;
+
+	static My_LinearValueInterpolatorUI Create(double startval, double maxchange)
+	{
+		let v = new("My_LinearValueInterpolatorUI");
+		v.mCurrentValue = startval;
+		v.mMaxChange = maxchange;
+		return v;
+	}
+
+	void Reset(double value)
+	{
+		mCurrentValue = value;
+	}
+
+	void Update(double destvalue, double deltatime = 1.0)
+	{
+		if (mCurrentValue > destvalue)
+		{
+			mCurrentValue = max(destvalue, mCurrentValue - mMaxChange * deltatime);
+		}
+		else
+		{
+			mCurrentValue = min(destvalue, mCurrentValue + mMaxChange * deltatime);
+		}
+	}
+	
+	double, int GetValue()
+	{
+		return mCurrentValue, int(round(mCurrentValue));
 	}
 }
