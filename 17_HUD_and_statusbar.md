@@ -40,10 +40,10 @@
    * [Drawing current ammo and weapon](#drawing-current-ammo-and-weapon)
    * [Colorizing ammo numbers](#colorizing-ammo-numbers)
    * [Drawing keys](#drawing-keys)
+   * [Drawing inventory bar](#drawing-inventory-bar)
 - [Advanced HUD systems](#advanced-hud-systems)
    * [Drawing all possessed ammo](#drawing-all-possessed-ammo)
    * [Multi-game compatibility](#multi-game-compatibility)
-   * [Drawing inventory bar](#drawing-inventory-bar)
    * [Animated bars](#animated-bars)
    * [Animated graphic indicators](#animated-graphic-indicators)
    * [Smooth animation with delta time](#smooth-animation-with-delta-time)
@@ -1191,9 +1191,9 @@ Boot into the game, and you'll see our health numbers are now colorized:
 
 ### Colorizing armor numbers
 
-Okay, what about armor, then? Well, the approach is very simple, and technically, you could use the same ranges. However, in practice *traditionally* armor numbers are designed to reflect **armor absorption** rather than the **amount of armor**. You know how you can pick up blue armor and then, once you're damaged enough, its amount may fall below 100, but it's still a *blue* armor and offers higher absorption than green armor? Yeah, that's absorption, which is a separate value from amount.
+Okay, what about armor, then? Well, the approach is very similar to health numbers, and technically, you could use the same ranges. However, in practice *traditionally* armor numbers are designed to reflect **armor absorption** rather than the **amount of armor**. You know how you can pick up blue armor and then, once you're damaged enough, its amount may fall below 100, but it's still a *blue* armor and offers higher absorption than green armor? Yeah, that's absorption, which is a separate value from amount.
 
-Armor's absorption is stored in the BasicArmor's `savePercent` value. This is a `double` value in the 0.0–1.0 range. Alternatively, BaseStatusBar also comes with a dedicated function, `GetArmorAmount()`, which returns an `int` value in the 0–100 range, which is the percentage; you can use whichever works for you.
+Armor's absorption is stored in the BasicArmor's `savePercent` value. This is a `double` value in the 0.0–1.0 range. Alternatively, BaseStatusBar also comes with a dedicated function, `GetArmorSavePercent()`, which returns an `int` value in the 0–100 range, which is the percentage; you can use whichever works for you.
 
 For this example, we'll be reading the `savePercent` field directly, because we're already obtaining a pointer to BasicArmor in `My_DrawHealthArmor()`. This means, that now we'll have to design a function that returns different font colors — much like `My_GetHealthColor()` we made earlier — but it'll take a `double` value in a 0.0–1.0 range.
 
@@ -1795,7 +1795,7 @@ We'll define the function as follows:
 void My_DrawKeys(Vector2 pos, int flags, Vector2 iconSize, int indent = 0)
 ```
 
-It'll have arguments for position and flags, like our other functions, but I also decided to define `iconSize` and `indent` as the function's argument. `iconSize`, similarly to our previous functions, will define the maximum size of the icon, and `indent` will determine how many empty pixels there will be between the icons horizontally and vertically, so they're not completely smushed together.
+It'll have arguments for position and flags, like our other functions, but I also decided to define `iconSize` and `indent` as the function's arguments. `iconSize`, similarly to our previous functions, will define the maximum size of the icon, and `indent` will determine how many empty pixels there will be between the icons horizontally and vertically, so they're not completely smooshed together.
 
 Now, here's the function itself:
 
@@ -1824,8 +1824,8 @@ void My_DrawKeys(Vector2 pos, int flags, Vector2 iconSize, int indent = 0)
             DrawInventoryIcon(k, kpos + iconOfs, flags|DI_ITEM_CENTER, boxSize: iconSize);
         }
         // Now handle rows and columns.
-        // If we're still at column 1 or 2, just move the horizontal drawing
-        // position to the left, and increment 'column':
+        // If we're still at column 1 or 2, just move the horizontal
+        // drawing position to the right and increment 'column':
         if (column < 3)
         {
             kpos.x += iconSize.x + indent;
@@ -1941,6 +1941,119 @@ We're now using 12x12 icons with 1px of indentation. Here's how it'll look in th
 
 ![](assets/2025-06-01-03-35-12-image.png)
 
+### Drawing inventory bar
+
+The inventory bar is something you might've seen in Heretic, Hexen or Strife. Doom by default doesn't have any items that *aren't* used immediately on pickup, but some mods for it may use them. For any of those cases, you might want an inventory bar in your HUD.
+
+An inventory bar is a row of icons that represent items in player's inventory that have the `+Inventory.INVBAR` flag set in their Default block. The bar draws their icon in the order the items are placed in player's inventory, draws their amounts, and also draws a selector for the currently selected item.
+
+In addition to the inventory bar. normally HUDs will also display the currently selected item separately, while the bar itself will only be draw when the player presses "next item"/"previous item" keys, and will disappear shortly after if there's no input. The PlayerPawn class has an `Inventory InvSel` field which contains a pointer to the currently selected item, so, from a HUD we can reach it with `CPlayer.mo.InvSel`.
+
+By default, most of the inventory bar functionality is handled through a separate ui-scoped class: InventoryBarState. You can find its definition in GZDoom at [zscript/ui/statusbar/statusbar.zs](https://github.com/ZDoom/gzdoom/blob/master/wadsrc/static/zscript/ui/statusbar/statusbar.zs), but normally you don't need to know the details, since the purpose of this class is that you just create an instance of it in your HUD's `Init()`, and then it handles the data for you. To draw the data stored in InventoryBarState you have a dedicated BaseStatusBar function: [`DrawInventoryBar`](https://www.zdoom.org/wiki/DrawInventoryBar_(BaseStatusBar)).
+
+While this approach comes with some limitations, it makes things very simple, since you don't need to worry about building a complex visual element for your inventory bar. To draw the bar using this method, you need to do the following:
+
+1. Declare an `InventoryBarState`-type field in your HUD class
+
+2. Create an instance of InventoryBarState and store it in the aforementioned field
+
+3. In your `Draw()`, override check if the inventory bar display is allowed with `if (!level.NoInventoryBar)`
+
+4. Call `IsInventoryBarVisible()` in your HUD to check if the bar is supposed to be visible (meaning, the player is currently cycling through it); if so, call `DrawInventoryBar` to draw it.
+
+5. Use `DrawInventoryIcon()`/`DrawString()` to draw the currently selected item.
+
+Overall, we're looking at something like this:
+
+```csharp
+class MyFullscreenHUD : BaseStatusBar
+{
+    HUDFont my_BigFont;
+    double my_BigFontHeight;
+    HUDFont my_BigFontMono;
+    InventoryBarState my_invbar;
+
+    override void Init()
+    {
+        Super.Init();
+
+        // Make InventoryBarState:
+        my_invbar = InventoryBarState.Create();
+
+        Font f = Font.FindFont('BigFont');
+        if (f)
+        {
+            my_BigFont = HUDFont.Create(f);
+            my_BigFontHeight = f.GetHeight();
+            my_BigFontMono = HUDFont.Create(f, f.GetCharWidth("0"), Mono_CellLeft);
+        }
+    }
+
+    override void Draw(int state, double TicFrac)
+    {
+        Super.Draw(state, TicFrac);
+        if (state == HUD_None || state == HUD_AltHUD)
+        {
+            return;
+        }
+
+        BeginHUD();
+
+        [...] // Draw your ammo, health, etc. here (omitted for brevity)
+
+        // Draw inventory bar:
+
+        // First, check if it's allowed to be displayed:
+        if (!level.NoInventoryBar)
+        {
+            // This function returns true when the player is cycling
+            // through the inventory bar, i.e. we need to draw it:
+            if (IsInventoryBarVisible())
+            {
+                // This will draw inventory bar, using our previously
+                // created InventoryBarState instance. This bar can display
+                // up to 7 items, and will be drawn 40 units above the
+                // center bottom of the screen:
+                DrawInventoryBar(my_invbar, (0, -40), 7, DI_SCREEN_CENTER_BOTTOM);
+            }
+            // Now, additionally we'll draw the currently selected item.
+            // First, try casting and null-checking it:
+            Inventory selectedItem = CPlayer.mo.InvSel;
+            if (selectedItem)
+            {
+                // If so, we'll draw selected item next to our health/armor
+                // indicator: bottom left corner, 80 pixels to the right:
+                DrawInventoryIcon(selectedItem,
+                    (80, -2),
+                    DI_SCREEN_LEFT_BOTTOM|DI_ITEM_BOTTOM
+                );
+                // And we'll draw its amount right above it:
+                DrawString(my_BigFont,
+                    String.Format("%d", selectedItem.amount),
+                    (80, -34),
+                    DI_SCREEN_LEFT_BOTTOM|DI_TEXT_ALIGN_CENTER, //horizontally centered
+                    scale: (0.5, 0.5) //scaled down to fit better
+                );
+            }
+        }
+    }
+
+    [...] // Draw the rest of your HUD (omitted for brevity)
+}
+```
+
+To test this, I'll load up Heretic, since Doom doesn't come with carriable items by default. Use the `give all` cheat to give yourself all items.
+
+In the bottom left, next to our health/armor display, we can see a Morph Ovum icon with an amount (16) above it — this is our currently selected item:
+
+![](assets/2025-06-05-15-10-22-image.png)
+
+And if we press "next item"/"previous item" button, the inventory bar will show up:
+
+![](assets/2025-06-05-15-10-32-image.png)
+
+Note that we don't have to do anything manually here. InventoryBarState automatically handles sizes, icon backgrounds, the movable selector, the little blue arrow on the right that shows that there are more than 7 items, etc. All we needed to do was `InventoryBarState.Create()` and then `DrawInventoryBar()`, basically.
+
 ## Advanced HUD systems
 
 In this subsection we'll cover some slightly more advanced HUD systems that you may want to add but aren't necessarily an obligatory part of the HUD.
@@ -2011,7 +2124,7 @@ void My_DrawAllAmmo(Vector2 pos, int flags, Vector2 iconSize)
 
 This is our overall structure. Now, let's get into the nitty-gritty of the functions themselves.
 
-Before we do that, one important note about slots. Slots are like an array, their indexes go from 0 to 9 — since this is how many numeric buttons we have to assign weapons to. HOWEVER, note that on the keyboard button 0 goes *after* 9, while button 1 is the first one. So, we will not be iterating from 0 to 9; we will be iterating in the order of 1, 2, 3, 4, 5, 6, 7, 8, 9, 0. I.e. 0 is at the end. This requires a few extra conditions.
+Before we do that, one important note about slots. Slots are like an array, their indexes go from 0 to 9 — since this is how many numeric buttons we have to assign weapons to. HOWEVER, note that on the keyboard button 0 goes *after* 9, while button 1 is the first one. So, we will not be iterating from 0 to 9; we will be iterating in the order of 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 (i.e. 0 is at the end). This requires a few extra conditions.
 
 Now, let's look at our data retrieval function:
 
@@ -2302,7 +2415,7 @@ Re-check the result in-game:
 
 ![](assets/2025-06-02-18-07-58-image.png)
 
-Nice, everything is neatly aligned. Remember: read `maxamount` of an Ammo instance in player's inventory, not of its default definition obtained with `GetDefaultByType()`, because the ammo the player owns can have its maxamount changed (this is what the Backpack does, for example).
+Nice, everything is neatly aligned. Remember: read `maxamount` off an Ammo instance in player's inventory, not off its default definition obtained with `GetDefaultByType()`, because the ammo the player owns can have its maxamount changed (this is what the Backpack does, for example).
 
 Optionally, you can colorize these numbers just like we [colorized ammo for the current weapon earlier in the chapter](#Colorizing-ammo-numbers).
 
@@ -2435,120 +2548,7 @@ else
 }
 ```
 
-If the positions look a bit odd to you, remember that `Fill()` simply draws a color bar from it's x, y position, always directed to the right and down.
-
-### Drawing inventory bar
-
-The inventory bar is something you might've seen in Heretic, Hexen or Strife. Doom by default doesn't have any items that *aren't* used immediately on pickup, but some mods for it may use them. For any of those cases, you might want an inventory bar in your HUD.
-
-An inventory bar is a row of icons that represent items in player's inventory that have the `+Inventory.INVBAR` flag set in their Default block. The bar draws their icon in the order the items are placed in player's inventory, draws their amounts, and also draws a selector for the currently selected item.
-
-In addition to the inventory bar. normally HUDs will also display the currently selected item separately, while the bar itself will only be draw when the player presses "next item"/"previous item" keys, and will disappear shortly after if there's no input. The PlayerPawn class has an `Inventory InvSel` field which contains a pointer to the currently selected item, so, from a HUD we can reach it with `CPlayer.mo.InvSel`.
-
-By default, most of the inventory bar functionality is handled through a separate ui-scoped class: InventoryBarState. You can find its definition in GZDoom at [zscript/ui/statusbar/statusbar.zs](https://github.com/ZDoom/gzdoom/blob/master/wadsrc/static/zscript/ui/statusbar/statusbar.zs), but normally you don't need to know the details, since the purpose of this class is that you just create an instance of it in your HUD's `Init()`, and then it handles the data for you. To draw the data stored in InventoryBarState you have a dedicated BaseStatusBar function: [`DrawInventoryBar`](https://www.zdoom.org/wiki/DrawInventoryBar_(BaseStatusBar)).
-
-While this approach comes with some limitations, it makes things very simple, since you don't need to worry about building a complex visual element for your inventory bar. To draw the bar using this method, you need to do the following:
-
-1. Declare an `InventoryBarState`-type field in your HUD class
-
-2. Create an instance of InventoryBarState and store it in the aforementioned field
-
-3. In your `Draw()`, override check if the inventory bar display is allowed with `if (!level.NoInventoryBar)`
-
-4. Call `IsInventoryBarVisible()` in your HUD to check if the bar is supposed to be visible (meaning, the player is currently cycling through it); if so, call `DrawInventoryBar` to draw it.
-
-5. Use `DrawInventoryIcon()`/`DrawString()` to draw the currently selected item.
-
-Overall, we're looking at something like this:
-
-```csharp
-class MyFullscreenHUD : BaseStatusBar
-{
-    HUDFont my_BigFont;
-    double my_BigFontHeight;
-    HUDFont my_BigFontMono;
-    InventoryBarState my_invbar;
-
-    override void Init()
-    {
-        Super.Init();
-
-        // Make InventoryBarState:
-        my_invbar = InventoryBarState.Create();
-
-        Font f = Font.FindFont('BigFont');
-        if (f)
-        {
-            my_BigFont = HUDFont.Create(f);
-            my_BigFontHeight = f.GetHeight();
-            my_BigFontMono = HUDFont.Create(f, f.GetCharWidth("0"), Mono_CellLeft);
-        }
-    }
-
-    override void Draw(int state, double TicFrac)
-    {
-        Super.Draw(state, TicFrac);
-        if (state == HUD_None || state == HUD_AltHUD)
-        {
-            return;
-        }
-
-        BeginHUD();
-
-        [...] // Draw your ammo, health, etc. here (omitted for brevity)
-
-        // Draw inventory bar:
-
-        // First, check if it's allowed to be displayed:
-        if (!level.NoInventoryBar)
-        {
-            // This function returns true when the player is cycling
-            // through the inventory bar, i.e. we need to draw it:
-            if (IsInventoryBarVisible())
-            {
-                // This will draw inventory bar, using our previously
-                // created InventoryBarState instance. This bar can display
-                // up to 7 items, and will be drawn 40 units above the
-                // center bottom of the screen:
-                DrawInventoryBar(my_invbar, (0, -40), 7, DI_SCREEN_CENTER_BOTTOM);
-            }
-            // Now, additionally we'll draw the currently selected item.
-            // First, try casting and null-checking it:
-            Inventory selectedItem = CPlayer.mo.InvSel;
-            if (selectedItem)
-            {
-                // If so, we'll draw selected item next to our health/armor
-                // indicator: bottom left corner, 80 pixels to the right:
-                DrawInventoryIcon(selectedItem,
-                    (80, -2),
-                    DI_SCREEN_LEFT_BOTTOM|DI_ITEM_BOTTOM
-                );
-                // And we'll draw its amount right above it:
-                DrawString(my_BigFont,
-                    String.Format("%d", selectedItem.amount),
-                    (80, -34),
-                    DI_SCREEN_LEFT_BOTTOM|DI_TEXT_ALIGN_CENTER, //horizontally centered
-                    scale: (0.5, 0.5) //scaled down to fit better
-                );
-            }
-        }
-    }
-
-    [...] // Draw the rest of your HUD (omitted for brevity)
-}
-```
-
-To test this, I'll load up Heretic, since Doom doesn't come with carriable items by default. Use the `give all` cheat to give yourself all items.
-
-In the bottom left, next to our health/armor display, we can see a Morph Ovum icon with an amount (16) above it — this is our currently selected item:
-
-![](assets/2025-06-05-15-10-22-image.png)
-
-And if we press "next item"/"previous item" button, the inventory bar will show up:
-
-![](assets/2025-06-05-15-10-32-image.png)
-
-Note that we don't have to do anything manually here. InventoryBarState automatically handles sizes, icon backgrounds, the movable selector, the little blue arrow on the right that shows that there are more than 7 items, etc. All we needed to do was `InventoryBarState.Create()` and then `DrawInventoryBar()`, basically.
+If the positions look a bit odd to you, remember that `Fill()` simply draws a rectangle, where the X, Y position is the rectangle's top left corner.
 
 ### Animated bars
 
@@ -2689,14 +2689,16 @@ We could try creating a function that takes two basic Color values (for example,
 ```csharp
 Color My_GetInterColor(Color from, Color to, double distance)
 {
+	// Clamp distance to 0.0-1.0 just in case, to avoid
+	// potential issues with incorrect given values:
     distance = clamp(distance, 0.0, 1.0);
     // Get a color between 'from' and 'to' based on
     // the provided 'distance' value:
     Color finalColor = Color(
-        int(round(from.a + (to.a - from.a)*distance)),
-        int(round(from.r + (to.r - from.r)*distance)),
-        int(round(from.g + (to.g - from.g)*distance)),
-        int(round(from.b + (to.b - from.b)*distance))
+        int(round(from.a + (to.a - from.a)*distance)), // alpha
+        int(round(from.r + (to.r - from.r)*distance)), // red
+        int(round(from.g + (to.g - from.g)*distance)), // green
+        int(round(from.b + (to.b - from.b)*distance))  // blue
     );
     return finalColor;
 }
@@ -2738,7 +2740,7 @@ This is the result:
 
 > Important note: **red-green color blindness is the most common type of color blindness**. So, hardcoding those colors like that might not be a very good idea. You could possibly let the user modify them with custom CVARs, or just provide different values, such as light-blue to orange.
 
-Now, we can take this a couple of steps further. Earliner I mentioned how a lot of games, especially fighting games, utilize essentially two bars: one updates instantly, while the other moves smoothly when the value changes. We can do this here too.
+Now, we can take this a couple of steps further. Earlier I mentioned how a lot of games, especially fighting games, utilize essentially two bars: one updates instantly, while the other moves smoothly when the value changes. We can do this here too.
 
 The trick here, of course, is not going to be about *drawing* two color rectangles — we're already drawing three, what's one more? — but rather about making the lower one interpolate. To do that, we'll need to make sure its value updates gradually rather than instantly, and that requires a separate system.
 
@@ -2810,15 +2812,16 @@ void My_DrawHealthBar(Vector2 pos, int width, int height, int flags)
         double maxHealth = CPlayer.mo.GetMaxHealth();
         // Divide interpolator's current value by
         // max health, to get a fraction for the lower,
-        // interpolated bar:
-        double interFrac = my_healthIntr.GetValue () / maxHealth;
+        // interpolated bar. Clamp it to 0.0-1.0 so the bar
+		// doesn't go beyond its intended boundaries:
+        double interFrac = clamp(my_healthIntr.GetValue () / maxHealth, 0.0, 1.0)
         // And draw the lower bar at the given position, multiplying
         // its width by the interpolated fraction:
         Fill(0xffcccccc, pos.x, pos.y, int(round( width * interFrac )), height, flags);
 
         // Continue to calculate the top bar's fraction
         // and draw it, like before:
-        double frac = health / maxhealth;
+        double frac = clamp(health / maxhealth, 0.0, 1.0);
         Color healthColor = My_GetInterColor(0xffff0000, 0xff00ff00, frac);
         width = int(round( width * frac ));
         Fill(healthColor, pos.x, pos.y, width, height, flags);
