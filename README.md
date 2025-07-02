@@ -1,6 +1,4 @@
-# ZScript Basics: A Guide for Non-Programmers (from a non-programmer)
-
-This guide is a beginner-friendly introduction to ZScript, a primary coding language used to code gameplay, UI and menus in GZDoom source port.
+**ZScript Basics** is a beginner-friendly introduction to ZScript, a primary coding language used to code gameplay, UI and menus in GZDoom source port.
 
 ☕ Support me:
 
