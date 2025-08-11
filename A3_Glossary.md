@@ -30,7 +30,7 @@ A variable that is a part of a [function](#Function). Also known as **parameter*
 
 ### Bit field
 
-An [integer](#Integer) [variable](#Variable) that is designed to hold multiple values. The intended values are [flags](#Flag) where each flag corresponds to a specific bit value: 2, 4, 8, 16, and so on. This provides a unique opportunity to use a single integer variable to hold multiple values. For example, if the value of the field is 12, we know that it contains flags 8 and 4 because no other combination can result in the total number of 12.
+An [integer](#Integer) [variable](#Variable) that is designed to hold multiple values. The intended values are [flags](#Flag) where each flag corresponds to a specific bit value: 2, 4, 8, 16, and so on. This provides a unique opportunity to use a single integer variable to hold multiple values. For example, if the value of the field is 12, we know that it contains flags 8 and 4 because no other combination can result in the total value of 12.
 
 Bit fields are often used as [arguments](#Argument) in [functions](#Function). See: [Flow Control - Bitwise Operators](A1_Flow_Control.md#bitwise-operators).
 
@@ -114,7 +114,7 @@ Very literally, an instance of an [object](#Object). For example, GZDoom comes w
 
 ### Instantiation
 
-The process of creating an [instance](#Instance) of something. For example, [actors](#Actor) are instantiated by being spawned in the map. See: [Pointers and casting](08_Pointers_and_casting.md).
+The process of creating an [instance](#Instance) of something. For example, [actors](#Actor) are instantiated by being spawned in the map with functions like `Spawn()`. See: [Pointers and casting](08_Pointers_and_casting.md).
 
 ### Integer
 
@@ -146,7 +146,7 @@ A function defined within a class. See: [Custom Functions](09_Custom_functions.m
 
 ### Mutable
 
-"Mutable" means "can be modified." Data that can be modified (for example, a [variable](#Variable)) can be described as mutable. The opposite of "immutable".
+"Mutable" means "can be modified." Data that can be modified (for example, a [variable](#Variable)) can be described as mutable. Antonym: [immutable](#Immutable).
 
 ### Nesting
 
@@ -175,6 +175,10 @@ The process of checking that something isn't null. Most of the time it looks lik
 In ZScript: the most basic [class](#Class). All classes inherit from Object. If you create a new class without a parent, it'll be implicitly inherited from Object.
 
 In a more general sense: any more or less clearly defined unit of data, such as a class, a struct, etc.
+
+### Operator
+
+Operators are constructs like `&&`, `||` and others that are used in logical [statements](#Statement). See [Flow control](A1_Flow_Control.md) and [ZScript operators on ZDoom Wiki](https://zdoom.org/wiki/Operators_(ZScript)).
 
 ### Parameter
 
@@ -248,11 +252,15 @@ Not to be confused with a [state label](#State label).
 
 ### State label
 
-A header for a series of [states](#State) inside a States block. State labels can converted to state pointers with `FindState()` and `ResolveState()`,  and jumped to with `goto`. If there's no `goto`, `loop` or another state control instruction at the end of a specific state sequence, the machine will just fall through to the next sequence.
+A header for a series of [states](#State) inside a States block such as "Spawn", "See", "Death", etc. State labels can converted to state pointers with `FindState()` and `ResolveState()`,  and jumped to with `goto`. If there's no `goto`, `loop` or another state control instruction at the end of a specific state sequence, the machine will just fall through to the next sequence.
 
 State labels are often referred to as just "states", which is incorrect: for example, a "Spawn" state label is specifically the *label* given to the spawn sequence, whereas a "Spawn state" would be only the first actual state of that sequence.
 
 See: [State Control](A1_Flow_Control.md#state-control).
+
+### Statement
+
+`if`, `else`, `switch`, `for` and other instructions that allow executing some part of a code conditionally, repeatedly and otherwise. See [Flow Control](A1_Flow_Control.md) and [ZScript Statements on ZDoom Wiki](https://zdoom.org/wiki/Statements).
 
 ### Thinker
 
@@ -264,19 +272,27 @@ A tic is a single unit of in-game time (this is not a GZDoom-specific term). GZD
 
 In contrast, things that happen in UI scope (such as drawing menus, the HUD, etc.) are not tied to tics. Everything that is drawn has to be drawn every frame, so it happens as frequently as possible, depending on the framerate the user is running GZDoom at. In vanilla Doom, the maximum framerate was the same as ticrate, but GZDoom has uncapped framerate.
 
+### Type
+
+Aka data type. Every [value](#Value) has a type: for example, `int`, `double`, `Vector3` are types.
+
+Pointers also have types: for example, the Actor class has a field `Actor target`; monsters use it to track who they're targetting. Since its type is `Actor`, it can contain a pointer to any instance of the Actor class or its subclasses.
+
+The [PlayerInfo struct](12.0_Player.md) has a `PlayerPawn mo` pointer that poitnts to the relevant PlayerPawn. This field can only point to instances of the PlayerPawn classes because its type is `PlayerPawn`.
+
 ### Value
 
 A piece of data, such as a number, a text string, a [pointer](#Pointer), or any other possible data type. Values can be obtained (e.g. via functions), stored (in variables) and manually set.
 
 ### Variable
 
-A piece of data of specific type, with a specific name. The [value](#Value) of that data can be not only read but also changed dynamically—hence it's "variable". Variables can be [declared](#Declaration) at the top of a [class](#Class) (or, more specifically, at any place in the class outside of any code block), which makes them a field (available anywhere within the class), or within a code block like an [anonymous function](#Anonymous function) (which makes them a local variable, available only within that code block). See: [Variables and data types](07_Variables_and_data_types.md).
+A piece of data of specific [type](#Type), with a specific name. The [value](#Value) of that data can be not only read but also changed dynamically—hence it's "variable". Variables can be [declared](#Declaration) at the top of a [class](#Class) (or, more specifically, at any place in the class outside of any code block), which makes them a field (available anywhere within the class), or within a code block like an [anonymous function](#Anonymous function) (which makes them a local variable, available only within that code block). See: [Variables and data types](07_Variables_and_data_types.md).
 
 ### Vector
 
 In very simple terms, a vector is a line that points from one point in space to another point in space. In ZScript vectors are often used to express position and velocity of [actors](#Actor). The game's world has a point of origin with XYZ coordinates of (0, 0, 0), and every actor's position is offset from that point. Similarly, velocity is directed somewhere along those XYZ axes.
 
-In ZScript most vectors are either 2-dimensional (only have X and Y components) or 3-dimensional (X, Y and Z).
+In ZScript most vectors are either 2-dimensional (only have X and Y components) or 3-dimensional (X, Y and Z), however a 4-dimensional vector (`Vector4`) also exists (it has X, Y, Z and W components).
 
 ### Virtual function
 
